@@ -31,3 +31,15 @@ class BackendError(OdecastError):
     """Raised when a backend-specific error occurs."""
 
     pass
+
+
+class OverdeterminedConditionsError(OdecastError):
+    """Raised when too many initial/boundary conditions are provided."""
+
+    pass
+
+
+class NonSolvableFormError(OdecastError):
+    """Raised when the equation cannot be solved in the required form."""
+
+    pass
