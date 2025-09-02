@@ -1,4 +1,3 @@
-# Odecast
 
 # <img src="https://github.com/maroba/odecast/raw/main/docs/odecast-logo.png" alt="Odecast Logo" width="120" align="left" />
 
