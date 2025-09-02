@@ -47,9 +47,14 @@ def test_solve_placeholder():
     y = var("y")
     eq = Eq(y.d(2) + y, 0)
 
-    # SymPy backend should raise NotImplementedError (Playbook 7)
-    with pytest.raises(NotImplementedError, match="SymPy backend"):
-        solve(eq, backend="sympy")
+    # SymPy backend should now work (Playbook 7 implemented)
+    sol = solve(eq, backend="sympy")
+    assert hasattr(sol, "as_expr")
+    expr = sol.as_expr(y)
+    # Should be a SymPy expression
+    import sympy as sp
+
+    assert isinstance(expr, sp.Expr)
 
     # BVP backend should raise NotImplementedError (Milestone 5)
     with pytest.raises(NotImplementedError, match="BVP backend"):

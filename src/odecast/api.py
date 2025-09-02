@@ -58,6 +58,20 @@ def solve(equation, *, ivp=None, bvp=None, tspan=None, backend=None, **kwargs):
     if backend is None:
         backend = "scipy"  # Default to scipy for IVP
 
+    if backend == "auto":
+        # Try SymPy first, fall back to SciPy on failure
+        try:
+            from .backends.sympy_backend import SymPyBackend
+
+            backend_instance = SymPyBackend()
+            solution = backend_instance.solve(
+                equations=eqs, t_symbol=t.symbol, **kwargs
+            )
+            return solution
+        except Exception:
+            # Fall back to SciPy backend
+            backend = "scipy"
+
     if backend == "scipy":
         if ivp is None:
             raise ValueError("IVP conditions required for scipy backend")
@@ -101,7 +115,14 @@ def solve(equation, *, ivp=None, bvp=None, tspan=None, backend=None, **kwargs):
         return solution
 
     elif backend == "sympy":
-        raise NotImplementedError("SymPy backend will be implemented in Playbook 7")
+        # SymPy backend for symbolic solutions
+        from .backends.sympy_backend import SymPyBackend
+
+        # Create SymPy backend instance
+        backend_instance = SymPyBackend()
+        solution = backend_instance.solve(equations=eqs, t_symbol=t.symbol, **kwargs)
+
+        return solution
 
     elif backend == "scipy_bvp":
         raise NotImplementedError("BVP backend will be implemented in Milestone 5")
