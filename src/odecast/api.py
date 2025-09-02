@@ -7,7 +7,9 @@ from .symbols import t, Variable
 from .equation import Eq
 
 
-def var(name: str, order: Optional[int] = None) -> Variable:
+def var(
+    name: str, order: Optional[int] = None, shape: Optional[tuple] = None
+) -> Variable:
     """
     Create a dependent variable for use in differential equations.
 
@@ -19,24 +21,33 @@ def var(name: str, order: Optional[int] = None) -> Variable:
         order: Maximum order of derivatives expected (optional, for validation).
                If specified and equations use higher-order derivatives, an
                OrderMismatchError will be raised.
+        shape: Shape tuple for vector/matrix variables (e.g., (3,) for 3D vector,
+               (2, 2) for 2x2 matrix). None for scalar variables.
 
     Returns:
         Variable object that supports:
         - Arithmetic operations: y + z, 2*y, y/3, etc.
         - Derivative notation: y.d() for y', y.d(2) for y'', etc.
         - Use in equations: Eq(y.d(2) + y, 0)
+        - Component access for vectors: u[0], u[1] for vector components
+        - Vectorized operations: u.d() + 2*u for vector equations
 
     Examples:
-        >>> y = var("y")           # Create variable y(t)
+        >>> y = var("y")           # Create scalar variable y(t)
         >>> y.d()                  # First derivative y'(t)
         >>> y.d(2)                 # Second derivative y''(t)
         >>> Eq(y.d(2) + y, 0)     # Simple harmonic oscillator
+
+        >>> u = var("u", shape=(2,))  # Create 2D vector variable u(t)
+        >>> u[0]                      # First component u[0](t)
+        >>> u.d()                     # Vector derivative u'(t)
+        >>> Eq(u.d() + u, 0)         # Vector equation u' + u = 0
 
         >>> z = var("z", order=1)  # Declare z as first-order only
         >>> Eq(z.d() - z, 0)       # Valid: uses only first derivative
         >>> Eq(z.d(2) + z, 0)      # Would raise OrderMismatchError
     """
-    return Variable(name, order)
+    return Variable(name, order, shape)
 
 
 def solve(equation, *, ivp=None, bvp=None, tspan=None, backend=None, **kwargs):
@@ -99,10 +110,14 @@ def solve(equation, *, ivp=None, bvp=None, tspan=None, backend=None, **kwargs):
     from .reduce import build_state_map, isolate_highest_derivatives, make_rhs
     from .compile import lambdify_rhs, lambdify_jac
     from .backends.scipy_ivp import ScipyIVPBackend, convert_ivp_to_state_vector
+    from .equation import expand_vector_equations
     import sympy as sp
 
     # Normalize equations to list
     eqs = [equation] if isinstance(equation, Eq) else list(equation)
+
+    # Expand vector equations to component equations
+    eqs = expand_vector_equations(eqs)
 
     # Step 1: Analyze - infer orders and resolve
     variables = collect_variables(eqs)

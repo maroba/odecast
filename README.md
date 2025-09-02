@@ -1,6 +1,6 @@
 # Odecast
 
-A clean, ergonomic DSL for solving ordinary differential equations with symbolic and numeric backends.
+A Python library for solving higher-order ordinary differential equations (ODEs) without manual reduction. Write equations in natural mathematical form (e.g. `y.d(2) + 0.3*y.d() + y = 0`) and let odecast handle order inference, validation, conversion to first-order systems, and solving via SymPy (symbolic) or SciPy (numeric).
 
 ## Features
 
@@ -96,7 +96,7 @@ This project follows a test-driven development approach. All functionality is de
 
 ### Development Setup
 ```bash
-git clone https://github.com/your-username/odecast.git
+git clone https://github.com/maroba/odecast.git
 cd odecast
 pip install -e ".[dev]"
 ```

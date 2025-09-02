@@ -51,7 +51,9 @@ class TestNormalizeIVP:
         """Test that invalid key types raise TypeError."""
         ivp = {"invalid": 1.0}
 
-        with pytest.raises(TypeError, match="IVP key must be Variable or Derivative"):
+        with pytest.raises(
+            TypeError, match="IVP key must be Variable, Derivative, or VectorDerivative"
+        ):
             normalize_ivp(ivp)
 
 

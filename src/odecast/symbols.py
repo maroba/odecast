@@ -2,8 +2,9 @@
 Symbolic variables and the distinguished independent variable t
 """
 
-from typing import Optional, Union, Any
+from typing import Optional, Union, Any, Tuple
 import sympy as sp
+import numpy as np
 
 
 class Expression:
@@ -102,31 +103,73 @@ class IndependentVariable:
 class Variable:
     """
     A dependent variable that can appear in differential equations.
+
+    Can be scalar (default) or vector/matrix-valued by specifying shape.
     """
 
-    def __init__(self, name: str, order: Optional[int] = None):
+    def __init__(
+        self,
+        name: str,
+        order: Optional[int] = None,
+        shape: Optional[Union[int, Tuple[int, ...]]] = None,
+    ):
         self.name = name
         self.intent_order = order  # Use intent_order as specified in Playbook 2
         self._derivatives = {}
+        self._component_cache = {}  # Cache component variables for consistency
+
+        # Handle shape parameter
+        if shape is None:
+            self.shape = None  # Scalar variable
+        elif isinstance(shape, int):
+            self.shape = (shape,)  # Vector variable
+        else:
+            self.shape = tuple(shape)  # Matrix/tensor variable
 
     @property
     def order(self) -> Optional[int]:
         """Backward compatibility property."""
         return self.intent_order
 
-    def d(self, n: int = 1) -> "Derivative":
+    def __bool__(self):
+        """Variable always evaluates to True in boolean context."""
+        return True
+
+    def __len__(self):
+        """Return length for vector variables."""
+        if self.shape is None:
+            raise TypeError(f"Scalar variable '{self.name}' has no length")
+        return self.shape[0]
+
+    def __getitem__(self, index):
+        """Component access for vector/matrix variables."""
+        if self.shape is None:
+            raise TypeError(f"Scalar variable '{self.name}' does not support indexing")
+
+        # Use cache to ensure same ComponentVariable objects
+        if index not in self._component_cache:
+            self._component_cache[index] = ComponentVariable(self, index)
+
+        return self._component_cache[index]
+
+    def d(
+        self, order: int = 1
+    ) -> Union["Derivative", "Expression", "VectorDerivative"]:
         """
-        Return the nth derivative of this variable.
+        Create a derivative of this variable.
 
         Args:
-            n: Order of derivative (default 1)
+            order: Order of the derivative (default 1)
 
         Returns:
-            Derivative object that can be used in equations
+            Derivative, Expression for higher orders, or VectorDerivative for vectors
         """
-        if n not in self._derivatives:
-            self._derivatives[n] = Derivative(self, n)
-        return self._derivatives[n]
+        if self.shape is not None:
+            # Vector/matrix variable - return VectorDerivative
+            return VectorDerivative(self, order)
+        else:
+            # Scalar variable - return Derivative directly for any order
+            return Derivative(self, order)
 
     def __repr__(self):
         return self.name
@@ -165,6 +208,166 @@ class Variable:
         return Expression("/", other, self)
 
 
+class ComponentVariable(Variable):
+    """
+    Represents a component of a vector/matrix variable (e.g., u[0]).
+    Behaves like a scalar variable for most purposes.
+    """
+
+    def __init__(self, parent: Variable, index: Union[int, Tuple[int, ...]]):
+        self.parent = parent
+        self.index = index
+
+        # Generate component name
+        if isinstance(index, int):
+            component_name = f"{parent.name}[{index}]"
+        else:
+            index_str = ",".join(str(i) for i in index)
+            component_name = f"{parent.name}[{index_str}]"
+
+        # Initialize as scalar variable
+        super().__init__(component_name, parent.intent_order, shape=None)
+
+    def d(self, order: int = 1) -> "Derivative":
+        """Override to use scalar derivative logic."""
+        return Derivative(self, order)
+
+    def __bool__(self):
+        """ComponentVariable always evaluates to True."""
+        return True
+
+    def __repr__(self):
+        return self.name
+
+    def sympy(self):
+        """Convert to SymPy expression."""
+        return sp.Function(self.name)(t.symbol)
+
+
+class VectorDerivative:
+    """
+    Represents the derivative of a vector variable.
+    Supports component access like u.d()[0] and vectorized operations.
+    """
+
+    def __init__(self, variable: Variable, order: int):
+        self.variable = variable
+        self.order = order
+        self._component_derivatives = {}
+
+    def __getitem__(self, index):
+        """Access derivative of a specific component."""
+        if index not in self._component_derivatives:
+            component = self.variable[index]  # Get ComponentVariable
+            self._component_derivatives[index] = component.d(self.order)
+        return self._component_derivatives[index]
+
+    def __repr__(self):
+        if self.order == 1:
+            return f"{self.variable.name}'"
+        else:
+            return f"{self.variable.name}^({self.order})"
+
+    def sympy(self):
+        """Convert to SymPy expression."""
+        # For now, vectorized operations not supported in SymPy mode
+        # This should ideally expand to component derivatives
+        raise NotImplementedError(
+            "VectorDerivative SymPy conversion requires expanding to component derivatives"
+        )
+
+    # Arithmetic operations for vectorized operations
+    def __add__(self, other):
+        return VectorExpression("+", self, other)
+
+    def __radd__(self, other):
+        return VectorExpression("+", other, self)
+
+    def __sub__(self, other):
+        return VectorExpression("-", self, other)
+
+    def __rsub__(self, other):
+        return VectorExpression("-", other, self)
+
+    def __mul__(self, other):
+        return VectorExpression("*", self, other)
+
+    def __rmul__(self, other):
+        return VectorExpression("*", other, self)
+
+
+class VectorExpression:
+    """
+    Represents arithmetic expressions involving vector variables.
+    Will be expanded to component equations internally.
+    """
+
+    def __init__(self, operator: str, left, right):
+        self.operator = operator
+        self.left = left
+        self.right = right
+
+    def __repr__(self):
+        return f"({self.left} {self.operator} {self.right})"
+
+    def sympy(self):
+        """Convert to SymPy expression."""
+        # Vector expressions need to be expanded to component equations
+        # For now, raise error to indicate this needs special handling
+        raise NotImplementedError(
+            "VectorExpression SymPy conversion requires expanding to component equations"
+        )
+
+    def expand_to_components(self, shape):
+        """Expand vector expression to component equations."""
+        component_exprs = []
+
+        for i in range(shape[0]):  # Handle 1D vectors for now
+            left_comp = self._get_component(self.left, i)
+            right_comp = self._get_component(self.right, i)
+
+            if self.operator == "+":
+                component_exprs.append(left_comp + right_comp)
+            elif self.operator == "-":
+                component_exprs.append(left_comp - right_comp)
+            elif self.operator == "*":
+                component_exprs.append(left_comp * right_comp)
+            else:
+                raise NotImplementedError(
+                    f"Vector operator {self.operator} not implemented"
+                )
+
+        return component_exprs
+
+    def _get_component(self, expr, index):
+        """Get component of an expression."""
+        if isinstance(expr, Variable) and expr.shape is not None:
+            return expr[index]
+        elif isinstance(expr, VectorDerivative):
+            return expr[index]
+        elif isinstance(expr, VectorExpression):
+            return expr._get_component_recursive(index)
+        else:
+            # Scalar or constant - same for all components
+            return expr
+
+    def _get_component_recursive(self, index):
+        """Recursively get component for nested vector expressions."""
+        left_comp = self._get_component(self.left, index)
+        right_comp = self._get_component(self.right, index)
+
+        if self.operator == "+":
+            return left_comp + right_comp
+        elif self.operator == "-":
+            return left_comp - right_comp
+        elif self.operator == "*":
+            return left_comp * right_comp
+        else:
+            raise NotImplementedError(
+                f"Vector operator {self.operator} not implemented"
+            )
+
+
 class Derivative:
     """
     Represents a derivative of a variable.
@@ -188,10 +391,6 @@ class Derivative:
         """
         func = sp.Function(self.variable.name)(t.symbol)
         return sp.Derivative(func, t.symbol, self.order)
-
-    def d(self, n: int = 1) -> "Derivative":
-        """Get higher derivatives."""
-        return self.variable.d(self.order + n)
 
     def __hash__(self):
         """Hash by variable identity and order."""
@@ -263,12 +462,19 @@ def as_sympy(expr) -> sp.Expr:
         return sp.sympify(expr)
     elif isinstance(expr, sp.Basic):
         return expr
+    elif isinstance(expr, ComponentVariable):
+        return expr.sympy()
     elif isinstance(expr, Variable):
         return sp.Function(expr.name)(t.symbol)
     elif isinstance(expr, Derivative):
         return expr.sympy()
     elif isinstance(expr, Expression):
         return expr.sympy()
+    elif isinstance(expr, (VectorExpression, VectorDerivative)):
+        # Vector operations need special handling
+        raise NotImplementedError(
+            f"SymPy conversion for {type(expr).__name__} requires component expansion"
+        )
     elif hasattr(expr, "sympy"):  # Custom expression types
         return expr.sympy()
     else:

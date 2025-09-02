@@ -3,7 +3,7 @@ Validation functions for ODEs and initial/boundary conditions
 """
 
 from typing import Dict, Union, Tuple, List
-from .symbols import Variable, Derivative
+from .symbols import Variable, Derivative, VectorDerivative
 from .equation import Eq
 from .errors import (
     MissingInitialConditionError,
@@ -19,22 +19,48 @@ def normalize_ivp(
     Normalize IVP dictionary to use (Variable, level) keys.
 
     Args:
-        ivp_dict: Dictionary with Variable (level 0) or Derivative (level n≥1) keys
+        ivp_dict: Dictionary with Variable (level 0), Derivative (level n≥1),
+                 or VectorDerivative keys, with values that can be floats or lists
 
     Returns:
-        Dictionary with (Variable, level) keys
+        Dictionary with (Variable, level) keys for all components
     """
     normalized = {}
 
     for key, value in ivp_dict.items():
         if isinstance(key, Variable):
-            # Variable itself is level 0
-            normalized[(key, 0)] = value
+            if key.shape is not None:
+                # Vector variable - expand to components
+                if not isinstance(value, (list, tuple)):
+                    raise ValueError(
+                        f"Vector variable {key.name} requires list/tuple initial condition, got {type(value)}"
+                    )
+
+                for i, comp_value in enumerate(value):
+                    component_var = key[i]  # Get ComponentVariable
+                    normalized[(component_var, 0)] = comp_value
+            else:
+                # Scalar variable - level 0
+                normalized[(key, 0)] = value
+
         elif isinstance(key, Derivative):
             # Derivative has specified level
             normalized[(key.variable, key.order)] = value
+
+        elif isinstance(key, VectorDerivative):
+            # Vector derivative - expand to component derivatives
+            if not isinstance(value, (list, tuple)):
+                raise ValueError(
+                    f"Vector derivative requires list/tuple initial condition, got {type(value)}"
+                )
+
+            for i, comp_value in enumerate(value):
+                component_var = key.variable[i]  # Get ComponentVariable
+                normalized[(component_var, key.order)] = comp_value
         else:
-            raise TypeError(f"IVP key must be Variable or Derivative, got {type(key)}")
+            raise TypeError(
+                f"IVP key must be Variable, Derivative, or VectorDerivative, got {type(key)}"
+            )
 
     return normalized
 
