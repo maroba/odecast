@@ -180,6 +180,14 @@ def solve(equation, *, ivp=None, bvp=None, tspan=None, backend=None, **kwargs):
         return solution
 
     elif backend == "scipy_bvp":
+        # Import BVP backend
+        from .backends.scipy_bvp import ScipyBVPBackend
+
+        # Create BVP backend instance
+        backend_instance = ScipyBVPBackend()
+
+        # For now, just raise NotImplementedError as the actual implementation
+        # will come in Milestone 5
         raise NotImplementedError("BVP backend will be implemented in Milestone 5")
 
     else:
