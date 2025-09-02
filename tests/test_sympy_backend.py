@@ -86,14 +86,14 @@ class TestSymPyBackend:
         assert ode_check == 0
 
     def test_multiple_equations_raises_error(self):
-        """Test that multiple equations raise an error."""
+        """Test that coupled equations raise an error."""
         backend = SymPyBackend()
         y = var("y")
         z = var("z")
         eq1 = Eq(y.d(2) + y, 0)
         eq2 = Eq(z.d() - y, 0)
 
-        with pytest.raises(BackendError, match="only supports single equations"):
+        with pytest.raises(BackendError, match="only supports decoupled systems"):
             backend.solve([eq1, eq2], t.symbol)
 
     def test_multiple_variables_raises_error(self):
@@ -218,6 +218,6 @@ class TestSymPyErrorHandling:
         eq1 = Eq(y.d() + z, 0)
         eq2 = Eq(z.d() - y, 0)
 
-        # Should raise BackendError due to multiple equations
-        with pytest.raises(BackendError, match="only supports single equations"):
+        # Should raise BackendError due to coupled equations
+        with pytest.raises(BackendError, match="only supports decoupled systems"):
             solve([eq1, eq2], backend="sympy")

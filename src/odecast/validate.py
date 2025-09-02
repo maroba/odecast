@@ -115,21 +115,32 @@ def validate_ivp(
                 f"Variable has order {order} and requires conditions for {level_desc}."
             )
 
-        # Check for extra conditions
+        # Check for extra conditions - but be lenient with vector derivatives
         extra_levels = provided_levels - required_levels
         if extra_levels:
-            if order == 0:
-                level_desc = "no conditions"
-            elif order == 1:
-                level_desc = "level 0 only"
+            # Check if this might be from vector derivative expansion
+            # In that case, we can just ignore the extra conditions
+            from .symbols import VectorDerivative
+            has_vector_derivative = any(isinstance(key, VectorDerivative) for key in ivp.keys())
+            
+            if has_vector_derivative:
+                # Filter out the extra conditions silently - they came from vector derivative expansion
+                # where some components don't need as high an order
+                continue
             else:
-                level_desc = f"levels 0 to {order-1} only"
+                # Strict validation for non-vector cases
+                if order == 0:
+                    level_desc = "no conditions"
+                elif order == 1:
+                    level_desc = "level 0 only"
+                else:
+                    level_desc = f"levels 0 to {order-1} only"
 
-            raise OverdeterminedConditionsError(
-                f"Too many initial conditions for variable {var.name}. "
-                f"Variable has order {order} and needs {level_desc}, "
-                f"but got conditions for levels {sorted(provided_levels)}."
-            )
+                raise OverdeterminedConditionsError(
+                    f"Too many initial conditions for variable {var.name}. "
+                    f"Variable has order {order} and needs {level_desc}, "
+                    f"but got conditions for levels {sorted(provided_levels)}."
+                )
 
 
 def validate_variable_orders(

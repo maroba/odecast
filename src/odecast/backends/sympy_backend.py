@@ -66,43 +66,68 @@ class SymPyBackend:
             BackendError: If SymPy cannot solve the system
         """
         try:
-            # For now, only handle single equations
-            if len(equations) != 1:
-                raise BackendError(
-                    f"SymPy backend currently only supports single equations, "
-                    f"got {len(equations)} equations"
-                )
-
-            eq = equations[0]
-
-            # Convert equation to SymPy form
-            sympy_eq = eq.sympy()
-
-            # Extract the variables from the equation
+            # Extract all variables from all equations
             from ..analyze import collect_variables
 
-            variables = collect_variables([eq])
+            variables = collect_variables(equations)
 
-            if len(variables) != 1:
-                raise BackendError(
-                    f"SymPy backend currently only supports single-variable equations, "
-                    f"got variables: {[v.name for v in variables]}"
-                )
+            # Handle single equation case
+            if len(equations) == 1:
+                eq = equations[0]
+                sympy_eq = eq.sympy()
 
-            var = list(variables)[0]
+                if len(variables) != 1:
+                    raise BackendError(
+                        f"SymPy backend currently only supports single-variable equations, "
+                        f"got variables: {[v.name for v in variables]}"
+                    )
 
-            # Create SymPy function for the variable
-            y_func = sp.Function(var.name)(t_symbol)
+                var = list(variables)[0]
+                y_func = sp.Function(var.name)(t_symbol)
+                solution_expr = sp.dsolve(sympy_eq, y_func)
 
-            # Use SymPy's dsolve to solve the ODE
-            solution_expr = sp.dsolve(sympy_eq, y_func)
+                if isinstance(solution_expr, sp.Eq):
+                    solution_expr = solution_expr.rhs
 
-            # Extract the right-hand side if it's an equation
-            if isinstance(solution_expr, sp.Eq):
-                solution_expr = solution_expr.rhs
+                solutions = {var: solution_expr}
 
-            # Store the solution
-            solutions = {var: solution_expr}
+            # Handle multiple equations - try to solve each independently if they're decoupled
+            else:
+                solutions = {}
+                
+                # Group equations by variables to see if they're decoupled
+                var_to_eqs = {}
+                for eq in equations:
+                    eq_vars = collect_variables([eq])
+                    if len(eq_vars) == 1:
+                        var = list(eq_vars)[0]
+                        if var not in var_to_eqs:
+                            var_to_eqs[var] = []
+                        var_to_eqs[var].append(eq)
+                    else:
+                        # Coupled system - not supported yet
+                        raise BackendError(
+                            f"SymPy backend currently only supports decoupled systems, "
+                            f"but equation {eq} involves variables: {[v.name for v in eq_vars]}"
+                        )
+
+                # Solve each variable's equation(s) independently
+                for var, var_eqs in var_to_eqs.items():
+                    if len(var_eqs) != 1:
+                        raise BackendError(
+                            f"Variable {var.name} appears in {len(var_eqs)} equations, "
+                            f"but SymPy backend expects exactly one equation per variable"
+                        )
+                    
+                    eq = var_eqs[0]
+                    sympy_eq = eq.sympy()
+                    y_func = sp.Function(var.name)(t_symbol)
+                    solution_expr = sp.dsolve(sympy_eq, y_func)
+
+                    if isinstance(solution_expr, sp.Eq):
+                        solution_expr = solution_expr.rhs
+
+                    solutions[var] = solution_expr
 
             return SolutionExpr(solutions, t_symbol)
 

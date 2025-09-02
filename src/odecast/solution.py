@@ -53,12 +53,28 @@ class SolutionIVP:
             Array of solution values at all time points
         """
         if isinstance(target, Variable):
-            # Variable itself is the 0th derivative
-            if (target, 0) in self.mapping:
-                state_index = self.mapping[(target, 0)]
-                return self.y[state_index, :]
+            # Check if it's a vector variable
+            if target.shape is not None:
+                # Vector variable - return 2D array with component values
+                n_components = target.shape[0] if isinstance(target.shape, tuple) else target.shape
+                component_arrays = []
+                
+                for i in range(n_components):
+                    component_var = target[i]
+                    if (component_var, 0) in self.mapping:
+                        state_index = self.mapping[(component_var, 0)]
+                        component_arrays.append(self.y[state_index, :])
+                    else:
+                        raise KeyError(f"Component {component_var.name} not found in solution")
+                
+                return np.vstack(component_arrays)
             else:
-                raise KeyError(f"Variable {target.name} not found in solution")
+                # Scalar variable - variable itself is the 0th derivative
+                if (target, 0) in self.mapping:
+                    state_index = self.mapping[(target, 0)]
+                    return self.y[state_index, :]
+                else:
+                    raise KeyError(f"Variable {target.name} not found in solution")
 
         elif isinstance(target, Derivative):
             # Derivative of specified order

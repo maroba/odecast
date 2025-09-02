@@ -93,6 +93,12 @@ def convert_ivp_to_state_vector(
     Returns:
         Initial state vector x0
     """
+    # Import here to avoid circular import
+    from ..validate import normalize_ivp
+    
+    # Normalize the IVP dictionary to handle vector variables
+    normalized_ivp = normalize_ivp(ivp_dict)
+    
     # Determine the size of the state vector
     max_index = 0
     for key, value in mapping.items():
@@ -105,27 +111,14 @@ def convert_ivp_to_state_vector(
     n_states = max_index + 1
     x0 = np.zeros(n_states)
 
-    # Fill in the initial conditions
-    for key, value in ivp_dict.items():
-        if isinstance(key, Variable):
-            # Variable itself (0th derivative)
-            if (key, 0) in mapping:
-                state_index = mapping[(key, 0)]
-                x0[state_index] = value
-            else:
-                raise ValueError(f"Variable {key.name} not found in state mapping")
-
-        elif isinstance(key, Derivative):
-            # Derivative of specified order
-            if (key.variable, key.order) in mapping:
-                state_index = mapping[(key.variable, key.order)]
-                x0[state_index] = value
-            else:
-                raise ValueError(
-                    f"Derivative {key.variable.name}^({key.order}) not found in state mapping"
-                )
-        else:
-            raise TypeError(f"IVP key must be Variable or Derivative, got {type(key)}")
+    # Fill in the initial conditions using normalized format
+    for (var, level), value in normalized_ivp.items():
+        if (var, level) in mapping:
+            state_index = mapping[(var, level)]
+            x0[state_index] = value
+        # else: silently ignore conditions that aren't needed
+        # This happens when vector derivatives are provided but some 
+        # components don't need that level of derivative
 
     return x0
 
