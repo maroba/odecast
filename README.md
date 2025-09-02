@@ -1,5 +1,14 @@
 # Odecast
 
+# <img src="https://github.com/maroba/odecast/raw/main/docs/odecast-logo.png" alt="Odecast Logo" width="120" align="left" />
+
+# Odecast
+
+[![PyPI version](https://img.shields.io/pypi/v/odecast.svg)](https://pypi.org/project/odecast/)
+[![License](https://img.shields.io/github/license/maroba/odecast)](https://github.com/maroba/odecast/blob/main/LICENSE)
+[![Tests](https://github.com/maroba/odecast/actions/workflows/test.yml/badge.svg)](https://github.com/maroba/odecast/actions)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+
 A Python library for solving higher-order ordinary differential equations (ODEs) without manual reduction. Write equations in natural mathematical form (e.g. `y.d(2) + 0.3*y.d() + y = 0`) and let odecast handle order inference, validation, conversion to first-order systems, and solving via SymPy (symbolic) or SciPy (numeric).
 
 ## Features
