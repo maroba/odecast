@@ -21,8 +21,10 @@ class TestBuildStateMap:
         mapping = build_state_map(orders)
 
         # Should have mappings for y: [0, 1], (y, 0): 0, (y, 1): 1
-        assert mapping[y] == [0, 1]
-        assert mapping[(y, 0)] == 0
+        assert list(mapping[y]) == [0, 1]  # VariableIndexer should iterate as [0, 1]
+        assert mapping[y][0] == 0  # Should support indexing
+        assert mapping[y][1] == 1
+        assert mapping[(y, 0)] == 0  # Should support tuple access
         assert mapping[(y, 1)] == 1
 
     def test_single_variable_third_order(self):
@@ -32,7 +34,10 @@ class TestBuildStateMap:
 
         mapping = build_state_map(orders)
 
-        assert mapping[z] == [0, 1, 2]
+        assert list(mapping[z]) == [0, 1, 2]
+        assert mapping[z][0] == 0
+        assert mapping[z][1] == 1
+        assert mapping[z][2] == 2
         assert mapping[(z, 0)] == 0
         assert mapping[(z, 1)] == 1
         assert mapping[(z, 2)] == 2
@@ -46,8 +51,11 @@ class TestBuildStateMap:
         mapping = build_state_map(orders)
 
         # y gets indices 0, 1 and z gets index 2
-        assert mapping[y] == [0, 1]
-        assert mapping[z] == [2]
+        assert list(mapping[y]) == [0, 1]
+        assert mapping[y][0] == 0
+        assert mapping[y][1] == 1
+        assert list(mapping[z]) == [2]
+        assert mapping[z][0] == 2
         assert mapping[(y, 0)] == 0
         assert mapping[(y, 1)] == 1
         assert mapping[(z, 0)] == 2
@@ -60,7 +68,9 @@ class TestBuildStateMap:
         mapping = build_state_map(orders)
 
         # Zero-order variable should have empty list
-        assert mapping[y] == []
+        assert list(mapping[y]) == []
+        # But should still be accessible via tuple notation if there were any entries
+        # (there aren't any in this case)
         # No (y, level) mappings should exist
 
 
@@ -211,7 +221,9 @@ class TestIntegration:
         # Step 2: Build state mapping
         mapping = build_state_map(orders)
 
-        assert mapping[y] == [0, 1]
+        assert list(mapping[y]) == [0, 1]
+        assert mapping[y][0] == 0
+        assert mapping[y][1] == 1
         assert mapping[(y, 0)] == 0
         assert mapping[(y, 1)] == 1
 

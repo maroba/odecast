@@ -1,5 +1,5 @@
 """
-Main API functions for odecast
+Main APIs for odecast
 """
 
 from typing import Dict, Any, Optional, Union, List
@@ -9,35 +9,90 @@ from .equation import Eq
 
 def var(name: str, order: Optional[int] = None) -> Variable:
     """
-    Factory function for creating variables.
+    Create a dependent variable for use in differential equations.
+
+    The variable represents an unknown function y(t) where t is the independent variable.
+    You can create derivatives using the .d(n) method.
 
     Args:
-        name: Name of the variable
-        order: Maximum order of derivatives expected (for validation)
+        name: Name of the variable (e.g., "y", "x", "theta")
+        order: Maximum order of derivatives expected (optional, for validation).
+               If specified and equations use higher-order derivatives, an
+               OrderMismatchError will be raised.
 
     Returns:
-        Variable object that supports .d(n) for derivatives
+        Variable object that supports:
+        - Arithmetic operations: y + z, 2*y, y/3, etc.
+        - Derivative notation: y.d() for y', y.d(2) for y'', etc.
+        - Use in equations: Eq(y.d(2) + y, 0)
+
+    Examples:
+        >>> y = var("y")           # Create variable y(t)
+        >>> y.d()                  # First derivative y'(t)
+        >>> y.d(2)                 # Second derivative y''(t)
+        >>> Eq(y.d(2) + y, 0)     # Simple harmonic oscillator
+
+        >>> z = var("z", order=1)  # Declare z as first-order only
+        >>> Eq(z.d() - z, 0)       # Valid: uses only first derivative
+        >>> Eq(z.d(2) + z, 0)      # Would raise OrderMismatchError
     """
     return Variable(name, order)
 
 
 def solve(equation, *, ivp=None, bvp=None, tspan=None, backend=None, **kwargs):
     """
-    Solve an ordinary differential equation.
+    Solve an ordinary differential equation or system of ODEs.
+
+    This is the main entry point for solving differential equations. It supports
+    both symbolic and numeric solutions through different backends.
 
     Args:
-        equation: An Eq object representing the ODE
-        ivp: Dictionary of initial conditions for IVP
-        bvp: List of boundary conditions for BVP
-        tspan: Tuple of (t_start, t_end) for the solution domain
-        backend: Backend to use ('scipy', 'sympy', 'scipy_bvp')
-        **kwargs: Additional backend-specific options
+        equation: Single Eq object or list of Eq objects representing the ODE system
+        ivp: Dictionary of initial conditions for initial value problems (IVP).
+             Keys can be Variable objects (for y(t0)) or Derivative objects (for y'(t0)).
+             Example: {y: 1.0, y.d(): 0.0} for y(0)=1, y'(0)=0
+        bvp: List of boundary conditions for boundary value problems (BVP).
+             Currently not implemented - will be available in future versions.
+        tspan: Tuple of (t_start, t_end) for numeric solutions.
+               Required for scipy backend, ignored for sympy backend.
+        backend: Solution backend to use:
+                 - "scipy": Numeric integration using SciPy (default)
+                 - "sympy": Symbolic solution using SymPy
+                 - "auto": Try SymPy first, fall back to SciPy if needed
+                 - "scipy_bvp": BVP solver (not yet implemented)
+        **kwargs: Additional backend-specific options:
+                  For scipy: method, rtol, atol, max_step, etc.
 
     Returns:
-        Solution object with methods to access results
+        Solution object that depends on the backend:
+        - SolutionIVP: For numeric solutions, supports sol[y], sol[y.d()], etc.
+        - SolutionExpr: For symbolic solutions, supports sol.as_expr(y)
 
     Raises:
-        NotImplementedError: Symbolic and BVP backends not yet implemented
+        MissingInitialConditionError: When required initial conditions are missing
+        OverdeterminedConditionsError: When too many initial conditions provided
+        OrderMismatchError: When declared variable order conflicts with equation usage
+        BackendError: When the chosen backend cannot solve the equation
+        ValueError: When required arguments are missing (e.g., tspan for scipy)
+
+    Examples:
+        Numeric solution of second-order ODE:
+        >>> y = var("y")
+        >>> eq = Eq(y.d(2) + 0.3*y.d() + y, 0)
+        >>> sol = solve(eq, ivp={y: 1.0, y.d(): 0.0}, tspan=(0, 10))
+        >>> y_values = sol[y]         # Get y(t) values
+        >>> yprime_values = sol[y.d()] # Get y'(t) values
+
+        Symbolic solution:
+        >>> eq = Eq(y.d(2) + y, 0)
+        >>> sol = solve(eq, backend="sympy")
+        >>> expr = sol.as_expr(y)    # Get SymPy expression
+
+        Coupled system:
+        >>> y, z = var("y"), var("z")
+        >>> eq1 = Eq(y.d(2) + z, 0)
+        >>> eq2 = Eq(z.d() - y, 0)
+        >>> sol = solve([eq1, eq2], ivp={y: 1.0, y.d(): 0.0, z: 0.0}, tspan=(0, 5))
     """
     from .analyze import collect_variables, infer_orders, resolve_orders
     from .validate import validate_ivp
@@ -133,9 +188,29 @@ def solve(equation, *, ivp=None, bvp=None, tspan=None, backend=None, **kwargs):
 
 class BC:
     """
-    Boundary condition for BVP problems.
+    Boundary condition for boundary value problems (BVP).
 
-    This is a placeholder for boundary condition specification.
+    Boundary conditions specify the value of a variable or its derivative
+    at specific points in the domain. This is used for BVP problems where
+    conditions are given at multiple points rather than all at the initial point.
+
+    Args:
+        variable: The variable or derivative to constrain (Variable or Derivative object)
+        t: The time/position where the condition applies
+        value: The required value at that position
+
+    Examples:
+        >>> y = var("y")
+        >>> bc1 = BC(y, t=0, value=0)      # y(0) = 0
+        >>> bc2 = BC(y, t=1, value=1)      # y(1) = 1
+        >>> bc3 = BC(y.d(), t=0, value=0)  # y'(0) = 0
+
+        BVP problem:
+        >>> eq = Eq(y.d(2) + y, 0)
+        >>> sol = solve(eq, bvp=[bc1, bc2], tspan=(0, 1), backend="scipy_bvp")
+
+    Note:
+        BVP solving is not yet implemented and will be available in future versions.
     """
 
     def __init__(self, variable, *, t=None, value=None):
@@ -143,7 +218,7 @@ class BC:
         Create a boundary condition.
 
         Args:
-            variable: The variable to constrain
+            variable: The variable or derivative to constrain
             t: The time/position where condition applies
             value: The value at that position
         """

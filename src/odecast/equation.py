@@ -11,8 +11,25 @@ class Eq:
     """
     Represents an ordinary differential equation.
 
-    This is typically created as Eq(lhs, rhs) where lhs and rhs are
-    expressions involving variables and their derivatives.
+    The Eq class is used to create equations of the form lhs = rhs, where the
+    left and right sides can contain variables, derivatives, and expressions.
+    This mirrors SymPy's Eq class but works with odecast's Variable and Derivative objects.
+
+    Examples:
+        Simple harmonic oscillator:
+        >>> y = var("y")
+        >>> eq = Eq(y.d(2) + y, 0)
+
+        Damped oscillator with forcing:
+        >>> eq = Eq(y.d(2) + 0.3*y.d() + y, sp.sin(t.symbol))
+
+        First-order ODE:
+        >>> eq = Eq(y.d() - 2*y, 0)
+
+        Coupled system:
+        >>> y, z = var("y"), var("z")
+        >>> eq1 = Eq(y.d() - z, 0)
+        >>> eq2 = Eq(z.d() + y, 0)
     """
 
     def __init__(self, lhs, rhs=0):
@@ -20,7 +37,7 @@ class Eq:
         Create an equation lhs = rhs.
 
         Args:
-            lhs: Left-hand side expression
+            lhs: Left-hand side expression (can contain variables, derivatives, constants)
             rhs: Right-hand side expression (default 0)
         """
         self.lhs = lhs

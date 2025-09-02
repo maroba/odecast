@@ -9,9 +9,60 @@ from .equation import Eq
 from .errors import NonSolvableFormError
 
 
+class StateMapping(dict):
+    """
+    Enhanced state mapping that supports both Variable and (Variable, level) access patterns.
+
+    This class ensures that mapping[var][level] == mapping[(var, level)] for consistency
+    across the API as required by Playbook 8.
+    """
+
+    def __getitem__(self, key):
+        if isinstance(key, Variable):
+            # Return a list-like object that supports indexing
+            return VariableIndexer(self, key)
+        else:
+            # Use normal dict access for tuples and other keys
+            return super().__getitem__(key)
+
+
+class VariableIndexer:
+    """
+    Helper class that makes mapping[var][level] equivalent to mapping[(var, level)].
+    """
+
+    def __init__(self, mapping: StateMapping, variable: Variable):
+        self.mapping = mapping
+        self.variable = variable
+
+    def __getitem__(self, level: int) -> int:
+        """Get state index for variable at given derivative level."""
+        return self.mapping[(self.variable, level)]
+
+    def __iter__(self):
+        """Iterate over all derivative levels for this variable."""
+        # Find all levels for this variable
+        levels = []
+        for key in self.mapping.keys():
+            if isinstance(key, tuple) and len(key) == 2 and key[0] is self.variable:
+                levels.append(key[1])
+
+        # Sort and return indices in order
+        for level in sorted(levels):
+            yield self.mapping[(self.variable, level)]
+
+    def __len__(self):
+        """Return number of derivative levels for this variable."""
+        count = 0
+        for key in self.mapping.keys():
+            if isinstance(key, tuple) and len(key) == 2 and key[0] is self.variable:
+                count += 1
+        return count
+
+
 def build_state_map(
     orders: Dict[Variable, int],
-) -> Dict[Union[Variable, tuple], List[int]]:
+) -> StateMapping:
     """
     Build a state mapping for converting higher-order ODEs to first-order systems.
 
@@ -19,25 +70,19 @@ def build_state_map(
         orders: Dictionary mapping each Variable to its maximum derivative order
 
     Returns:
-        Dictionary with mappings:
-        - var: [i0, i1, ..., i_{k-1}] - list of state indices for this variable
-        - (var, 0): i0, (var, 1): i1, ... - individual state index for each derivative level
+        StateMapping with consistent access patterns:
+        - mapping[var][level] returns state index for derivative level
+        - mapping[(var, level)] returns same state index
     """
-    mapping = {}
+    mapping = StateMapping()
     state_index = 0
 
     for var, order in orders.items():
         # For each variable of order k, we need k state variables:
         # x[i0] = y, x[i1] = y', ..., x[i_{k-1}] = y^(k-1)
-        indices = []
-
         for level in range(order):
-            indices.append(state_index)
             mapping[(var, level)] = state_index
             state_index += 1
-
-        # Store the list of indices for this variable
-        mapping[var] = indices
 
     return mapping
 
@@ -261,7 +306,12 @@ def _substitute_derivatives_with_states(
         # Find the corresponding Variable by name
         corresponding_var = None
         for key in mapping.keys():
-            if isinstance(key, Variable) and key.name == func_name:
+            if isinstance(key, tuple) and len(key) == 2:
+                var, order = key
+                if isinstance(var, Variable) and var.name == func_name:
+                    corresponding_var = var
+                    break
+            elif isinstance(key, Variable) and key.name == func_name:
                 corresponding_var = key
                 break
 
@@ -278,7 +328,12 @@ def _substitute_derivatives_with_states(
             # Find corresponding variable
             corresponding_var = None
             for key in mapping.keys():
-                if isinstance(key, Variable) and key.name == func_name:
+                if isinstance(key, tuple) and len(key) == 2:
+                    var, order = key
+                    if isinstance(var, Variable) and var.name == func_name:
+                        corresponding_var = var
+                        break
+                elif isinstance(key, Variable) and key.name == func_name:
                     corresponding_var = key
                     break
 

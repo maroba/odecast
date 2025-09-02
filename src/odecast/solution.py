@@ -16,7 +16,7 @@ class SolutionIVP:
         self,
         t: np.ndarray,
         y: np.ndarray,
-        mapping: Dict[Union[Variable, Tuple[Variable, int]], Union[list, int]],
+        mapping: Any,  # StateMapping from reduce.py
         t0: float,
         f_compiled: Optional[Callable] = None,
         jac_compiled: Optional[Callable] = None,
