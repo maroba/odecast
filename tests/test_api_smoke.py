@@ -41,11 +41,23 @@ def test_basic_equation_creation():
 
 
 def test_solve_placeholder():
-    """Test that solve raises NotImplementedError as expected."""
+    """Test that solve raises appropriate errors for unimplemented backends."""
     from odecast import var, Eq, solve
 
     y = var("y")
     eq = Eq(y.d(2) + y, 0)
 
-    with pytest.raises(NotImplementedError):
-        solve(eq, ivp={y: 1.0, y.d(): 0.0}, tspan=(0, 1), backend="scipy")
+    # SymPy backend should raise NotImplementedError (Playbook 7)
+    with pytest.raises(NotImplementedError, match="SymPy backend"):
+        solve(eq, backend="sympy")
+
+    # BVP backend should raise NotImplementedError (Milestone 5)
+    with pytest.raises(NotImplementedError, match="BVP backend"):
+        solve(eq, backend="scipy_bvp")
+
+    # SciPy backend should require IVP and tspan
+    with pytest.raises(ValueError, match="IVP conditions required"):
+        solve(eq, backend="scipy")
+
+    with pytest.raises(ValueError, match="tspan required"):
+        solve(eq, ivp={y: 1.0, y.d(): 0.0}, backend="scipy")
