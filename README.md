@@ -14,64 +14,6 @@
 
 ---
 
-## 📚 More Examples
-
-Check out the `examples/` directory for complete working examples:
-- 🔢 **Numeric solutions**: `01_ivp_damped_oscillator.py`  
-- 🔣 **Symbolic solutions**: `02_symbolic_simple.py`
-- 🏹 **Vector systems**: `04_vector_harmonic_oscillator.py`
-- 🔗 **Coupled systems**: `05_vector_mixed_system.py`
-
-```bash
-# Run any example
-python examples/01_ivp_damped_oscillator.py
-```
-
-## 🤝 Contributing
-
-Want to make Odecast even better? We'd love your help!
-
-```bash
-git clone https://github.com/maroba/odecast.git
-cd odecast  
-pip install -e ".[dev]"
-pytest  # Run tests
-```
-
-**What we need:**
-- 📖 More examples from your field
-- 🐛 Bug reports and fixes  
-- 🚀 Performance improvements
-- 📝 Documentation improvements
-
-## ⭐ Like what you see?
-
-**Give us a star!** ⭐ It helps others discover Odecast.
-
-**Share it** with colleagues who are tired of manual ODE reduction.
-
-**Follow us** for updates on new features and improvements.
-
----
-
-<div align="center">
-
-**Stop fighting with first-order systems. Start writing math like math.**
-
-[⭐ **Star on GitHub**](https://github.com/maroba/odecast) • [📦 **Install from PyPI**](https://pypi.org/project/odecast/) • [📖 **Read the Docs**](https://github.com/maroba/odecast/tree/main/examples)
-
-*Made with ❤️ for scientists, engineers, and students worldwide.*
-
-</div>s.io/github/license/maroba/odecast)](https://github.com/maroba/odecast/blob/main/LICENSE)
-[![Tests](https://github.com/maroba/odecast/actions/workflows/test.yml/badge.svg)](https://github.com/maroba/odecast/actions)
-[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
-[![Downloads](https://pepy.tech/badge/odecast)](https://pepy.tech/project/odecast)
-
-*Stop wrestling with manual ODE reduction. Write differential equations as they appear in your textbook.*
-
-</div>
-
----
 
 ## 🚫 The Problem
 
@@ -348,3 +290,64 @@ Current implementation status:
 ## License
 
 MIT License - see LICENSE file for details.
+
+## 📚 More Examples
+
+Check out the `examples/` directory for complete working examples:
+- 🔢 **Numeric solutions**: `01_ivp_damped_oscillator.py`  
+- 🔣 **Symbolic solutions**: `02_symbolic_simple.py`
+- 🏹 **Vector systems**: `04_vector_harmonic_oscillator.py`
+- 🔗 **Coupled systems**: `05_vector_mixed_system.py`
+
+```bash
+# Run any example
+python examples/01_ivp_damped_oscillator.py
+```
+
+## ⭐ Like what you see?
+
+**Give us a star!** ⭐ It helps others discover Odecast.
+
+**Share it** with colleagues who are tired of manual ODE reduction.
+
+**Follow us** for updates on new features and improvements.
+
+---
+
+<div align="center">
+
+**Stop fighting with first-order systems. Start writing math like math.**
+
+[⭐ **Star on GitHub**](https://github.com/maroba/odecast) • [📦 **Install from PyPI**](https://pypi.org/project/odecast/) • [📖 **Read the Docs**](https://github.com/maroba/odecast/tree/main/examples)
+
+*Made with ❤️ for scientists, engineers, and students worldwide.*
+
+</div>s.io/github/license/maroba/odecast)](https://github.com/maroba/odecast/blob/main/LICENSE)
+[![Tests](https://github.com/maroba/odecast/actions/workflows/test.yml/badge.svg)](https://github.com/maroba/odecast/actions)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![Downloads](https://pepy.tech/badge/odecast)](https://pepy.tech/project/odecast)
+
+*Stop wrestling with manual ODE reduction. Write differential equations as they appear in your textbook.*
+
+</div>
+
+---
+
+
+## 🤝 Contributing
+
+Want to make Odecast even better? We'd love your help!
+
+```bash
+git clone https://github.com/maroba/odecast.git
+cd odecast  
+pip install -e ".[dev]"
+pytest  # Run tests
+```
+
+**What we need:**
+- 📖 More examples from your field
+- 🐛 Bug reports and fixes  
+- 🚀 Performance improvements
+- 📝 Documentation improvements
+
