@@ -94,7 +94,7 @@ class SymPyBackend:
             # Handle multiple equations - try to solve each independently if they're decoupled
             else:
                 solutions = {}
-                
+
                 # Group equations by variables to see if they're decoupled
                 var_to_eqs = {}
                 for eq in equations:
@@ -118,7 +118,7 @@ class SymPyBackend:
                             f"Variable {var.name} appears in {len(var_eqs)} equations, "
                             f"but SymPy backend expects exactly one equation per variable"
                         )
-                    
+
                     eq = var_eqs[0]
                     sympy_eq = eq.sympy()
                     y_func = sp.Function(var.name)(t_symbol)

@@ -95,10 +95,10 @@ def convert_ivp_to_state_vector(
     """
     # Import here to avoid circular import
     from ..validate import normalize_ivp
-    
+
     # Normalize the IVP dictionary to handle vector variables
     normalized_ivp = normalize_ivp(ivp_dict)
-    
+
     # Determine the size of the state vector
     max_index = 0
     for key, value in mapping.items():
@@ -117,7 +117,7 @@ def convert_ivp_to_state_vector(
             state_index = mapping[(var, level)]
             x0[state_index] = value
         # else: silently ignore conditions that aren't needed
-        # This happens when vector derivatives are provided but some 
+        # This happens when vector derivatives are provided but some
         # components don't need that level of derivative
 
     return x0

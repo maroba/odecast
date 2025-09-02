@@ -121,8 +121,11 @@ def validate_ivp(
             # Check if this might be from vector derivative expansion
             # In that case, we can just ignore the extra conditions
             from .symbols import VectorDerivative
-            has_vector_derivative = any(isinstance(key, VectorDerivative) for key in ivp.keys())
-            
+
+            has_vector_derivative = any(
+                isinstance(key, VectorDerivative) for key in ivp.keys()
+            )
+
             if has_vector_derivative:
                 # Filter out the extra conditions silently - they came from vector derivative expansion
                 # where some components don't need as high an order
