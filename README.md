@@ -1,12 +1,20 @@
 
-<div align="center">
-<img src="https://github.com/maroba/odecast/raw/main/docs/odecast-logo.png" alt="Odecast Logo" width="150" />
+# <img src="https://github.com/maroba/odecast/raw/main/docs/odecast-logo.png" alt="Odecast Logo" width="120" align="left" />
 
 # Odecast
 ### Write ODEs Like Math, Not Code
 
 [![PyPI version](https://img.shields.io/pypi/v/odecast.svg)](https://pypi.org/project/odecast/)
-[![License](htt## 📚 More Examples
+[![License](https://img.shields.io/github/license/maroba/odecast)](https://github.com/maroba/odecast/blob/main/LICENSE)
+[![Tests](https://github.com/maroba/odecast/actions/workflows/test.yml/badge.svg)](https://github.com/maroba/odecast/actions)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![Downloads](https://pepy.tech/badge/odecast)](https://pepy.tech/project/odecast)
+
+*Stop wrestling with manual ODE reduction. Write differential equations as they appear in your textbook.*
+
+---
+
+## 📚 More Examples
 
 Check out the `examples/` directory for complete working examples:
 - 🔢 **Numeric solutions**: `01_ivp_damped_oscillator.py`  
