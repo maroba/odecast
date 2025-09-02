@@ -2,9 +2,14 @@
 Validation functions for ODEs and initial/boundary conditions
 """
 
-from typing import Dict, Union, Tuple
+from typing import Dict, Union, Tuple, List
 from .symbols import Variable, Derivative
-from .errors import MissingInitialConditionError, OverdeterminedConditionsError
+from .equation import Eq
+from .errors import (
+    MissingInitialConditionError,
+    OverdeterminedConditionsError,
+    OrderMismatchError,
+)
 
 
 def normalize_ivp(
@@ -71,19 +76,68 @@ def validate_ivp(
         missing_levels = required_levels - provided_levels
         if missing_levels:
             missing_level = min(missing_levels)  # Report the lowest missing level
+            if order == 0:
+                # Zero-order variables don't need any conditions
+                continue
+            elif order == 1:
+                level_desc = "level 0"
+            else:
+                level_desc = f"levels 0 to {order-1}"
+
             raise MissingInitialConditionError(
-                f"Missing initial condition for {var.name}^({missing_level}) "
-                f"(variable has order {order}, requires conditions for levels 0 to {order-1})"
+                f"Missing initial condition for {var.name}^({missing_level}). "
+                f"Variable has order {order} and requires conditions for {level_desc}."
             )
 
         # Check for extra conditions
         extra_levels = provided_levels - required_levels
         if extra_levels:
+            if order == 0:
+                level_desc = "no conditions"
+            elif order == 1:
+                level_desc = "level 0 only"
+            else:
+                level_desc = f"levels 0 to {order-1} only"
+
             raise OverdeterminedConditionsError(
-                f"Too many initial conditions for variable {var.name}: "
-                f"provided levels {sorted(provided_levels)}, but order is {order} "
-                f"(only need levels 0 to {order-1})"
+                f"Too many initial conditions for variable {var.name}. "
+                f"Variable has order {order} and needs {level_desc}, "
+                f"but got conditions for levels {sorted(provided_levels)}."
             )
+
+
+def validate_variable_orders(
+    equations: List[Eq],
+    declared_orders: Dict[Variable, int],
+) -> None:
+    """
+    Validate that declared variable orders match equation requirements.
+
+    Args:
+        equations: List of equations to check
+        declared_orders: Dictionary of explicitly declared variable orders
+
+    Raises:
+        OrderMismatchError: When declared order doesn't match equation usage
+    """
+    from .analyze import collect_variables, infer_orders
+
+    # Get all variables used in equations
+    all_variables = collect_variables(equations)
+
+    # Infer orders from equation usage
+    inferred_orders = infer_orders(equations)
+
+    # Check for mismatches between declared and inferred orders
+    for var, declared_order in declared_orders.items():
+        if var in inferred_orders:
+            inferred_order = inferred_orders[var]
+            if declared_order != inferred_order:
+                raise OrderMismatchError(
+                    f"Variable {var.name} declared with order {declared_order} "
+                    f"but equations require order {inferred_order}. "
+                    f"Either update the declaration or check your equations."
+                )
 
 
 def validate_initial_conditions(equation, conditions):
