@@ -2,9 +2,9 @@
 SymPy-based backend for symbolic ODE solving
 """
 
-from typing import Dict, List, Union
+from typing import Dict, List
 import sympy as sp
-from ..symbols import Variable, Derivative
+from ..symbols import Variable
 from ..equation import Eq
 from ..errors import BackendError
 

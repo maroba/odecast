@@ -2,9 +2,9 @@
 Reduction of higher-order ODEs to first-order systems
 """
 
-from typing import Dict, List, Optional, Union, Any
+from typing import Dict, List, Optional, Union
 import sympy as sp
-from .symbols import Variable, Derivative, as_sympy, t
+from .symbols import Variable, t
 from .equation import Eq
 from .errors import NonSolvableFormError
 

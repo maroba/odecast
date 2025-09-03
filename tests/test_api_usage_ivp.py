@@ -1,6 +1,5 @@
 import numpy as np
-import pytest
-from odecast import t, var, Eq, solve
+from odecast import var, Eq, solve
 
 
 def test_second_order_ivp_numeric():

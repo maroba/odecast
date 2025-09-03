@@ -108,7 +108,7 @@ def validate_ivp(
             elif order == 1:
                 level_desc = "level 0"
             else:
-                level_desc = f"levels 0 to {order-1}"
+                level_desc = f"levels 0 to {order - 1}"
 
             raise MissingInitialConditionError(
                 f"Missing initial condition for {var.name}^({missing_level}). "
@@ -137,7 +137,7 @@ def validate_ivp(
                 elif order == 1:
                     level_desc = "level 0 only"
                 else:
-                    level_desc = f"levels 0 to {order-1} only"
+                    level_desc = f"levels 0 to {order - 1} only"
 
                 raise OverdeterminedConditionsError(
                     f"Too many initial conditions for variable {var.name}. "

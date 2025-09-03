@@ -2,7 +2,7 @@
 Equation objects for representing ODEs
 """
 
-from typing import Any, List, Union
+from typing import List
 import sympy as sp
 from .symbols import as_sympy, VectorExpression, VectorDerivative, Variable
 

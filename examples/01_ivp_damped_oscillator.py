@@ -13,9 +13,8 @@ This represents a mass-spring-damper system with:
 - Damping ratio: ζ = 0.15 (underdamped)
 """
 
-import numpy as np
 import matplotlib.pyplot as plt
-from odecast import t, var, Eq, solve
+from odecast import var, Eq, solve
 
 
 def main():

@@ -4,7 +4,7 @@ Analysis functions for ODEs - order inference, validation, etc.
 
 from typing import Set, List, Dict
 import sympy as sp
-from .symbols import Variable, Derivative, as_sympy
+from .symbols import Variable, Derivative
 from .equation import Eq
 from .errors import OrderMismatchError
 

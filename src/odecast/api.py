@@ -2,7 +2,7 @@
 Main APIs for odecast
 """
 
-from typing import Dict, Any, Optional, Union, List
+from typing import Optional
 from .symbols import t, Variable
 from .equation import Eq
 
@@ -58,7 +58,8 @@ def solve(equation, *, ivp=None, bvp=None, tspan=None, backend=None, **kwargs):
     both symbolic and numeric solutions through different backends.
 
     Args:
-        equation: Single Eq object or list of Eq objects representing the ODE system
+        equation: Single Eq object or list of Eq objects representing the ODE
+                  system
         ivp: Dictionary of initial conditions for initial value problems (IVP).
              Keys can be Variable objects (for y(t0)) or Derivative objects (for y'(t0)).
              Example: {y: 1.0, y.d(): 0.0} for y(0)=1, y'(0)=0
@@ -187,8 +188,8 @@ def solve(equation, *, ivp=None, bvp=None, tspan=None, backend=None, **kwargs):
             except Exception as sympy_error:
                 # If both fail, raise informative error
                 raise RuntimeError(
-                    f"Auto backend failed: Both SciPy and SymPy backends failed to solve the equation. "
-                    f"SymPy error: {sympy_error}"
+                    f"Auto backend failed: Both SciPy and SymPy backends "
+                    f"failed to solve the equation. SymPy error: {sympy_error}"
                 )
 
     if backend == "scipy":

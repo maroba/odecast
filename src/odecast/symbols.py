@@ -2,9 +2,8 @@
 Symbolic variables and the distinguished independent variable t
 """
 
-from typing import Optional, Union, Any, Tuple
+from typing import Optional, Union, Tuple
 import sympy as sp
-import numpy as np
 
 
 class Expression:
@@ -77,9 +76,6 @@ class Expression:
 
     def __rtruediv__(self, other):
         return Expression("/", other, self)
-
-
-from typing import Optional, Union
 
 
 class IndependentVariable:
