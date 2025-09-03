@@ -85,6 +85,10 @@ plt.plot(solution.t, solution[y])
 plt.show()  # Beautiful decay curve! 📈
 ```
 
+## Documentation
+
+Comprehensive documentation is available at [https://maroba.github.io/odecast](https://maroba.github.io/odecast).
+
 ## Power Features
 
 ### **Intuitive Syntax** 
