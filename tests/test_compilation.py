@@ -6,10 +6,9 @@ import pytest
 import numpy as np
 import sympy as sp
 from odecast import var, Eq, solve, t
-from odecast.compile import lambdify_rhs, lambdify_jac
-from odecast.backends.scipy_ivp import ScipyIVPBackend, convert_ivp_to_state_vector
+from odecast.compile import lambdify_rhs
+from odecast.backends.scipy_ivp import convert_ivp_to_state_vector
 from odecast.solution import SolutionIVP
-from odecast.reduce import build_state_map
 from odecast.errors import MissingInitialConditionError
 
 

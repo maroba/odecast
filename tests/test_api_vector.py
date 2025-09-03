@@ -15,7 +15,7 @@ def test_vector_component_access():
 
     # Component access should return scalar Variable objects
     u0 = u[0]
-    u1 = u[1]
+    u[1]
 
     assert isinstance(u0, type(var("test")))
     assert u0.name == "u[0]"
@@ -57,7 +57,7 @@ def test_vector_initial_conditions():
 
     # Component access
     u0_vals = sol[u[0]]
-    u1_vals = sol[u[1]]
+    sol[u[1]]
     assert len(u0_vals) == len(sol.t)
 
 

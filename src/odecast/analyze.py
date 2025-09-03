@@ -26,7 +26,7 @@ def collect_variables(eqs: List[Eq]) -> Set[Variable]:
         sympy_eq = eq.sympy()
 
         # Get all functions in the equation (these correspond to our variables)
-        functions = sympy_eq.atoms(sp.Function)
+        sympy_eq.atoms(sp.Function)
 
         # Map back to our Variable objects by walking the original expressions
         _collect_variables_from_expr(eq.lhs, variables)

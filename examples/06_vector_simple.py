@@ -12,8 +12,7 @@ Mathematical model:
 This represents a 2D harmonic oscillator where u = [x, y].
 """
 
-from odecast import t, var, Eq, solve
-import numpy as np
+from odecast import var, Eq, solve
 
 
 def main():

@@ -1,5 +1,5 @@
 import pytest
-from odecast import t, var, Eq, solve
+from odecast import var, Eq, solve
 from odecast.errors import MissingInitialConditionError, OrderMismatchError
 
 

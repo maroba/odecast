@@ -6,8 +6,7 @@ This script demonstrates all the key vector variable features in odecast.
 Run this to see a comprehensive showcase of vector functionality.
 """
 
-from odecast import t, var, Eq, solve
-import numpy as np
+from odecast import var, Eq, solve
 
 
 def demo_vector_features():
@@ -142,7 +141,7 @@ def demo_vector_features():
         u0_expr = sym_sol.as_expr(u[0])
         u1_expr = sym_sol.as_expr(u[1])
 
-        print(f"✓ Symbolic solution:")
+        print("✓ Symbolic solution:")
         print(f"  u[0](t) = {u0_expr}")
         print(f"  u[1](t) = {u1_expr}")
 
@@ -166,7 +165,7 @@ def demo_vector_features():
     for achievement in achievements:
         print(f"  {achievement}")
 
-    print(f"\n📊 Total tests passed: All vector functionality working!")
+    print("\n📊 Total tests passed: All vector functionality working!")
     print("🚀 Ready for production use!")
 
 

@@ -3,7 +3,7 @@ Test validation functions thoroughly for Playbook 6
 """
 
 import pytest
-from odecast import var, Eq, solve, t
+from odecast import var, Eq, solve
 from odecast.validate import normalize_ivp, validate_ivp, validate_variable_orders
 from odecast.errors import (
     MissingInitialConditionError,

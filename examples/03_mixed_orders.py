@@ -12,9 +12,8 @@ System:
 This represents a coupled oscillator system where one variable affects the other.
 """
 
-import numpy as np
 import matplotlib.pyplot as plt
-from odecast import t, var, Eq, solve
+from odecast import var, Eq, solve
 
 
 def main():
@@ -35,9 +34,9 @@ def main():
     for i, eq in enumerate(equations, 1):
         print(f"  Eq {i}: {eq}")
 
-    print(f"\nVariable orders:")
-    print(f"  x: 2nd order (requires x(0) and x'(0))")
-    print(f"  y: 1st order (requires y(0))")
+    print("\nVariable orders:")
+    print("  x: 2nd order (requires x(0) and x'(0))")
+    print("  y: 1st order (requires y(0))")
 
     # Set initial conditions
     initial_conditions = {
@@ -46,7 +45,7 @@ def main():
         y: 0.5,  # y(0) = 0.5
     }
 
-    print(f"\nInitial conditions:")
+    print("\nInitial conditions:")
     print(f"  x(0) = {initial_conditions[x]}")
     print(f"  x'(0) = {initial_conditions[x.d()]}")
     print(f"  y(0) = {initial_conditions[y]}")
@@ -134,18 +133,18 @@ def main():
         print(f"   {t_eval:4.0f}   {x_eval:8.4f}  {xprime_eval:8.4f}  {y_eval:8.4f}")
 
     # Show system properties
-    print(f"\n🔧 System Analysis:")
-    print(f"This coupled system demonstrates:")
-    print(f"  • Mixed orders: x is 2nd order, y is 1st order")
-    print(f"  • Coupling: x affects y through the +0.3*x term")
-    print(f"  • Coupling: y affects x through the -0.5*y term")
-    print(f"  • Damping: x has damping (0.1*x' term), y has decay (2*y term)")
+    print("\n🔧 System Analysis:")
+    print("This coupled system demonstrates:")
+    print("  • Mixed orders: x is 2nd order, y is 1st order")
+    print("  • Coupling: x affects y through the +0.3*x term")
+    print("  • Coupling: y affects x through the -0.5*y term")
+    print("  • Damping: x has damping (0.1*x' term), y has decay (2*y term)")
 
     # Inspect the first-order system
-    print(f"\n🔍 First-order system inspection:")
+    print("\n🔍 First-order system inspection:")
     f, jac, x0, t0, mapping = sol.as_first_order()
     print(f"  State vector dimension: {len(x0)}")
-    print(f"  State mapping:")
+    print("  State mapping:")
     print(f"    x    -> index {mapping[(x, 0)]}")
     print(f"    x'   -> index {mapping[(x, 1)]}")
     print(f"    y    -> index {mapping[(y, 0)]}")

@@ -59,13 +59,13 @@ def main():
         print("❌ Verification failed!")
 
     # Show general form with constants
-    print(f"\n📝 General solution form:")
-    print(f"The solution contains arbitrary constants C1 and C2,")
-    print(f"which would be determined by initial or boundary conditions.")
-    print(f"General form: y(t) = C1*cos(t) + C2*sin(t)")
+    print("\n📝 General solution form:")
+    print("The solution contains arbitrary constants C1 and C2,")
+    print("which would be determined by initial or boundary conditions.")
+    print("General form: y(t) = C1*cos(t) + C2*sin(t)")
 
     # Demonstrate symbolic manipulation
-    print(f"\n🔧 Symbolic manipulation examples:")
+    print("\n🔧 Symbolic manipulation examples:")
 
     # Extract coefficients if possible
     try:
@@ -77,18 +77,18 @@ def main():
             print(f"Coefficient of cos(t): {cos_coeff}")
         if sin_coeff is not None:
             print(f"Coefficient of sin(t): {sin_coeff}")
-    except:
+    except Exception:
         print("Coefficients depend on the specific form SymPy returns")
 
     # Show derivative relationships
-    print(f"\nDerivative relationship:")
-    print(f"If y(t) = A*cos(t) + B*sin(t), then:")
-    print(f"y'(t) = -A*sin(t) + B*cos(t)")
-    print(f"y''(t) = -A*cos(t) - B*sin(t) = -y(t)")
-    print(f"Therefore: y''(t) + y(t) = 0 ✓")
+    print("\nDerivative relationship:")
+    print("If y(t) = A*cos(t) + B*sin(t), then:")
+    print("y'(t) = -A*sin(t) + B*cos(t)")
+    print("y''(t) = -A*cos(t) - B*sin(t) = -y(t)")
+    print("Therefore: y''(t) + y(t) = 0 ✓")
 
     # Demonstrate evaluation at specific points
-    print(f"\n📊 Symbolic evaluation:")
+    print("\n📊 Symbolic evaluation:")
     eval_points = [0, sp.pi / 4, sp.pi / 2, sp.pi]
     for t_val in eval_points:
         y_val = expr.subs(t_sym, t_val)

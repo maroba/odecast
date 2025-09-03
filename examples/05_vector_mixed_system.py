@@ -25,7 +25,7 @@ Where x represents the average motion and u represents the differential motion.
 
 import numpy as np
 import matplotlib.pyplot as plt
-from odecast import t, var, Eq, solve
+from odecast import var, Eq, solve
 
 
 def main():
@@ -41,7 +41,7 @@ def main():
     # Derived parameters
     omega0 = np.sqrt(g / L)  # Natural pendulum frequency
     omega1 = np.sqrt(g / L + 2 * k / m)  # Coupled frequency
-    kappa = k / m  # Coupling strength
+    k / m  # Coupling strength
 
     print("Physical parameters:")
     print(f"  Pendulum length: L = {L} m")
@@ -102,7 +102,7 @@ def main():
     print(f"  x(0) = {ivp[x]:.1f}      (average position)")
     print(f"  x'(0) = {ivp[x.d()]:.1f}     (average velocity)")
     print(f"  u₀(0) = {ivp[u][0]:.1f}     (position difference/2)")
-    print(f"  u₀'(0) = 0.0    (velocity difference/2)")
+    print("  u₀'(0) = 0.0    (velocity difference/2)")
     print()
 
     # Solve the system

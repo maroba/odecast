@@ -17,7 +17,7 @@ This expands to the component equations:
 
 import numpy as np
 import matplotlib.pyplot as plt
-from odecast import t, var, Eq, solve
+from odecast import var, Eq, solve
 
 
 def main():

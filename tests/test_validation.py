@@ -3,8 +3,7 @@ Comprehensive tests for Playbook 6 - Validation and precise errors
 """
 
 import pytest
-import numpy as np
-from odecast import var, Eq, solve, t
+from odecast import var, Eq, solve
 from odecast.validate import normalize_ivp, validate_ivp
 from odecast.errors import (
     MissingInitialConditionError,

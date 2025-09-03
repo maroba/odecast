@@ -163,7 +163,7 @@ def validate_variable_orders(
     from .analyze import collect_variables, infer_orders
 
     # Get all variables used in equations
-    all_variables = collect_variables(equations)
+    collect_variables(equations)
 
     # Infer orders from equation usage
     inferred_orders = infer_orders(equations)
