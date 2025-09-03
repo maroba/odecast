@@ -8,7 +8,7 @@
 [![License](https://img.shields.io/github/license/maroba/odecast)](https://github.com/maroba/odecast/blob/main/LICENSE)
 [![Tests](https://github.com/maroba/odecast/actions/workflows/test.yml/badge.svg)](https://github.com/maroba/odecast/actions)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
-[![Downloads](https://pepy.tech/badge/odecast)](https://pepy.tech/project/odecast)
+
 
 *Stop wrestling with manual ODE reduction. Write differential equations as they appear in your textbook.*
 
@@ -350,4 +350,3 @@ pytest  # Run tests
 - 🐛 Bug reports and fixes  
 - 🚀 Performance improvements
 - 📝 Documentation improvements
-
