@@ -5,6 +5,7 @@
 ### Write ODEs Like Math, Not Code
 
 [![PyPI version](https://img.shields.io/pypi/v/odecast.svg)](https://pypi.org/project/odecast/)
+[![Documentation](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://maroba.github.io/odecast)
 [![License](https://img.shields.io/github/license/maroba/odecast)](https://github.com/maroba/odecast/blob/main/LICENSE)
 [![Tests](https://github.com/maroba/odecast/actions/workflows/test.yml/badge.svg)](https://github.com/maroba/odecast/actions)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
@@ -318,7 +319,7 @@ python examples/01_ivp_damped_oscillator.py
 
 **Stop fighting with first-order systems. Start writing math like math.**
 
-[⭐ **Star on GitHub**](https://github.com/maroba/odecast) • [📦 **Install from PyPI**](https://pypi.org/project/odecast/) • [📖 **Read the Docs**](https://github.com/maroba/odecast/tree/main/examples)
+[⭐ **Star on GitHub**](https://github.com/maroba/odecast) • [📦 **Install from PyPI**](https://pypi.org/project/odecast/) • [📖 **Read the Docs**](https://maroba.github.io/odecast)
 
 *Made with ❤️ for scientists, engineers, and students worldwide.*
 
