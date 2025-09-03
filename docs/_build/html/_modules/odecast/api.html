@@ -215,18 +215,63 @@
         <span class="n">backend</span> <span class="o">=</span> <span class="s2">&quot;scipy&quot;</span>  <span class="c1"># Default to scipy for IVP</span>
 
     <span class="k">if</span> <span class="n">backend</span> <span class="o">==</span> <span class="s2">&quot;auto&quot;</span><span class="p">:</span>
-        <span class="c1"># Try SymPy first, fall back to SciPy on failure</span>
+        <span class="c1"># Try SciPy first, fall back to SymPy on failure</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="kn">from</span><span class="w"> </span><span class="nn">.backends.sympy_backend</span><span class="w"> </span><span class="kn">import</span> <span class="n">SymPyBackend</span>
-
-            <span class="n">backend_instance</span> <span class="o">=</span> <span class="n">SymPyBackend</span><span class="p">()</span>
-            <span class="n">solution</span> <span class="o">=</span> <span class="n">backend_instance</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span>
-                <span class="n">equations</span><span class="o">=</span><span class="n">eqs</span><span class="p">,</span> <span class="n">t_symbol</span><span class="o">=</span><span class="n">t</span><span class="o">.</span><span class="n">symbol</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+            <span class="c1"># Check basic requirements for SciPy backend</span>
+            <span class="k">if</span> <span class="n">ivp</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;SciPy backend requires IVP conditions&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">tspan</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;SciPy backend requires tspan&quot;</span><span class="p">)</span>
+            
+            <span class="c1"># Try SciPy backend</span>
+            <span class="n">t0</span> <span class="o">=</span> <span class="n">tspan</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">validate_ivp</span><span class="p">(</span><span class="n">orders</span><span class="p">,</span> <span class="n">ivp</span><span class="p">,</span> <span class="n">t0</span><span class="p">)</span>
+            
+            <span class="c1"># Step 3: Reduce to first-order system</span>
+            <span class="n">mapping</span> <span class="o">=</span> <span class="n">build_state_map</span><span class="p">(</span><span class="n">orders</span><span class="p">)</span>
+            <span class="n">highest_rules</span> <span class="o">=</span> <span class="n">isolate_highest_derivatives</span><span class="p">(</span><span class="n">eqs</span><span class="p">,</span> <span class="n">orders</span><span class="p">)</span>
+            <span class="n">f_sym_vec</span><span class="p">,</span> <span class="n">jac_sym</span> <span class="o">=</span> <span class="n">make_rhs</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">symbol</span><span class="p">,</span> <span class="n">mapping</span><span class="p">,</span> <span class="n">highest_rules</span><span class="p">)</span>
+            
+            <span class="c1"># Step 4: Convert IVP to state vector</span>
+            <span class="n">x0</span> <span class="o">=</span> <span class="n">convert_ivp_to_state_vector</span><span class="p">(</span><span class="n">ivp</span><span class="p">,</span> <span class="n">mapping</span><span class="p">)</span>
+            
+            <span class="c1"># Step 5: Compile to numerical functions</span>
+            <span class="n">n_states</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">x0</span><span class="p">)</span>
+            <span class="n">state_syms</span> <span class="o">=</span> <span class="p">[</span><span class="n">sp</span><span class="o">.</span><span class="n">Symbol</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;x</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_states</span><span class="p">)]</span>
+            
+            <span class="n">f_compiled</span> <span class="o">=</span> <span class="n">lambdify_rhs</span><span class="p">(</span><span class="n">f_sym_vec</span><span class="p">,</span> <span class="n">t</span><span class="o">.</span><span class="n">symbol</span><span class="p">,</span> <span class="n">state_syms</span><span class="p">)</span>
+            <span class="n">jac_compiled</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">lambdify_jac</span><span class="p">(</span><span class="n">jac_sym</span><span class="p">,</span> <span class="n">t</span><span class="o">.</span><span class="n">symbol</span><span class="p">,</span> <span class="n">state_syms</span><span class="p">)</span> <span class="k">if</span> <span class="n">jac_sym</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
             <span class="p">)</span>
+            
+            <span class="c1"># Step 6: Solve using SciPy backend</span>
+            <span class="n">backend_instance</span> <span class="o">=</span> <span class="n">ScipyIVPBackend</span><span class="p">()</span>
+            <span class="n">solution</span> <span class="o">=</span> <span class="n">backend_instance</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span>
+                <span class="n">f_compiled</span><span class="o">=</span><span class="n">f_compiled</span><span class="p">,</span>
+                <span class="n">jac_compiled</span><span class="o">=</span><span class="n">jac_compiled</span><span class="p">,</span>
+                <span class="n">x0</span><span class="o">=</span><span class="n">x0</span><span class="p">,</span>
+                <span class="n">t0</span><span class="o">=</span><span class="n">t0</span><span class="p">,</span>
+                <span class="n">tspan</span><span class="o">=</span><span class="n">tspan</span><span class="p">,</span>
+                <span class="n">mapping</span><span class="o">=</span><span class="n">mapping</span><span class="p">,</span>
+                <span class="n">options</span><span class="o">=</span><span class="n">kwargs</span><span class="p">,</span>
+            <span class="p">)</span>
+            
             <span class="k">return</span> <span class="n">solution</span>
+            
         <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-            <span class="c1"># Fall back to SciPy backend</span>
-            <span class="n">backend</span> <span class="o">=</span> <span class="s2">&quot;scipy&quot;</span>
+            <span class="c1"># Fall back to SymPy backend</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="kn">from</span><span class="w"> </span><span class="nn">.backends.sympy_backend</span><span class="w"> </span><span class="kn">import</span> <span class="n">SymPyBackend</span>
+                
+                <span class="n">backend_instance</span> <span class="o">=</span> <span class="n">SymPyBackend</span><span class="p">()</span>
+                <span class="n">solution</span> <span class="o">=</span> <span class="n">backend_instance</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">equations</span><span class="o">=</span><span class="n">eqs</span><span class="p">,</span> <span class="n">t_symbol</span><span class="o">=</span><span class="n">t</span><span class="o">.</span><span class="n">symbol</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">solution</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">sympy_error</span><span class="p">:</span>
+                <span class="c1"># If both fail, raise informative error</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Auto backend failed: Both SciPy and SymPy backends failed to solve the equation. &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;SymPy error: </span><span class="si">{</span><span class="n">sympy_error</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
 
     <span class="k">if</span> <span class="n">backend</span> <span class="o">==</span> <span class="s2">&quot;scipy&quot;</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">ivp</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>

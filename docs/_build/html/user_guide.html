@@ -236,7 +236,7 @@ elegant syntax.</p>
 </section>
 <section id="auto-backend">
 <h3>Auto Backend<a class="headerlink" href="#auto-backend" title="Link to this heading"></a></h3>
-<p>The auto backend tries symbolic first, falling back to numeric:</p>
+<p>The auto backend tries numeric first, falling back to symbolic:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Automatic backend selection</span>
 <span class="n">solution</span> <span class="o">=</span> <span class="n">solve</span><span class="p">(</span><span class="n">equation</span><span class="p">,</span> <span class="n">ivp</span><span class="o">=</span><span class="n">conditions</span><span class="p">,</span> <span class="n">tspan</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="n">backend</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">)</span>
 </pre></div>

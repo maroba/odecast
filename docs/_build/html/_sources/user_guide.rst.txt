@@ -144,7 +144,7 @@ The SymPy backend provides exact symbolic solutions:
 Auto Backend
 ~~~~~~~~~~~~
 
-The auto backend tries symbolic first, falling back to numeric:
+The auto backend tries numeric first, falling back to symbolic:
 
 .. code-block:: python
 

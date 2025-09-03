@@ -167,10 +167,13 @@ class TestSymPyIntegration:
         eq1 = Eq(y.d(2) + z, 0)
         eq2 = Eq(z.d() - y, 0)
 
-        # Auto should try SciPy first (which fails due to no IVP), 
+        # Auto should try SciPy first (which fails due to no IVP),
         # then fall back to SymPy (which also fails due to coupled system)
         # So we expect RuntimeError about both backends failing
-        with pytest.raises(RuntimeError, match="Auto backend failed.*Both SciPy and SymPy backends failed"):
+        with pytest.raises(
+            RuntimeError,
+            match="Auto backend failed.*Both SciPy and SymPy backends failed",
+        ):
             solve([eq1, eq2], backend="auto")
 
     def test_different_ode_types(self):
