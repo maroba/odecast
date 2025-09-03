@@ -194,7 +194,7 @@
             <span class="k">elif</span> <span class="n">order</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
                 <span class="n">level_desc</span> <span class="o">=</span> <span class="s2">&quot;level 0&quot;</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">level_desc</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;levels 0 to </span><span class="si">{</span><span class="n">order</span><span class="o">-</span><span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="n">level_desc</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;levels 0 to </span><span class="si">{</span><span class="n">order</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span>
 
             <span class="k">raise</span> <span class="n">MissingInitialConditionError</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;Missing initial condition for </span><span class="si">{</span><span class="n">var</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">^(</span><span class="si">{</span><span class="n">missing_level</span><span class="si">}</span><span class="s2">). &quot;</span>
@@ -223,7 +223,7 @@
                 <span class="k">elif</span> <span class="n">order</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
                     <span class="n">level_desc</span> <span class="o">=</span> <span class="s2">&quot;level 0 only&quot;</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="n">level_desc</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;levels 0 to </span><span class="si">{</span><span class="n">order</span><span class="o">-</span><span class="mi">1</span><span class="si">}</span><span class="s2"> only&quot;</span>
+                    <span class="n">level_desc</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;levels 0 to </span><span class="si">{</span><span class="n">order</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2"> only&quot;</span>
 
                 <span class="k">raise</span> <span class="n">OverdeterminedConditionsError</span><span class="p">(</span>
                     <span class="sa">f</span><span class="s2">&quot;Too many initial conditions for variable </span><span class="si">{</span><span class="n">var</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">. &quot;</span>
@@ -252,7 +252,7 @@
     <span class="kn">from</span><span class="w"> </span><span class="nn">.analyze</span><span class="w"> </span><span class="kn">import</span> <span class="n">collect_variables</span><span class="p">,</span> <span class="n">infer_orders</span>
 
     <span class="c1"># Get all variables used in equations</span>
-    <span class="n">all_variables</span> <span class="o">=</span> <span class="n">collect_variables</span><span class="p">(</span><span class="n">equations</span><span class="p">)</span>
+    <span class="n">collect_variables</span><span class="p">(</span><span class="n">equations</span><span class="p">)</span>
 
     <span class="c1"># Infer orders from equation usage</span>
     <span class="n">inferred_orders</span> <span class="o">=</span> <span class="n">infer_orders</span><span class="p">(</span><span class="n">equations</span><span class="p">)</span>
