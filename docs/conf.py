@@ -34,8 +34,8 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
 html_theme = "sphinx_rtd_theme"
 html_static_path = ["_static"]
-html_logo = "_static/odecast-logo.png"
-html_favicon = "_static/odecast-logo.png"
+html_logo = "odecast-logo.png"
+html_favicon = "odecast-logo.png"
 
 # GitHub Pages configuration
 html_baseurl = "https://maroba.github.io/odecast/"
@@ -86,7 +86,7 @@ mathjax3_config = {
 plot_include_source = True
 plot_html_show_source_link = False
 plot_formats = ["png", "svg"]
-plot_basedir = "_static/plots"
+# Remove plot_basedir to use default _images directory
 
 # NBSphinx configuration
 nbsphinx_execute = "never"  # Don't execute notebooks during build

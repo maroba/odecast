@@ -47,6 +47,8 @@ jobs:
         run: |
           cd docs
           make html
+          # Copy .nojekyll to build output to prevent Jekyll processing
+          cp ../.nojekyll _build/html/
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
