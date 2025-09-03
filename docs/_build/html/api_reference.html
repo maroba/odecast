@@ -1,0 +1,1000 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>API Reference &mdash; Odecast 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/plot_directive.css" />
+
+  
+    <link rel="shortcut icon" href="_static/odecast-logo.png"/>
+    <link rel="canonical" href="https://maroba.github.io/odecast/api_reference.html" />
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=01f34227"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Examples" href="examples.html" />
+    <link rel="prev" title="User Guide" href="user_guide.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Odecast
+              <img src="_static/odecast-logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quick Start Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user_guide.html">User Guide</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#module-odecast.api">Core Functions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#odecast.api.BC"><code class="docutils literal notranslate"><span class="pre">BC</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#odecast.api.solve"><code class="docutils literal notranslate"><span class="pre">solve()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#odecast.api.var"><code class="docutils literal notranslate"><span class="pre">var()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#variables-and-equations">Variables and Equations</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#odecast.var"><code class="docutils literal notranslate"><span class="pre">var()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#odecast.Eq"><code class="docutils literal notranslate"><span class="pre">Eq()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#odecast.t"><code class="docutils literal notranslate"><span class="pre">t</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#solving-functions">Solving Functions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#odecast.solve"><code class="docutils literal notranslate"><span class="pre">solve()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#solution-classes">Solution Classes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#odecast.solution.Solution"><code class="docutils literal notranslate"><span class="pre">Solution</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#odecast.solution.Solution.as_expr"><code class="docutils literal notranslate"><span class="pre">Solution.as_expr()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#odecast.solution.Solution.as_first_order"><code class="docutils literal notranslate"><span class="pre">Solution.as_first_order()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-odecast.errors">Validation and Errors</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#odecast.errors.BackendError"><code class="docutils literal notranslate"><span class="pre">BackendError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#odecast.errors.CompilationError"><code class="docutils literal notranslate"><span class="pre">CompilationError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#odecast.errors.MissingInitialConditionError"><code class="docutils literal notranslate"><span class="pre">MissingInitialConditionError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#odecast.errors.NonSolvableFormError"><code class="docutils literal notranslate"><span class="pre">NonSolvableFormError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#odecast.errors.OdecastError"><code class="docutils literal notranslate"><span class="pre">OdecastError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#odecast.errors.OrderMismatchError"><code class="docutils literal notranslate"><span class="pre">OrderMismatchError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#odecast.errors.OverdeterminedConditionsError"><code class="docutils literal notranslate"><span class="pre">OverdeterminedConditionsError</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#internal-modules">Internal Modules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#module-odecast.analyze">Equation Analysis</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#odecast.analyze.analyze_equation"><code class="docutils literal notranslate"><span class="pre">analyze_equation()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#odecast.analyze.collect_variables"><code class="docutils literal notranslate"><span class="pre">collect_variables()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#odecast.analyze.infer_orders"><code class="docutils literal notranslate"><span class="pre">infer_orders()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#odecast.analyze.resolve_orders"><code class="docutils literal notranslate"><span class="pre">resolve_orders()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-odecast.compile">Compilation</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#odecast.compile.compile_to_function"><code class="docutils literal notranslate"><span class="pre">compile_to_function()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#odecast.compile.lambdify_jac"><code class="docutils literal notranslate"><span class="pre">lambdify_jac()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#odecast.compile.lambdify_rhs"><code class="docutils literal notranslate"><span class="pre">lambdify_rhs()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-odecast.reduce">Order Reduction</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#odecast.reduce.StateMapping"><code class="docutils literal notranslate"><span class="pre">StateMapping</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#odecast.reduce.VariableIndexer"><code class="docutils literal notranslate"><span class="pre">VariableIndexer</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#odecast.reduce.build_state_map"><code class="docutils literal notranslate"><span class="pre">build_state_map()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#odecast.reduce.isolate_highest_derivatives"><code class="docutils literal notranslate"><span class="pre">isolate_highest_derivatives()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#odecast.reduce.make_rhs"><code class="docutils literal notranslate"><span class="pre">make_rhs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#odecast.reduce.reduce_to_first_order"><code class="docutils literal notranslate"><span class="pre">reduce_to_first_order()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-odecast.validate">Validation</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#odecast.validate.normalize_ivp"><code class="docutils literal notranslate"><span class="pre">normalize_ivp()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#odecast.validate.validate_initial_conditions"><code class="docutils literal notranslate"><span class="pre">validate_initial_conditions()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#odecast.validate.validate_ivp"><code class="docutils literal notranslate"><span class="pre">validate_ivp()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#odecast.validate.validate_variable_orders"><code class="docutils literal notranslate"><span class="pre">validate_variable_orders()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-odecast.backends.scipy_ivp">Backend Implementations</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#odecast.backends.scipy_ivp.ScipyIVPBackend"><code class="docutils literal notranslate"><span class="pre">ScipyIVPBackend</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#odecast.backends.scipy_ivp.convert_ivp_to_state_vector"><code class="docutils literal notranslate"><span class="pre">convert_ivp_to_state_vector()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#odecast.backends.scipy_ivp.solve_ivp_scipy"><code class="docutils literal notranslate"><span class="pre">solve_ivp_scipy()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#odecast.backends.scipy_bvp.ScipyBVPBackend"><code class="docutils literal notranslate"><span class="pre">ScipyBVPBackend</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#odecast.backends.scipy_bvp.solve_bvp_scipy"><code class="docutils literal notranslate"><span class="pre">solve_bvp_scipy()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#odecast.backends.sympy_backend.SolutionExpr"><code class="docutils literal notranslate"><span class="pre">SolutionExpr</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#odecast.backends.sympy_backend.SymPyBackend"><code class="docutils literal notranslate"><span class="pre">SymPyBackend</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#odecast.backends.sympy_backend.solve_symbolic_sympy"><code class="docutils literal notranslate"><span class="pre">solve_symbolic_sympy()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Odecast</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">API Reference</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/api_reference.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="api-reference">
+<h1>API Reference<a class="headerlink" href="#api-reference" title="Link to this heading"></a></h1>
+<p>This section provides detailed documentation for all Odecast functions and classes.</p>
+<section id="module-odecast.api">
+<span id="core-functions"></span><h2>Core Functions<a class="headerlink" href="#module-odecast.api" title="Link to this heading"></a></h2>
+<p>Main APIs for odecast</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="odecast.api.BC">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">odecast.api.</span></span><span class="sig-name descname"><span class="pre">BC</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/odecast/api.html#BC"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#odecast.api.BC" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Boundary condition for boundary value problems (BVP).</p>
+<p>Boundary conditions specify the value of a variable or its derivative
+at specific points in the domain. This is used for BVP problems where
+conditions are given at multiple points rather than all at the initial point.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>variable</strong> – The variable or derivative to constrain (Variable or Derivative object)</p></li>
+<li><p><strong>t</strong> – The time/position where the condition applies</p></li>
+<li><p><strong>value</strong> – The required value at that position</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">var</span><span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bc1</span> <span class="o">=</span> <span class="n">BC</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>      <span class="c1"># y(0) = 0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bc2</span> <span class="o">=</span> <span class="n">BC</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>      <span class="c1"># y(1) = 1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bc3</span> <span class="o">=</span> <span class="n">BC</span><span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">d</span><span class="p">(),</span> <span class="n">t</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># y&#39;(0) = 0</span>
+</pre></div>
+</div>
+<p>BVP problem:
+&gt;&gt;&gt; eq = Eq(y.d(2) + y, 0)
+&gt;&gt;&gt; sol = solve(eq, bvp=[bc1, bc2], tspan=(0, 1), backend=”scipy_bvp”)</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>BVP solving is not yet implemented and will be available in future versions.</p>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="odecast.api.solve">
+<span class="sig-prename descclassname"><span class="pre">odecast.api.</span></span><span class="sig-name descname"><span class="pre">solve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">equation</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ivp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bvp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tspan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/odecast/api.html#solve"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#odecast.api.solve" title="Link to this definition"></a></dt>
+<dd><p>Solve an ordinary differential equation or system of ODEs.</p>
+<p>This is the main entry point for solving differential equations. It supports
+both symbolic and numeric solutions through different backends.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>equation</strong> – Single Eq object or list of Eq objects representing the ODE system</p></li>
+<li><p><strong>ivp</strong> – Dictionary of initial conditions for initial value problems (IVP).
+Keys can be Variable objects (for y(t0)) or Derivative objects (for y’(t0)).
+Example: {y: 1.0, y.d(): 0.0} for y(0)=1, y’(0)=0</p></li>
+<li><p><strong>bvp</strong> – List of boundary conditions for boundary value problems (BVP).
+Currently not implemented - will be available in future versions.</p></li>
+<li><p><strong>tspan</strong> – Tuple of (t_start, t_end) for numeric solutions.
+Required for scipy backend, ignored for sympy backend.</p></li>
+<li><p><strong>backend</strong> – Solution backend to use:
+- “scipy”: Numeric integration using SciPy (default)
+- “sympy”: Symbolic solution using SymPy
+- “auto”: Try SymPy first, fall back to SciPy if needed
+- “scipy_bvp”: BVP solver (not yet implemented)</p></li>
+<li><p><strong>**kwargs</strong> – Additional backend-specific options:
+For scipy: method, rtol, atol, max_step, etc.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>SolutionIVP: For numeric solutions, supports sol[y], sol[y.d()], etc.</p></li>
+<li><p>SolutionExpr: For symbolic solutions, supports sol.as_expr(y)</p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Solution object that depends on the backend</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><a class="reference internal" href="#odecast.errors.MissingInitialConditionError" title="odecast.errors.MissingInitialConditionError"><strong>MissingInitialConditionError</strong></a> – When required initial conditions are missing</p></li>
+<li><p><a class="reference internal" href="#odecast.errors.OverdeterminedConditionsError" title="odecast.errors.OverdeterminedConditionsError"><strong>OverdeterminedConditionsError</strong></a> – When too many initial conditions provided</p></li>
+<li><p><a class="reference internal" href="#odecast.errors.OrderMismatchError" title="odecast.errors.OrderMismatchError"><strong>OrderMismatchError</strong></a> – When declared variable order conflicts with equation usage</p></li>
+<li><p><a class="reference internal" href="#odecast.errors.BackendError" title="odecast.errors.BackendError"><strong>BackendError</strong></a> – When the chosen backend cannot solve the equation</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.13)"><strong>ValueError</strong></a> – When required arguments are missing (e.g., tspan for scipy)</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>Numeric solution of second-order ODE:
+&gt;&gt;&gt; y = var(“y”)
+&gt;&gt;&gt; eq = Eq(y.d(2) + 0.3*y.d() + y, 0)
+&gt;&gt;&gt; sol = solve(eq, ivp={y: 1.0, y.d(): 0.0}, tspan=(0, 10))
+&gt;&gt;&gt; y_values = sol[y]         # Get y(t) values
+&gt;&gt;&gt; yprime_values = sol[y.d()] # Get y’(t) values</p>
+<p>Symbolic solution:
+&gt;&gt;&gt; eq = Eq(y.d(2) + y, 0)
+&gt;&gt;&gt; sol = solve(eq, backend=”sympy”)
+&gt;&gt;&gt; expr = sol.as_expr(y)    # Get SymPy expression</p>
+<p>Coupled system:
+&gt;&gt;&gt; y, z = var(“y”), var(“z”)
+&gt;&gt;&gt; eq1 = Eq(y.d(2) + z, 0)
+&gt;&gt;&gt; eq2 = Eq(z.d() - y, 0)
+&gt;&gt;&gt; sol = solve([eq1, eq2], ivp={y: 1.0, y.d(): 0.0, z: 0.0}, tspan=(0, 5))</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="odecast.api.var">
+<span class="sig-prename descclassname"><span class="pre">odecast.api.</span></span><span class="sig-name descname"><span class="pre">var</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><span class="pre">tuple</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Variable</span></span></span><a class="reference internal" href="_modules/odecast/api.html#var"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#odecast.api.var" title="Link to this definition"></a></dt>
+<dd><p>Create a dependent variable for use in differential equations.</p>
+<p>The variable represents an unknown function y(t) where t is the independent variable.
+You can create derivatives using the .d(n) method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – Name of the variable (e.g., “y”, “x”, “theta”)</p></li>
+<li><p><strong>order</strong> – Maximum order of derivatives expected (optional, for validation).
+If specified and equations use higher-order derivatives, an
+OrderMismatchError will be raised.</p></li>
+<li><p><strong>shape</strong> – Shape tuple for vector/matrix variables (e.g., (3,) for 3D vector,
+(2, 2) for 2x2 matrix). None for scalar variables.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>Arithmetic operations: y + z, 2*y, y/3, etc.</p></li>
+<li><p>Derivative notation: y.d() for y’, y.d(2) for y’’, etc.</p></li>
+<li><p>Use in equations: Eq(y.d(2) + y, 0)</p></li>
+<li><p>Component access for vectors: u[0], u[1] for vector components</p></li>
+<li><p>Vectorized operations: u.d() + 2*u for vector equations</p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Variable object that supports</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">var</span><span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">)</span>           <span class="c1"># Create scalar variable y(t)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span><span class="o">.</span><span class="n">d</span><span class="p">()</span>                  <span class="c1"># First derivative y&#39;(t)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span><span class="o">.</span><span class="n">d</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>                 <span class="c1"># Second derivative y&#39;&#39;(t)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Eq</span><span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">d</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">y</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>     <span class="c1"># Simple harmonic oscillator</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">u</span> <span class="o">=</span> <span class="n">var</span><span class="p">(</span><span class="s2">&quot;u&quot;</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,))</span>  <span class="c1"># Create 2D vector variable u(t)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>                      <span class="c1"># First component u[0](t)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">u</span><span class="o">.</span><span class="n">d</span><span class="p">()</span>                     <span class="c1"># Vector derivative u&#39;(t)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Eq</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">d</span><span class="p">()</span> <span class="o">+</span> <span class="n">u</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>         <span class="c1"># Vector equation u&#39; + u = 0</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">z</span> <span class="o">=</span> <span class="n">var</span><span class="p">(</span><span class="s2">&quot;z&quot;</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># Declare z as first-order only</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Eq</span><span class="p">(</span><span class="n">z</span><span class="o">.</span><span class="n">d</span><span class="p">()</span> <span class="o">-</span> <span class="n">z</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>       <span class="c1"># Valid: uses only first derivative</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Eq</span><span class="p">(</span><span class="n">z</span><span class="o">.</span><span class="n">d</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">z</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>      <span class="c1"># Would raise OrderMismatchError</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</section>
+<section id="variables-and-equations">
+<h2>Variables and Equations<a class="headerlink" href="#variables-and-equations" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="odecast.var">
+<span class="sig-prename descclassname"><span class="pre">odecast.</span></span><span class="sig-name descname"><span class="pre">var</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><span class="pre">tuple</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Variable</span></span></span><a class="reference internal" href="_modules/odecast/api.html#var"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#odecast.var" title="Link to this definition"></a></dt>
+<dd><p>Create a dependent variable for use in differential equations.</p>
+<p>The variable represents an unknown function y(t) where t is the independent variable.
+You can create derivatives using the .d(n) method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – Name of the variable (e.g., “y”, “x”, “theta”)</p></li>
+<li><p><strong>order</strong> – Maximum order of derivatives expected (optional, for validation).
+If specified and equations use higher-order derivatives, an
+OrderMismatchError will be raised.</p></li>
+<li><p><strong>shape</strong> – Shape tuple for vector/matrix variables (e.g., (3,) for 3D vector,
+(2, 2) for 2x2 matrix). None for scalar variables.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>Arithmetic operations: y + z, 2*y, y/3, etc.</p></li>
+<li><p>Derivative notation: y.d() for y’, y.d(2) for y’’, etc.</p></li>
+<li><p>Use in equations: Eq(y.d(2) + y, 0)</p></li>
+<li><p>Component access for vectors: u[0], u[1] for vector components</p></li>
+<li><p>Vectorized operations: u.d() + 2*u for vector equations</p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Variable object that supports</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">var</span><span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">)</span>           <span class="c1"># Create scalar variable y(t)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span><span class="o">.</span><span class="n">d</span><span class="p">()</span>                  <span class="c1"># First derivative y&#39;(t)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span><span class="o">.</span><span class="n">d</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>                 <span class="c1"># Second derivative y&#39;&#39;(t)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Eq</span><span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">d</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">y</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>     <span class="c1"># Simple harmonic oscillator</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">u</span> <span class="o">=</span> <span class="n">var</span><span class="p">(</span><span class="s2">&quot;u&quot;</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,))</span>  <span class="c1"># Create 2D vector variable u(t)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>                      <span class="c1"># First component u[0](t)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">u</span><span class="o">.</span><span class="n">d</span><span class="p">()</span>                     <span class="c1"># Vector derivative u&#39;(t)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Eq</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">d</span><span class="p">()</span> <span class="o">+</span> <span class="n">u</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>         <span class="c1"># Vector equation u&#39; + u = 0</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">z</span> <span class="o">=</span> <span class="n">var</span><span class="p">(</span><span class="s2">&quot;z&quot;</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># Declare z as first-order only</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Eq</span><span class="p">(</span><span class="n">z</span><span class="o">.</span><span class="n">d</span><span class="p">()</span> <span class="o">-</span> <span class="n">z</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>       <span class="c1"># Valid: uses only first derivative</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Eq</span><span class="p">(</span><span class="n">z</span><span class="o">.</span><span class="n">d</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">z</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>      <span class="c1"># Would raise OrderMismatchError</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="odecast.Eq">
+<span class="sig-prename descclassname"><span class="pre">odecast.</span></span><span class="sig-name descname"><span class="pre">Eq</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lhs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rhs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/odecast/equation.html#Eq"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#odecast.Eq" title="Link to this definition"></a></dt>
+<dd><p>Represents an ordinary differential equation.</p>
+<p>The Eq class is used to create equations of the form lhs = rhs, where the
+left and right sides can contain variables, derivatives, and expressions.
+This mirrors SymPy’s Eq class but works with odecast’s Variable and Derivative objects.</p>
+<p class="rubric">Examples</p>
+<p>Simple harmonic oscillator:
+&gt;&gt;&gt; y = var(“y”)
+&gt;&gt;&gt; eq = Eq(y.d(2) + y, 0)</p>
+<p>Damped oscillator with forcing:
+&gt;&gt;&gt; eq = Eq(y.d(2) + 0.3*y.d() + y, sp.sin(t.symbol))</p>
+<p>First-order ODE:
+&gt;&gt;&gt; eq = Eq(y.d() - 2*y, 0)</p>
+<p>Coupled system:
+&gt;&gt;&gt; y, z = var(“y”), var(“z”)
+&gt;&gt;&gt; eq1 = Eq(y.d() - z, 0)
+&gt;&gt;&gt; eq2 = Eq(z.d() + y, 0)</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="odecast.t">
+<span class="sig-prename descclassname"><span class="pre">odecast.</span></span><span class="sig-name descname"><span class="pre">t</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">t</span></em><a class="headerlink" href="#odecast.t" title="Link to this definition"></a></dt>
+<dd><p>The distinguished independent variable, typically time.</p>
+</dd></dl>
+
+</section>
+<section id="solving-functions">
+<h2>Solving Functions<a class="headerlink" href="#solving-functions" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="odecast.solve">
+<span class="sig-prename descclassname"><span class="pre">odecast.</span></span><span class="sig-name descname"><span class="pre">solve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">equation</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ivp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bvp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tspan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/odecast/api.html#solve"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#odecast.solve" title="Link to this definition"></a></dt>
+<dd><p>Solve an ordinary differential equation or system of ODEs.</p>
+<p>This is the main entry point for solving differential equations. It supports
+both symbolic and numeric solutions through different backends.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>equation</strong> – Single Eq object or list of Eq objects representing the ODE system</p></li>
+<li><p><strong>ivp</strong> – Dictionary of initial conditions for initial value problems (IVP).
+Keys can be Variable objects (for y(t0)) or Derivative objects (for y’(t0)).
+Example: {y: 1.0, y.d(): 0.0} for y(0)=1, y’(0)=0</p></li>
+<li><p><strong>bvp</strong> – List of boundary conditions for boundary value problems (BVP).
+Currently not implemented - will be available in future versions.</p></li>
+<li><p><strong>tspan</strong> – Tuple of (t_start, t_end) for numeric solutions.
+Required for scipy backend, ignored for sympy backend.</p></li>
+<li><p><strong>backend</strong> – Solution backend to use:
+- “scipy”: Numeric integration using SciPy (default)
+- “sympy”: Symbolic solution using SymPy
+- “auto”: Try SymPy first, fall back to SciPy if needed
+- “scipy_bvp”: BVP solver (not yet implemented)</p></li>
+<li><p><strong>**kwargs</strong> – Additional backend-specific options:
+For scipy: method, rtol, atol, max_step, etc.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>SolutionIVP: For numeric solutions, supports sol[y], sol[y.d()], etc.</p></li>
+<li><p>SolutionExpr: For symbolic solutions, supports sol.as_expr(y)</p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Solution object that depends on the backend</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><a class="reference internal" href="#odecast.errors.MissingInitialConditionError" title="odecast.errors.MissingInitialConditionError"><strong>MissingInitialConditionError</strong></a> – When required initial conditions are missing</p></li>
+<li><p><a class="reference internal" href="#odecast.errors.OverdeterminedConditionsError" title="odecast.errors.OverdeterminedConditionsError"><strong>OverdeterminedConditionsError</strong></a> – When too many initial conditions provided</p></li>
+<li><p><a class="reference internal" href="#odecast.errors.OrderMismatchError" title="odecast.errors.OrderMismatchError"><strong>OrderMismatchError</strong></a> – When declared variable order conflicts with equation usage</p></li>
+<li><p><a class="reference internal" href="#odecast.errors.BackendError" title="odecast.errors.BackendError"><strong>BackendError</strong></a> – When the chosen backend cannot solve the equation</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.13)"><strong>ValueError</strong></a> – When required arguments are missing (e.g., tspan for scipy)</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>Numeric solution of second-order ODE:
+&gt;&gt;&gt; y = var(“y”)
+&gt;&gt;&gt; eq = Eq(y.d(2) + 0.3*y.d() + y, 0)
+&gt;&gt;&gt; sol = solve(eq, ivp={y: 1.0, y.d(): 0.0}, tspan=(0, 10))
+&gt;&gt;&gt; y_values = sol[y]         # Get y(t) values
+&gt;&gt;&gt; yprime_values = sol[y.d()] # Get y’(t) values</p>
+<p>Symbolic solution:
+&gt;&gt;&gt; eq = Eq(y.d(2) + y, 0)
+&gt;&gt;&gt; sol = solve(eq, backend=”sympy”)
+&gt;&gt;&gt; expr = sol.as_expr(y)    # Get SymPy expression</p>
+<p>Coupled system:
+&gt;&gt;&gt; y, z = var(“y”), var(“z”)
+&gt;&gt;&gt; eq1 = Eq(y.d(2) + z, 0)
+&gt;&gt;&gt; eq2 = Eq(z.d() - y, 0)
+&gt;&gt;&gt; sol = solve([eq1, eq2], ivp={y: 1.0, y.d(): 0.0, z: 0.0}, tspan=(0, 5))</p>
+</dd></dl>
+
+</section>
+<section id="solution-classes">
+<h2>Solution Classes<a class="headerlink" href="#solution-classes" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="odecast.solution.Solution">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">odecast.solution.</span></span><span class="sig-name descname"><span class="pre">Solution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t_values</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_values</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/odecast/solution.html#Solution"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#odecast.solution.Solution" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Base container for ODE solution data and methods.</p>
+<p>This is a placeholder for future symbolic solutions.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="odecast.solution.Solution.as_expr">
+<span class="sig-name descname"><span class="pre">as_expr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/odecast/solution.html#Solution.as_expr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#odecast.solution.Solution.as_expr" title="Link to this definition"></a></dt>
+<dd><p>Return symbolic expression for a variable.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="odecast.solution.Solution.as_first_order">
+<span class="sig-name descname"><span class="pre">as_first_order</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/odecast/solution.html#Solution.as_first_order"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#odecast.solution.Solution.as_first_order" title="Link to this definition"></a></dt>
+<dd><p>Return first-order system representation.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-odecast.errors">
+<span id="validation-and-errors"></span><h2>Validation and Errors<a class="headerlink" href="#module-odecast.errors" title="Link to this heading"></a></h2>
+<p>Custom error types for odecast</p>
+<dl class="py exception">
+<dt class="sig sig-object py" id="odecast.errors.BackendError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">odecast.errors.</span></span><span class="sig-name descname"><span class="pre">BackendError</span></span><a class="reference internal" href="_modules/odecast/errors.html#BackendError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#odecast.errors.BackendError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#odecast.errors.OdecastError" title="odecast.errors.OdecastError"><code class="xref py py-class docutils literal notranslate"><span class="pre">OdecastError</span></code></a></p>
+<p>Raised when a backend-specific error occurs.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="odecast.errors.CompilationError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">odecast.errors.</span></span><span class="sig-name descname"><span class="pre">CompilationError</span></span><a class="reference internal" href="_modules/odecast/errors.html#CompilationError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#odecast.errors.CompilationError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#odecast.errors.OdecastError" title="odecast.errors.OdecastError"><code class="xref py py-class docutils literal notranslate"><span class="pre">OdecastError</span></code></a></p>
+<p>Raised when symbolic to numeric compilation fails.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="odecast.errors.MissingInitialConditionError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">odecast.errors.</span></span><span class="sig-name descname"><span class="pre">MissingInitialConditionError</span></span><a class="reference internal" href="_modules/odecast/errors.html#MissingInitialConditionError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#odecast.errors.MissingInitialConditionError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#odecast.errors.OdecastError" title="odecast.errors.OdecastError"><code class="xref py py-class docutils literal notranslate"><span class="pre">OdecastError</span></code></a></p>
+<p>Raised when required initial conditions are missing.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="odecast.errors.NonSolvableFormError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">odecast.errors.</span></span><span class="sig-name descname"><span class="pre">NonSolvableFormError</span></span><a class="reference internal" href="_modules/odecast/errors.html#NonSolvableFormError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#odecast.errors.NonSolvableFormError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#odecast.errors.OdecastError" title="odecast.errors.OdecastError"><code class="xref py py-class docutils literal notranslate"><span class="pre">OdecastError</span></code></a></p>
+<p>Raised when the equation cannot be solved in the required form.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="odecast.errors.OdecastError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">odecast.errors.</span></span><span class="sig-name descname"><span class="pre">OdecastError</span></span><a class="reference internal" href="_modules/odecast/errors.html#OdecastError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#odecast.errors.OdecastError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
+<p>Base exception for odecast errors.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="odecast.errors.OrderMismatchError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">odecast.errors.</span></span><span class="sig-name descname"><span class="pre">OrderMismatchError</span></span><a class="reference internal" href="_modules/odecast/errors.html#OrderMismatchError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#odecast.errors.OrderMismatchError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#odecast.errors.OdecastError" title="odecast.errors.OdecastError"><code class="xref py py-class docutils literal notranslate"><span class="pre">OdecastError</span></code></a></p>
+<p>Raised when variable order doesn’t match equation requirements.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="odecast.errors.OverdeterminedConditionsError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">odecast.errors.</span></span><span class="sig-name descname"><span class="pre">OverdeterminedConditionsError</span></span><a class="reference internal" href="_modules/odecast/errors.html#OverdeterminedConditionsError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#odecast.errors.OverdeterminedConditionsError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#odecast.errors.OdecastError" title="odecast.errors.OdecastError"><code class="xref py py-class docutils literal notranslate"><span class="pre">OdecastError</span></code></a></p>
+<p>Raised when too many initial/boundary conditions are provided.</p>
+</dd></dl>
+
+</section>
+<section id="internal-modules">
+<h2>Internal Modules<a class="headerlink" href="#internal-modules" title="Link to this heading"></a></h2>
+<p>The following modules are primarily for internal use but may be useful for
+advanced users or contributors.</p>
+<section id="module-odecast.analyze">
+<span id="equation-analysis"></span><h3>Equation Analysis<a class="headerlink" href="#module-odecast.analyze" title="Link to this heading"></a></h3>
+<p>Analysis functions for ODEs - order inference, validation, etc.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="odecast.analyze.analyze_equation">
+<span class="sig-prename descclassname"><span class="pre">odecast.analyze.</span></span><span class="sig-name descname"><span class="pre">analyze_equation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">equation</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/odecast/analyze.html#analyze_equation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#odecast.analyze.analyze_equation" title="Link to this definition"></a></dt>
+<dd><p>Analyze an equation to determine properties like order, variables involved, etc.</p>
+<p>This is a placeholder for future implementation.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="odecast.analyze.collect_variables">
+<span class="sig-prename descclassname"><span class="pre">odecast.analyze.</span></span><span class="sig-name descname"><span class="pre">collect_variables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eqs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.13)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><span class="pre">Eq</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Set" title="(in Python v3.13)"><span class="pre">Set</span></a><span class="p"><span class="pre">[</span></span><span class="pre">Variable</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/odecast/analyze.html#collect_variables"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#odecast.analyze.collect_variables" title="Link to this definition"></a></dt>
+<dd><p>Collect all variables used in the given equations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>eqs</strong> – List of equations to analyze</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Set of Variable objects found in the equations</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="odecast.analyze.infer_orders">
+<span class="sig-prename descclassname"><span class="pre">odecast.analyze.</span></span><span class="sig-name descname"><span class="pre">infer_orders</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eqs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.13)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><span class="pre">Eq</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.13)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><span class="pre">Variable</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/odecast/analyze.html#infer_orders"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#odecast.analyze.infer_orders" title="Link to this definition"></a></dt>
+<dd><p>Infer the maximum derivative order for each variable from the equations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>eqs</strong> – List of equations to analyze</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dictionary mapping each variable to its maximum derivative order</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="odecast.analyze.resolve_orders">
+<span class="sig-prename descclassname"><span class="pre">odecast.analyze.</span></span><span class="sig-name descname"><span class="pre">resolve_orders</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variables</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.13)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><span class="pre">Variable</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inferred</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.13)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><span class="pre">Variable</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.13)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><span class="pre">Variable</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/odecast/analyze.html#resolve_orders"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#odecast.analyze.resolve_orders" title="Link to this definition"></a></dt>
+<dd><p>Resolve final orders by checking intent_order against inferred orders.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>variables</strong> – List of variables to resolve orders for</p></li>
+<li><p><strong>inferred</strong> – Dictionary of inferred orders from equations</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dictionary mapping each variable to its resolved order</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#odecast.errors.OrderMismatchError" title="odecast.errors.OrderMismatchError"><strong>OrderMismatchError</strong></a> – If intent_order is set but is less than inferred order</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-odecast.compile">
+<span id="compilation"></span><h3>Compilation<a class="headerlink" href="#module-odecast.compile" title="Link to this heading"></a></h3>
+<p>Compilation of symbolic expressions to numerical functions</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="odecast.compile.compile_to_function">
+<span class="sig-prename descclassname"><span class="pre">odecast.compile.</span></span><span class="sig-name descname"><span class="pre">compile_to_function</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">expression</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/odecast/compile.html#compile_to_function"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#odecast.compile.compile_to_function" title="Link to this definition"></a></dt>
+<dd><p>Compile a symbolic expression to a numerical function.</p>
+<p>This is a placeholder that will be removed once the above functions are integrated.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="odecast.compile.lambdify_jac">
+<span class="sig-prename descclassname"><span class="pre">odecast.compile.</span></span><span class="sig-name descname"><span class="pre">lambdify_jac</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">jac_sym</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.sympy.org/latest/modules/matrices/dense.html#sympy.matrices.dense.MutableDenseMatrix" title="(in SymPy v1.14.0)"><span class="pre">MutableDenseMatrix</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_symbol</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.sympy.org/latest/modules/core.html#sympy.core.symbol.Symbol" title="(in SymPy v1.14.0)"><span class="pre">Symbol</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">state_syms</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.13)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.sympy.org/latest/modules/core.html#sympy.core.symbol.Symbol" title="(in SymPy v1.14.0)"><span class="pre">Symbol</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_names</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.13)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Callable" title="(in Python v3.13)"><span class="pre">Callable</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span></span><a class="reference internal" href="_modules/odecast/compile.html#lambdify_jac"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#odecast.compile.lambdify_jac" title="Link to this definition"></a></dt>
+<dd><p>Compile symbolic Jacobian matrix to a numerical function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>jac_sym</strong> – SymPy Matrix representing the Jacobian df/dx (can be None)</p></li>
+<li><p><strong>t_symbol</strong> – SymPy symbol for time</p></li>
+<li><p><strong>state_syms</strong> – List of SymPy symbols for state variables</p></li>
+<li><p><strong>param_names</strong> – Optional list of parameter names</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Callable function jac(t, x) -&gt; np.ndarray, or None if jac_sym is None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="odecast.compile.lambdify_rhs">
+<span class="sig-prename descclassname"><span class="pre">odecast.compile.</span></span><span class="sig-name descname"><span class="pre">lambdify_rhs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f_sym_vec</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.sympy.org/latest/modules/matrices/dense.html#sympy.matrices.dense.MutableDenseMatrix" title="(in SymPy v1.14.0)"><span class="pre">MutableDenseMatrix</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_symbol</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.sympy.org/latest/modules/core.html#sympy.core.symbol.Symbol" title="(in SymPy v1.14.0)"><span class="pre">Symbol</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">state_syms</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.13)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.sympy.org/latest/modules/core.html#sympy.core.symbol.Symbol" title="(in SymPy v1.14.0)"><span class="pre">Symbol</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_names</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.13)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Callable" title="(in Python v3.13)"><span class="pre">Callable</span></a></span></span><a class="reference internal" href="_modules/odecast/compile.html#lambdify_rhs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#odecast.compile.lambdify_rhs" title="Link to this definition"></a></dt>
+<dd><p>Compile symbolic RHS vector to a numerical function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>f_sym_vec</strong> – SymPy Matrix representing the RHS vector f(t, x)</p></li>
+<li><p><strong>t_symbol</strong> – SymPy symbol for time</p></li>
+<li><p><strong>state_syms</strong> – List of SymPy symbols for state variables [x0, x1, …]</p></li>
+<li><p><strong>param_names</strong> – Optional list of parameter names to include in the function</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Callable function f(t, x) -&gt; np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-odecast.reduce">
+<span id="order-reduction"></span><h3>Order Reduction<a class="headerlink" href="#module-odecast.reduce" title="Link to this heading"></a></h3>
+<p>Reduction of higher-order ODEs to first-order systems</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="odecast.reduce.StateMapping">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">odecast.reduce.</span></span><span class="sig-name descname"><span class="pre">StateMapping</span></span><a class="reference internal" href="_modules/odecast/reduce.html#StateMapping"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#odecast.reduce.StateMapping" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a></p>
+<p>Enhanced state mapping that supports both Variable and (Variable, level) access patterns.</p>
+<p>This class ensures that mapping[var][level] == mapping[(var, level)] for consistency
+across the API as required by Playbook 8.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="odecast.reduce.VariableIndexer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">odecast.reduce.</span></span><span class="sig-name descname"><span class="pre">VariableIndexer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mapping</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#odecast.reduce.StateMapping" title="odecast.reduce.StateMapping"><span class="pre">StateMapping</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">variable</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Variable</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/odecast/reduce.html#VariableIndexer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#odecast.reduce.VariableIndexer" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Helper class that makes mapping[var][level] equivalent to mapping[(var, level)].</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="odecast.reduce.build_state_map">
+<span class="sig-prename descclassname"><span class="pre">odecast.reduce.</span></span><span class="sig-name descname"><span class="pre">build_state_map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">orders</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.13)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><span class="pre">Variable</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#odecast.reduce.StateMapping" title="odecast.reduce.StateMapping"><span class="pre">StateMapping</span></a></span></span><a class="reference internal" href="_modules/odecast/reduce.html#build_state_map"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#odecast.reduce.build_state_map" title="Link to this definition"></a></dt>
+<dd><p>Build a state mapping for converting higher-order ODEs to first-order systems.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>orders</strong> – Dictionary mapping each Variable to its maximum derivative order</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>mapping[var][level] returns state index for derivative level</p></li>
+<li><p>mapping[(var, level)] returns same state index</p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>StateMapping with consistent access patterns</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="odecast.reduce.isolate_highest_derivatives">
+<span class="sig-prename descclassname"><span class="pre">odecast.reduce.</span></span><span class="sig-name descname"><span class="pre">isolate_highest_derivatives</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eqs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.13)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><span class="pre">Eq</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">orders</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.13)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><span class="pre">Variable</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.13)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><span class="pre">Variable</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.sympy.org/latest/modules/core.html#sympy.core.expr.Expr" title="(in SymPy v1.14.0)"><span class="pre">Expr</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/odecast/reduce.html#isolate_highest_derivatives"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#odecast.reduce.isolate_highest_derivatives" title="Link to this definition"></a></dt>
+<dd><p>Isolate the highest derivatives in the equations.</p>
+<p>For each variable with order k&gt;0, find an equation containing the k-th derivative
+and solve for that derivative in terms of t and lower derivatives.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>eqs</strong> – List of equations</p></li>
+<li><p><strong>orders</strong> – Dictionary mapping variables to their orders</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dictionary mapping each variable to a SymPy expression for its highest derivative</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#odecast.errors.NonSolvableFormError" title="odecast.errors.NonSolvableFormError"><strong>NonSolvableFormError</strong></a> – If a highest derivative cannot be isolated</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="odecast.reduce.make_rhs">
+<span class="sig-prename descclassname"><span class="pre">odecast.reduce.</span></span><span class="sig-name descname"><span class="pre">make_rhs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t_symbol</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.sympy.org/latest/modules/core.html#sympy.core.symbol.Symbol" title="(in SymPy v1.14.0)"><span class="pre">Symbol</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">mapping</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.13)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><span class="pre">Variable</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><span class="pre">tuple</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.13)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">highest_rules</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.13)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><span class="pre">Variable</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.sympy.org/latest/modules/core.html#sympy.core.expr.Expr" title="(in SymPy v1.14.0)"><span class="pre">Expr</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.13)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.sympy.org/latest/modules/matrices/dense.html#sympy.matrices.dense.MutableDenseMatrix" title="(in SymPy v1.14.0)"><span class="pre">MutableDenseMatrix</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.sympy.org/latest/modules/matrices/dense.html#sympy.matrices.dense.MutableDenseMatrix" title="(in SymPy v1.14.0)"><span class="pre">MutableDenseMatrix</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/odecast/reduce.html#make_rhs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#odecast.reduce.make_rhs" title="Link to this definition"></a></dt>
+<dd><p>Build the right-hand side vector field f(t, x) for the first-order system.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>t_symbol</strong> – The SymPy symbol for the independent variable</p></li>
+<li><p><strong>mapping</strong> – State mapping from build_state_map</p></li>
+<li><p><strong>highest_rules</strong> – Expressions for highest derivatives from isolate_highest_derivatives</p></li>
+<li><p><strong>params</strong> – Optional parameter values to substitute</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Tuple of (f_sympy_vector, jac_sympy_matrix)
+- f_sympy_vector: SymPy Matrix representing dx/dt = f(t, x)
+- jac_sympy_matrix: SymPy Matrix representing the Jacobian df/dx (optional for MVP)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="odecast.reduce.reduce_to_first_order">
+<span class="sig-prename descclassname"><span class="pre">odecast.reduce.</span></span><span class="sig-name descname"><span class="pre">reduce_to_first_order</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">equation</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_conditions</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/odecast/reduce.html#reduce_to_first_order"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#odecast.reduce.reduce_to_first_order" title="Link to this definition"></a></dt>
+<dd><p>Reduce a higher-order ODE to a system of first-order ODEs.</p>
+<p>This is a placeholder for future implementation that will integrate
+the above functions.</p>
+</dd></dl>
+
+</section>
+<section id="module-odecast.validate">
+<span id="validation"></span><h3>Validation<a class="headerlink" href="#module-odecast.validate" title="Link to this heading"></a></h3>
+<p>Validation functions for ODEs and initial/boundary conditions</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="odecast.validate.normalize_ivp">
+<span class="sig-prename descclassname"><span class="pre">odecast.validate.</span></span><span class="sig-name descname"><span class="pre">normalize_ivp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ivp_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.13)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><span class="pre">Variable</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Derivative</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.13)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.13)"><span class="pre">Tuple</span></a><span class="p"><span class="pre">[</span></span><span class="pre">Variable</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/odecast/validate.html#normalize_ivp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#odecast.validate.normalize_ivp" title="Link to this definition"></a></dt>
+<dd><p>Normalize IVP dictionary to use (Variable, level) keys.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ivp_dict</strong> – Dictionary with Variable (level 0), Derivative (level n≥1),
+or VectorDerivative keys, with values that can be floats or lists</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dictionary with (Variable, level) keys for all components</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="odecast.validate.validate_initial_conditions">
+<span class="sig-prename descclassname"><span class="pre">odecast.validate.</span></span><span class="sig-name descname"><span class="pre">validate_initial_conditions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">equation</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conditions</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/odecast/validate.html#validate_initial_conditions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#odecast.validate.validate_initial_conditions" title="Link to this definition"></a></dt>
+<dd><p>Validate that initial conditions match the equation requirements.</p>
+<p>This is a placeholder that will be removed once the above functions are integrated.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="odecast.validate.validate_ivp">
+<span class="sig-prename descclassname"><span class="pre">odecast.validate.</span></span><span class="sig-name descname"><span class="pre">validate_ivp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">orders</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.13)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><span class="pre">Variable</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ivp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.13)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><span class="pre">Variable</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Derivative</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span></span><a class="reference internal" href="_modules/odecast/validate.html#validate_ivp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#odecast.validate.validate_ivp" title="Link to this definition"></a></dt>
+<dd><p>Validate that IVP has correct number of initial conditions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>orders</strong> – Dictionary mapping variables to their orders</p></li>
+<li><p><strong>ivp</strong> – IVP dictionary with initial conditions</p></li>
+<li><p><strong>t0</strong> – Initial time</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><a class="reference internal" href="#odecast.errors.MissingInitialConditionError" title="odecast.errors.MissingInitialConditionError"><strong>MissingInitialConditionError</strong></a> – When required initial conditions are missing</p></li>
+<li><p><a class="reference internal" href="#odecast.errors.OverdeterminedConditionsError" title="odecast.errors.OverdeterminedConditionsError"><strong>OverdeterminedConditionsError</strong></a> – When too many conditions are provided</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="odecast.validate.validate_variable_orders">
+<span class="sig-prename descclassname"><span class="pre">odecast.validate.</span></span><span class="sig-name descname"><span class="pre">validate_variable_orders</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">equations</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.13)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><span class="pre">Eq</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">declared_orders</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.13)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><span class="pre">Variable</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span></span><a class="reference internal" href="_modules/odecast/validate.html#validate_variable_orders"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#odecast.validate.validate_variable_orders" title="Link to this definition"></a></dt>
+<dd><p>Validate that declared variable orders match equation requirements.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>equations</strong> – List of equations to check</p></li>
+<li><p><strong>declared_orders</strong> – Dictionary of explicitly declared variable orders</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#odecast.errors.OrderMismatchError" title="odecast.errors.OrderMismatchError"><strong>OrderMismatchError</strong></a> – When declared order doesn’t match equation usage</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-odecast.backends.scipy_ivp">
+<span id="backend-implementations"></span><h3>Backend Implementations<a class="headerlink" href="#module-odecast.backends.scipy_ivp" title="Link to this heading"></a></h3>
+<p>SciPy-based backend for solving initial value problems</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="odecast.backends.scipy_ivp.ScipyIVPBackend">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">odecast.backends.scipy_ivp.</span></span><span class="sig-name descname"><span class="pre">ScipyIVPBackend</span></span><a class="reference internal" href="_modules/odecast/backends/scipy_ivp.html#ScipyIVPBackend"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#odecast.backends.scipy_ivp.ScipyIVPBackend" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Backend for solving IVPs using SciPy’s solve_ivp.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="odecast.backends.scipy_ivp.ScipyIVPBackend.solve">
+<span class="sig-name descname"><span class="pre">solve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f_compiled</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Callable" title="(in Python v3.13)"><span class="pre">Callable</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">jac_compiled</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Callable" title="(in Python v3.13)"><span class="pre">Callable</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">x0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><span class="pre">ndarray</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">t0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">tspan</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.13)"><span class="pre">Tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mapping</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.13)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><span class="pre">Variable</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.13)"><span class="pre">Tuple</span></a><span class="p"><span class="pre">[</span></span><span class="pre">Variable</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><span class="pre">list</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">options</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.13)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><span class="pre">Any</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">SolutionIVP</span></span></span><a class="reference internal" href="_modules/odecast/backends/scipy_ivp.html#ScipyIVPBackend.solve"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#odecast.backends.scipy_ivp.ScipyIVPBackend.solve" title="Link to this definition"></a></dt>
+<dd><p>Solve the IVP using SciPy’s solve_ivp.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>f_compiled</strong> – Compiled RHS function f(t, x) -&gt; dx/dt</p></li>
+<li><p><strong>jac_compiled</strong> – Compiled Jacobian function (optional)</p></li>
+<li><p><strong>x0</strong> – Initial state vector</p></li>
+<li><p><strong>t0</strong> – Initial time</p></li>
+<li><p><strong>tspan</strong> – Tuple of (t_start, t_end)</p></li>
+<li><p><strong>mapping</strong> – State mapping from build_state_map</p></li>
+<li><p><strong>options</strong> – Additional solver options</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>SolutionIVP object with results</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="odecast.backends.scipy_ivp.convert_ivp_to_state_vector">
+<span class="sig-prename descclassname"><span class="pre">odecast.backends.scipy_ivp.</span></span><span class="sig-name descname"><span class="pre">convert_ivp_to_state_vector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ivp_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.13)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><span class="pre">Variable</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Derivative</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mapping</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.13)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><span class="pre">Variable</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.13)"><span class="pre">Tuple</span></a><span class="p"><span class="pre">[</span></span><span class="pre">Variable</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><span class="pre">list</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><span class="pre">ndarray</span></a></span></span><a class="reference internal" href="_modules/odecast/backends/scipy_ivp.html#convert_ivp_to_state_vector"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#odecast.backends.scipy_ivp.convert_ivp_to_state_vector" title="Link to this definition"></a></dt>
+<dd><p>Convert IVP dictionary to initial state vector.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ivp_dict</strong> – Dictionary mapping variables/derivatives to initial values</p></li>
+<li><p><strong>mapping</strong> – State mapping from build_state_map</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Initial state vector x0</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="odecast.backends.scipy_ivp.solve_ivp_scipy">
+<span class="sig-prename descclassname"><span class="pre">odecast.backends.scipy_ivp.</span></span><span class="sig-name descname"><span class="pre">solve_ivp_scipy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">equation</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_conditions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tspan</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/odecast/backends/scipy_ivp.html#solve_ivp_scipy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#odecast.backends.scipy_ivp.solve_ivp_scipy" title="Link to this definition"></a></dt>
+<dd><p>Solve an IVP using SciPy’s solve_ivp.</p>
+<p>This is a placeholder that will be removed once the ScipyIVPBackend is integrated.</p>
+</dd></dl>
+
+<p id="module-odecast.backends.scipy_bvp">SciPy-based backend for solving boundary value problems</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="odecast.backends.scipy_bvp.ScipyBVPBackend">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">odecast.backends.scipy_bvp.</span></span><span class="sig-name descname"><span class="pre">ScipyBVPBackend</span></span><a class="reference internal" href="_modules/odecast/backends/scipy_bvp.html#ScipyBVPBackend"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#odecast.backends.scipy_bvp.ScipyBVPBackend" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Backend for solving boundary value problems using SciPy’s solve_bvp.</p>
+<p>This backend will handle two-point boundary value problems where
+conditions are specified at multiple points in the domain.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="odecast.backends.scipy_bvp.ScipyBVPBackend.solve">
+<span class="sig-name descname"><span class="pre">solve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><span class="pre">Any</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">bvp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.13)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#odecast.api.BC" title="odecast.api.BC"><span class="pre">BC</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tspan</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><span class="pre">tuple</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">options</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.13)"><span class="pre">Dict</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><span class="pre">Any</span></a></span></span><a class="reference internal" href="_modules/odecast/backends/scipy_bvp.html#ScipyBVPBackend.solve"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#odecast.backends.scipy_bvp.ScipyBVPBackend.solve" title="Link to this definition"></a></dt>
+<dd><p>Solve a boundary value problem.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>system</strong> – First-order system representation</p></li>
+<li><p><strong>bvp</strong> – List of boundary conditions</p></li>
+<li><p><strong>tspan</strong> – Integration domain (start, end)</p></li>
+<li><p><strong>options</strong> – Additional solver options</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Solution object for BVP</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#NotImplementedError" title="(in Python v3.13)"><strong>NotImplementedError</strong></a> – BVP implementation arrives in Milestone 5</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="odecast.backends.scipy_bvp.solve_bvp_scipy">
+<span class="sig-prename descclassname"><span class="pre">odecast.backends.scipy_bvp.</span></span><span class="sig-name descname"><span class="pre">solve_bvp_scipy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">equation</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">boundary_conditions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tspan</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/odecast/backends/scipy_bvp.html#solve_bvp_scipy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#odecast.backends.scipy_bvp.solve_bvp_scipy" title="Link to this definition"></a></dt>
+<dd><p>Solve a BVP using SciPy’s solve_bvp.</p>
+<p>This is a placeholder for future implementation.</p>
+</dd></dl>
+
+<p id="module-odecast.backends.sympy_backend">SymPy-based backend for symbolic ODE solving</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="odecast.backends.sympy_backend.SolutionExpr">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">odecast.backends.sympy_backend.</span></span><span class="sig-name descname"><span class="pre">SolutionExpr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">solutions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.13)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><span class="pre">Variable</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.sympy.org/latest/modules/core.html#sympy.core.expr.Expr" title="(in SymPy v1.14.0)"><span class="pre">Expr</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_symbol</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.sympy.org/latest/modules/core.html#sympy.core.symbol.Symbol" title="(in SymPy v1.14.0)"><span class="pre">Symbol</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/odecast/backends/sympy_backend.html#SolutionExpr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#odecast.backends.sympy_backend.SolutionExpr" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Symbolic solution object that wraps SymPy expressions.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="odecast.backends.sympy_backend.SolutionExpr.as_expr">
+<span class="sig-name descname"><span class="pre">as_expr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">var</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Variable</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.sympy.org/latest/modules/core.html#sympy.core.expr.Expr" title="(in SymPy v1.14.0)"><span class="pre">Expr</span></a></span></span><a class="reference internal" href="_modules/odecast/backends/sympy_backend.html#SolutionExpr.as_expr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#odecast.backends.sympy_backend.SolutionExpr.as_expr" title="Link to this definition"></a></dt>
+<dd><p>Get the SymPy expression for a variable.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>var</strong> – Variable to get expression for</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>SymPy expression in terms of t</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#KeyError" title="(in Python v3.13)"><strong>KeyError</strong></a> – If variable not found in solution</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="odecast.backends.sympy_backend.SymPyBackend">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">odecast.backends.sympy_backend.</span></span><span class="sig-name descname"><span class="pre">SymPyBackend</span></span><a class="reference internal" href="_modules/odecast/backends/sympy_backend.html#SymPyBackend"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#odecast.backends.sympy_backend.SymPyBackend" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Backend that uses SymPy for symbolic ODE solving.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="odecast.backends.sympy_backend.SymPyBackend.solve">
+<span class="sig-name descname"><span class="pre">solve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">equations</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.13)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><span class="pre">Eq</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_symbol</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.sympy.org/latest/modules/core.html#sympy.core.symbol.Symbol" title="(in SymPy v1.14.0)"><span class="pre">Symbol</span></a></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">options</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#odecast.backends.sympy_backend.SolutionExpr" title="odecast.backends.sympy_backend.SolutionExpr"><span class="pre">SolutionExpr</span></a></span></span><a class="reference internal" href="_modules/odecast/backends/sympy_backend.html#SymPyBackend.solve"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#odecast.backends.sympy_backend.SymPyBackend.solve" title="Link to this definition"></a></dt>
+<dd><p>Solve ODEs symbolically using SymPy.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>equations</strong> – List of equations to solve</p></li>
+<li><p><strong>t_symbol</strong> – SymPy symbol for independent variable</p></li>
+<li><p><strong>**options</strong> – Additional options (currently unused)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>SolutionExpr object with symbolic solutions</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#odecast.errors.BackendError" title="odecast.errors.BackendError"><strong>BackendError</strong></a> – If SymPy cannot solve the system</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="odecast.backends.sympy_backend.solve_symbolic_sympy">
+<span class="sig-prename descclassname"><span class="pre">odecast.backends.sympy_backend.</span></span><span class="sig-name descname"><span class="pre">solve_symbolic_sympy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">equation</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/odecast/backends/sympy_backend.html#solve_symbolic_sympy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#odecast.backends.sympy_backend.solve_symbolic_sympy" title="Link to this definition"></a></dt>
+<dd><p>Solve an ODE symbolically using SymPy.</p>
+<p>This is a placeholder for future implementation.</p>
+</dd></dl>
+
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="user_guide.html" class="btn btn-neutral float-left" title="User Guide" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="examples.html" class="btn btn-neutral float-right" title="Examples" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Matthias Baer.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -84,9 +84,9 @@ plt.plot(solution.t, solution[y])
 plt.show()  # Beautiful decay curve! 📈
 ```
 
-## 💪 Power Features
+## Power Features
 
-### 🎯 **Intuitive Syntax** 
+### **Intuitive Syntax** 
 ```python
 # Traditional nightmare:
 def system(t, z): return [z[1], -0.3*z[1] - z[0]]
@@ -95,19 +95,19 @@ def system(t, z): return [z[1], -0.3*z[1] - z[0]]
 Eq(y.d(2) + 0.3*y.d() + y, 0)
 ```
 
-### 🔗 **Vector Systems Made Easy**
+### **Vector Systems Made Easy**
 ```python
 # 2D harmonic oscillator in one line:
 u = var("u", shape=2)
 Eq(u.d(2) + u, 0)  # Automatically expands to u₀'' + u₀ = 0, u₁'' + u₁ = 0
 ```
 
-### ⚡ **Multiple Backends**
+### **Multiple Backends**
 - **SciPy**: Lightning-fast numerics for engineering
 - **SymPy**: Exact symbolic solutions for analysis  
 - **Auto**: Tries symbolic first, falls back to numeric
 
-### 🛡️ **Bulletproof Validation**
+### **Bulletproof Validation**
 ```python
 # Clear error messages when you mess up:
 y = var("y")
@@ -115,7 +115,7 @@ solve(Eq(y.d(2) + y, 0), ivp={y: 1.0})  # Missing y'(0)!
 # ❌ ODEValidationError: Missing initial condition for y.d()
 ```
 
-### 🎨 **Real-World Examples**
+### **Real-World Examples**
 
 | Domain | Equation | Odecast Code |
 |--------|----------|--------------|
@@ -124,14 +124,14 @@ solve(Eq(y.d(2) + y, 0), ivp={y: 1.0})  # Missing y'(0)!
 | **Engineering** | RLC Circuit: `Lq̈ + Rq̇ + q/C = V(t)` | `Eq(L*q.d(2) + R*q.d() + q/C, V)` |
 | **Economics** | Growth: `K̇ = sY - δK` | `Eq(K.d() - s*Y + delta*K, 0)` |
 
-### 👥 **Who Uses Odecast?**
+### **Who Uses Odecast?**
 
 - 🎓 **Researchers**: Copy equations directly from papers
 - 👨‍🎓 **Students**: Focus on physics, not programming
 - 🏭 **Engineers**: Rapid prototyping of dynamic systems  
 - 📊 **Data Scientists**: Time-series modeling made easy
 
-## 🏆 Show Me The Code
+## Show Me The Code
 
 **Example 1: Pendulum with damping**
 ```python
@@ -158,7 +158,7 @@ sol = solve(eq, ivp={u: [1, 0], u.d(): [0, 1]}, tspan=(0, 10))
 plt.plot(sol[u[0]], sol[u[1]])  # Phase space plot! 🌀
 ```
 
-## 📚 More Examples
+## More Examples
 
 ```python
 from odecast import t, var, Eq, solve

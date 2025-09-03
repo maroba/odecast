@@ -1,0 +1,373 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>odecast.api &mdash; Odecast 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
+
+  
+    <link rel="shortcut icon" href="../../_static/odecast-logo.png"/>
+    <link rel="canonical" href="https://maroba.github.io/odecast/_modules/odecast/api.html" />
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Odecast
+              <img src="../../_static/odecast-logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">Quick Start Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user_guide.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api_reference.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Odecast</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">odecast.api</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for odecast.api</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Main APIs for odecast</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">List</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.symbols</span><span class="w"> </span><span class="kn">import</span> <span class="n">t</span><span class="p">,</span> <span class="n">Variable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.equation</span><span class="w"> </span><span class="kn">import</span> <span class="n">Eq</span>
+
+
+<div class="viewcode-block" id="var">
+<a class="viewcode-back" href="../../api_reference.html#odecast.api.var">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">var</span><span class="p">(</span>
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">order</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">shape</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">tuple</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Variable</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create a dependent variable for use in differential equations.</span>
+
+<span class="sd">    The variable represents an unknown function y(t) where t is the independent variable.</span>
+<span class="sd">    You can create derivatives using the .d(n) method.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        name: Name of the variable (e.g., &quot;y&quot;, &quot;x&quot;, &quot;theta&quot;)</span>
+<span class="sd">        order: Maximum order of derivatives expected (optional, for validation).</span>
+<span class="sd">               If specified and equations use higher-order derivatives, an</span>
+<span class="sd">               OrderMismatchError will be raised.</span>
+<span class="sd">        shape: Shape tuple for vector/matrix variables (e.g., (3,) for 3D vector,</span>
+<span class="sd">               (2, 2) for 2x2 matrix). None for scalar variables.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Variable object that supports:</span>
+<span class="sd">        - Arithmetic operations: y + z, 2*y, y/3, etc.</span>
+<span class="sd">        - Derivative notation: y.d() for y&#39;, y.d(2) for y&#39;&#39;, etc.</span>
+<span class="sd">        - Use in equations: Eq(y.d(2) + y, 0)</span>
+<span class="sd">        - Component access for vectors: u[0], u[1] for vector components</span>
+<span class="sd">        - Vectorized operations: u.d() + 2*u for vector equations</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; y = var(&quot;y&quot;)           # Create scalar variable y(t)</span>
+<span class="sd">        &gt;&gt;&gt; y.d()                  # First derivative y&#39;(t)</span>
+<span class="sd">        &gt;&gt;&gt; y.d(2)                 # Second derivative y&#39;&#39;(t)</span>
+<span class="sd">        &gt;&gt;&gt; Eq(y.d(2) + y, 0)     # Simple harmonic oscillator</span>
+
+<span class="sd">        &gt;&gt;&gt; u = var(&quot;u&quot;, shape=(2,))  # Create 2D vector variable u(t)</span>
+<span class="sd">        &gt;&gt;&gt; u[0]                      # First component u[0](t)</span>
+<span class="sd">        &gt;&gt;&gt; u.d()                     # Vector derivative u&#39;(t)</span>
+<span class="sd">        &gt;&gt;&gt; Eq(u.d() + u, 0)         # Vector equation u&#39; + u = 0</span>
+
+<span class="sd">        &gt;&gt;&gt; z = var(&quot;z&quot;, order=1)  # Declare z as first-order only</span>
+<span class="sd">        &gt;&gt;&gt; Eq(z.d() - z, 0)       # Valid: uses only first derivative</span>
+<span class="sd">        &gt;&gt;&gt; Eq(z.d(2) + z, 0)      # Would raise OrderMismatchError</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">Variable</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">order</span><span class="p">,</span> <span class="n">shape</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="solve">
+<a class="viewcode-back" href="../../api_reference.html#odecast.api.solve">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">solve</span><span class="p">(</span><span class="n">equation</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">ivp</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">bvp</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tspan</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Solve an ordinary differential equation or system of ODEs.</span>
+
+<span class="sd">    This is the main entry point for solving differential equations. It supports</span>
+<span class="sd">    both symbolic and numeric solutions through different backends.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        equation: Single Eq object or list of Eq objects representing the ODE system</span>
+<span class="sd">        ivp: Dictionary of initial conditions for initial value problems (IVP).</span>
+<span class="sd">             Keys can be Variable objects (for y(t0)) or Derivative objects (for y&#39;(t0)).</span>
+<span class="sd">             Example: {y: 1.0, y.d(): 0.0} for y(0)=1, y&#39;(0)=0</span>
+<span class="sd">        bvp: List of boundary conditions for boundary value problems (BVP).</span>
+<span class="sd">             Currently not implemented - will be available in future versions.</span>
+<span class="sd">        tspan: Tuple of (t_start, t_end) for numeric solutions.</span>
+<span class="sd">               Required for scipy backend, ignored for sympy backend.</span>
+<span class="sd">        backend: Solution backend to use:</span>
+<span class="sd">                 - &quot;scipy&quot;: Numeric integration using SciPy (default)</span>
+<span class="sd">                 - &quot;sympy&quot;: Symbolic solution using SymPy</span>
+<span class="sd">                 - &quot;auto&quot;: Try SymPy first, fall back to SciPy if needed</span>
+<span class="sd">                 - &quot;scipy_bvp&quot;: BVP solver (not yet implemented)</span>
+<span class="sd">        **kwargs: Additional backend-specific options:</span>
+<span class="sd">                  For scipy: method, rtol, atol, max_step, etc.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Solution object that depends on the backend:</span>
+<span class="sd">        - SolutionIVP: For numeric solutions, supports sol[y], sol[y.d()], etc.</span>
+<span class="sd">        - SolutionExpr: For symbolic solutions, supports sol.as_expr(y)</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        MissingInitialConditionError: When required initial conditions are missing</span>
+<span class="sd">        OverdeterminedConditionsError: When too many initial conditions provided</span>
+<span class="sd">        OrderMismatchError: When declared variable order conflicts with equation usage</span>
+<span class="sd">        BackendError: When the chosen backend cannot solve the equation</span>
+<span class="sd">        ValueError: When required arguments are missing (e.g., tspan for scipy)</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        Numeric solution of second-order ODE:</span>
+<span class="sd">        &gt;&gt;&gt; y = var(&quot;y&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; eq = Eq(y.d(2) + 0.3*y.d() + y, 0)</span>
+<span class="sd">        &gt;&gt;&gt; sol = solve(eq, ivp={y: 1.0, y.d(): 0.0}, tspan=(0, 10))</span>
+<span class="sd">        &gt;&gt;&gt; y_values = sol[y]         # Get y(t) values</span>
+<span class="sd">        &gt;&gt;&gt; yprime_values = sol[y.d()] # Get y&#39;(t) values</span>
+
+<span class="sd">        Symbolic solution:</span>
+<span class="sd">        &gt;&gt;&gt; eq = Eq(y.d(2) + y, 0)</span>
+<span class="sd">        &gt;&gt;&gt; sol = solve(eq, backend=&quot;sympy&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; expr = sol.as_expr(y)    # Get SymPy expression</span>
+
+<span class="sd">        Coupled system:</span>
+<span class="sd">        &gt;&gt;&gt; y, z = var(&quot;y&quot;), var(&quot;z&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; eq1 = Eq(y.d(2) + z, 0)</span>
+<span class="sd">        &gt;&gt;&gt; eq2 = Eq(z.d() - y, 0)</span>
+<span class="sd">        &gt;&gt;&gt; sol = solve([eq1, eq2], ivp={y: 1.0, y.d(): 0.0, z: 0.0}, tspan=(0, 5))</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">.analyze</span><span class="w"> </span><span class="kn">import</span> <span class="n">collect_variables</span><span class="p">,</span> <span class="n">infer_orders</span><span class="p">,</span> <span class="n">resolve_orders</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">.validate</span><span class="w"> </span><span class="kn">import</span> <span class="n">validate_ivp</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">.reduce</span><span class="w"> </span><span class="kn">import</span> <span class="n">build_state_map</span><span class="p">,</span> <span class="n">isolate_highest_derivatives</span><span class="p">,</span> <span class="n">make_rhs</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">.compile</span><span class="w"> </span><span class="kn">import</span> <span class="n">lambdify_rhs</span><span class="p">,</span> <span class="n">lambdify_jac</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">.backends.scipy_ivp</span><span class="w"> </span><span class="kn">import</span> <span class="n">ScipyIVPBackend</span><span class="p">,</span> <span class="n">convert_ivp_to_state_vector</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">.equation</span><span class="w"> </span><span class="kn">import</span> <span class="n">expand_vector_equations</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">sympy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sp</span>
+
+    <span class="c1"># Normalize equations to list</span>
+    <span class="n">eqs</span> <span class="o">=</span> <span class="p">[</span><span class="n">equation</span><span class="p">]</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">equation</span><span class="p">,</span> <span class="n">Eq</span><span class="p">)</span> <span class="k">else</span> <span class="nb">list</span><span class="p">(</span><span class="n">equation</span><span class="p">)</span>
+
+    <span class="c1"># Expand vector equations to component equations</span>
+    <span class="n">eqs</span> <span class="o">=</span> <span class="n">expand_vector_equations</span><span class="p">(</span><span class="n">eqs</span><span class="p">)</span>
+
+    <span class="c1"># Step 1: Analyze - infer orders and resolve</span>
+    <span class="n">variables</span> <span class="o">=</span> <span class="n">collect_variables</span><span class="p">(</span><span class="n">eqs</span><span class="p">)</span>
+    <span class="n">inferred_orders</span> <span class="o">=</span> <span class="n">infer_orders</span><span class="p">(</span><span class="n">eqs</span><span class="p">)</span>
+    <span class="n">orders</span> <span class="o">=</span> <span class="n">resolve_orders</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">variables</span><span class="p">),</span> <span class="n">inferred_orders</span><span class="p">)</span>
+
+    <span class="c1"># Route to appropriate backend</span>
+    <span class="k">if</span> <span class="n">backend</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">backend</span> <span class="o">=</span> <span class="s2">&quot;scipy&quot;</span>  <span class="c1"># Default to scipy for IVP</span>
+
+    <span class="k">if</span> <span class="n">backend</span> <span class="o">==</span> <span class="s2">&quot;auto&quot;</span><span class="p">:</span>
+        <span class="c1"># Try SymPy first, fall back to SciPy on failure</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">.backends.sympy_backend</span><span class="w"> </span><span class="kn">import</span> <span class="n">SymPyBackend</span>
+
+            <span class="n">backend_instance</span> <span class="o">=</span> <span class="n">SymPyBackend</span><span class="p">()</span>
+            <span class="n">solution</span> <span class="o">=</span> <span class="n">backend_instance</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span>
+                <span class="n">equations</span><span class="o">=</span><span class="n">eqs</span><span class="p">,</span> <span class="n">t_symbol</span><span class="o">=</span><span class="n">t</span><span class="o">.</span><span class="n">symbol</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="n">solution</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="c1"># Fall back to SciPy backend</span>
+            <span class="n">backend</span> <span class="o">=</span> <span class="s2">&quot;scipy&quot;</span>
+
+    <span class="k">if</span> <span class="n">backend</span> <span class="o">==</span> <span class="s2">&quot;scipy&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">ivp</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;IVP conditions required for scipy backend&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">tspan</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;tspan required for scipy backend&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Step 2: Validate IVP</span>
+        <span class="n">t0</span> <span class="o">=</span> <span class="n">tspan</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">validate_ivp</span><span class="p">(</span><span class="n">orders</span><span class="p">,</span> <span class="n">ivp</span><span class="p">,</span> <span class="n">t0</span><span class="p">)</span>
+
+        <span class="c1"># Step 3: Reduce to first-order system</span>
+        <span class="n">mapping</span> <span class="o">=</span> <span class="n">build_state_map</span><span class="p">(</span><span class="n">orders</span><span class="p">)</span>
+        <span class="n">highest_rules</span> <span class="o">=</span> <span class="n">isolate_highest_derivatives</span><span class="p">(</span><span class="n">eqs</span><span class="p">,</span> <span class="n">orders</span><span class="p">)</span>
+        <span class="n">f_sym_vec</span><span class="p">,</span> <span class="n">jac_sym</span> <span class="o">=</span> <span class="n">make_rhs</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">symbol</span><span class="p">,</span> <span class="n">mapping</span><span class="p">,</span> <span class="n">highest_rules</span><span class="p">)</span>
+
+        <span class="c1"># Step 4: Convert IVP to state vector</span>
+        <span class="n">x0</span> <span class="o">=</span> <span class="n">convert_ivp_to_state_vector</span><span class="p">(</span><span class="n">ivp</span><span class="p">,</span> <span class="n">mapping</span><span class="p">)</span>
+
+        <span class="c1"># Step 5: Compile to numerical functions</span>
+        <span class="c1"># Determine state symbols</span>
+        <span class="n">n_states</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">x0</span><span class="p">)</span>
+        <span class="n">state_syms</span> <span class="o">=</span> <span class="p">[</span><span class="n">sp</span><span class="o">.</span><span class="n">Symbol</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;x</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_states</span><span class="p">)]</span>
+
+        <span class="n">f_compiled</span> <span class="o">=</span> <span class="n">lambdify_rhs</span><span class="p">(</span><span class="n">f_sym_vec</span><span class="p">,</span> <span class="n">t</span><span class="o">.</span><span class="n">symbol</span><span class="p">,</span> <span class="n">state_syms</span><span class="p">)</span>
+        <span class="n">jac_compiled</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">lambdify_jac</span><span class="p">(</span><span class="n">jac_sym</span><span class="p">,</span> <span class="n">t</span><span class="o">.</span><span class="n">symbol</span><span class="p">,</span> <span class="n">state_syms</span><span class="p">)</span> <span class="k">if</span> <span class="n">jac_sym</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Step 6: Solve using SciPy backend</span>
+        <span class="n">backend_instance</span> <span class="o">=</span> <span class="n">ScipyIVPBackend</span><span class="p">()</span>
+        <span class="n">solution</span> <span class="o">=</span> <span class="n">backend_instance</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span>
+            <span class="n">f_compiled</span><span class="o">=</span><span class="n">f_compiled</span><span class="p">,</span>
+            <span class="n">jac_compiled</span><span class="o">=</span><span class="n">jac_compiled</span><span class="p">,</span>
+            <span class="n">x0</span><span class="o">=</span><span class="n">x0</span><span class="p">,</span>
+            <span class="n">t0</span><span class="o">=</span><span class="n">t0</span><span class="p">,</span>
+            <span class="n">tspan</span><span class="o">=</span><span class="n">tspan</span><span class="p">,</span>
+            <span class="n">mapping</span><span class="o">=</span><span class="n">mapping</span><span class="p">,</span>
+            <span class="n">options</span><span class="o">=</span><span class="n">kwargs</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">solution</span>
+
+    <span class="k">elif</span> <span class="n">backend</span> <span class="o">==</span> <span class="s2">&quot;sympy&quot;</span><span class="p">:</span>
+        <span class="c1"># SymPy backend for symbolic solutions</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">.backends.sympy_backend</span><span class="w"> </span><span class="kn">import</span> <span class="n">SymPyBackend</span>
+
+        <span class="c1"># Create SymPy backend instance</span>
+        <span class="n">backend_instance</span> <span class="o">=</span> <span class="n">SymPyBackend</span><span class="p">()</span>
+        <span class="n">solution</span> <span class="o">=</span> <span class="n">backend_instance</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">equations</span><span class="o">=</span><span class="n">eqs</span><span class="p">,</span> <span class="n">t_symbol</span><span class="o">=</span><span class="n">t</span><span class="o">.</span><span class="n">symbol</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">solution</span>
+
+    <span class="k">elif</span> <span class="n">backend</span> <span class="o">==</span> <span class="s2">&quot;scipy_bvp&quot;</span><span class="p">:</span>
+        <span class="c1"># Import BVP backend</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">.backends.scipy_bvp</span><span class="w"> </span><span class="kn">import</span> <span class="n">ScipyBVPBackend</span>
+
+        <span class="c1"># Create BVP backend instance</span>
+        <span class="n">backend_instance</span> <span class="o">=</span> <span class="n">ScipyBVPBackend</span><span class="p">()</span>
+
+        <span class="c1"># For now, just raise NotImplementedError as the actual implementation</span>
+        <span class="c1"># will come in Milestone 5</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;BVP backend will be implemented in Milestone 5&quot;</span><span class="p">)</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown backend: </span><span class="si">{</span><span class="n">backend</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="BC">
+<a class="viewcode-back" href="../../api_reference.html#odecast.api.BC">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">BC</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Boundary condition for boundary value problems (BVP).</span>
+
+<span class="sd">    Boundary conditions specify the value of a variable or its derivative</span>
+<span class="sd">    at specific points in the domain. This is used for BVP problems where</span>
+<span class="sd">    conditions are given at multiple points rather than all at the initial point.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        variable: The variable or derivative to constrain (Variable or Derivative object)</span>
+<span class="sd">        t: The time/position where the condition applies</span>
+<span class="sd">        value: The required value at that position</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; y = var(&quot;y&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; bc1 = BC(y, t=0, value=0)      # y(0) = 0</span>
+<span class="sd">        &gt;&gt;&gt; bc2 = BC(y, t=1, value=1)      # y(1) = 1</span>
+<span class="sd">        &gt;&gt;&gt; bc3 = BC(y.d(), t=0, value=0)  # y&#39;(0) = 0</span>
+
+<span class="sd">        BVP problem:</span>
+<span class="sd">        &gt;&gt;&gt; eq = Eq(y.d(2) + y, 0)</span>
+<span class="sd">        &gt;&gt;&gt; sol = solve(eq, bvp=[bc1, bc2], tspan=(0, 1), backend=&quot;scipy_bvp&quot;)</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        BVP solving is not yet implemented and will be available in future versions.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create a boundary condition.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            variable: The variable or derivative to constrain</span>
+<span class="sd">            t: The time/position where condition applies</span>
+<span class="sd">            value: The value at that position</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">variable</span> <span class="o">=</span> <span class="n">variable</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">t</span> <span class="o">=</span> <span class="n">t</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">value</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;BC(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">variable</span><span class="si">}</span><span class="s2">, t=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">t</span><span class="si">}</span><span class="s2">, value=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2">)&quot;</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Matthias Baer.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

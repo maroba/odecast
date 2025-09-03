@@ -1,0 +1,1013 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Examples &mdash; Odecast 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/plot_directive.css" />
+
+  
+    <link rel="shortcut icon" href="_static/odecast-logo.png"/>
+    <link rel="canonical" href="https://maroba.github.io/odecast/examples.html" />
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=01f34227"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "displayMath": [["$$", "$$"], ["\\[", "\\]"]]}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Contributing" href="contributing.html" />
+    <link rel="prev" title="API Reference" href="api_reference.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Odecast
+              <img src="_static/odecast-logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quick Start Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user_guide.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_reference.html">API Reference</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Examples</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#physics-examples">Physics Examples</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#damped-harmonic-oscillator">Damped Harmonic Oscillator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#simple-pendulum">Simple Pendulum</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#d-harmonic-oscillator">2D Harmonic Oscillator</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#biology-examples">Biology Examples</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#lotka-volterra-model">Lotka-Volterra Model</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#engineering-examples">Engineering Examples</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#rlc-circuit">RLC Circuit</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#control-systems">Control Systems</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#symbolic-examples">Symbolic Examples</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#exact-solutions">Exact Solutions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#mixed-systems">Mixed Systems</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#complete-example-scripts">Complete Example Scripts</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Odecast</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Examples</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/examples.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="examples">
+<h1>Examples<a class="headerlink" href="#examples" title="Link to this heading"></a></h1>
+<p>This section provides comprehensive examples demonstrating Odecast’s capabilities
+across various domains.</p>
+<section id="physics-examples">
+<h2>Physics Examples<a class="headerlink" href="#physics-examples" title="Link to this heading"></a></h2>
+<section id="damped-harmonic-oscillator">
+<h3>Damped Harmonic Oscillator<a class="headerlink" href="#damped-harmonic-oscillator" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>A classic example from mechanics: a mass-spring sys   ax4.plot(t_fine, kinetic, ‘g-’, linewidth=2, label=’Kinetic’)</dt><dd><p>ax4.plot(t_fine, potential, ‘r-’, linewidth=2, label=’Potential’)
+ax4.plot(t_fine, total_energy, ‘k-’, linewidth=2, label=’Total’) with damping.</p>
+</dd>
+</dl>
+<p><strong>Mathematical Model:</strong></p>
+<p>The equation of motion for a damped harmonic oscillator is:</p>
+<div class="math notranslate nohighlight">
+\[m\frac{d^2x}{dt^2} + c\frac{dx}{dt} + kx = 0\]</div>
+<p>This can be written in standard form as:</p>
+<div class="math notranslate nohighlight">
+\[\frac{d^2x}{dt^2} + 2\zeta\omega_n\frac{dx}{dt} + \omega_n^2 x = 0\]</div>
+<p>where <span class="math notranslate nohighlight">\(\omega_n = \sqrt{k/m}\)</span> is the natural frequency and <span class="math notranslate nohighlight">\(\zeta = c/(2\sqrt{km})\)</span> is the damping ratio.</p>
+<p><strong>Odecast Implementation:</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">odecast</span><span class="w"> </span><span class="kn">import</span> <span class="n">var</span><span class="p">,</span> <span class="n">Eq</span><span class="p">,</span> <span class="n">solve</span>
+
+<span class="c1"># Define the variable</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">var</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">)</span>
+
+<span class="c1"># System parameters</span>
+<span class="n">omega_n</span> <span class="o">=</span> <span class="mf">2.0</span>  <span class="c1"># Natural frequency</span>
+<span class="n">zeta</span> <span class="o">=</span> <span class="mf">0.3</span>     <span class="c1"># Damping ratio</span>
+
+<span class="c1"># Damped harmonic oscillator: x&#39;&#39; + 2*zeta*omega_n*x&#39; + omega_n^2*x = 0</span>
+<span class="n">equation</span> <span class="o">=</span> <span class="n">Eq</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">d</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="mi">2</span><span class="o">*</span><span class="n">zeta</span><span class="o">*</span><span class="n">omega_n</span><span class="o">*</span><span class="n">x</span><span class="o">.</span><span class="n">d</span><span class="p">()</span> <span class="o">+</span> <span class="n">omega_n</span><span class="o">**</span><span class="mi">2</span><span class="o">*</span><span class="n">x</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+<span class="c1"># Initial conditions: x(0) = 1, x&#39;(0) = 0</span>
+<span class="n">initial_conditions</span> <span class="o">=</span> <span class="p">{</span><span class="n">x</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">d</span><span class="p">():</span> <span class="mf">0.0</span><span class="p">}</span>
+
+<span class="c1"># Solve the equation with fine resolution</span>
+<span class="n">solution</span> <span class="o">=</span> <span class="n">solve</span><span class="p">(</span><span class="n">equation</span><span class="p">,</span> <span class="n">ivp</span><span class="o">=</span><span class="n">initial_conditions</span><span class="p">,</span> <span class="n">tspan</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span>
+                <span class="n">backend</span><span class="o">=</span><span class="s2">&quot;scipy&quot;</span><span class="p">,</span> <span class="n">max_step</span><span class="o">=</span><span class="mf">0.01</span><span class="p">)</span>
+
+<span class="c1"># Create fine time grid for smooth plotting</span>
+<span class="n">t_fine</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span>
+<span class="n">x_smooth</span> <span class="o">=</span> <span class="n">solution</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">t_fine</span><span class="p">)</span>
+<span class="n">xdot_smooth</span> <span class="o">=</span> <span class="n">solution</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">d</span><span class="p">(),</span> <span class="n">t_fine</span><span class="p">)</span>
+
+<span class="c1"># Create the plot</span>
+<span class="n">fig</span><span class="p">,</span> <span class="p">(</span><span class="n">ax1</span><span class="p">,</span> <span class="n">ax2</span><span class="p">)</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+
+<span class="c1"># Time series plot</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t_fine</span><span class="p">,</span> <span class="n">x_smooth</span><span class="p">,</span> <span class="s1">&#39;b-&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Position&#39;</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t_fine</span><span class="p">,</span> <span class="n">xdot_smooth</span><span class="p">,</span> <span class="s1">&#39;r--&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Velocity&#39;</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Time (s)&#39;</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Amplitude&#39;</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Damped Harmonic Oscillator&#39;</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+
+<span class="c1"># Phase portrait</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x_smooth</span><span class="p">,</span> <span class="n">xdot_smooth</span><span class="p">,</span> <span class="s1">&#39;g-&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x_smooth</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">xdot_smooth</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;ro&#39;</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Start&#39;</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x_smooth</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">xdot_smooth</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="s1">&#39;bs&#39;</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;End&#39;</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Position&#39;</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Velocity&#39;</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Phase Portrait&#39;</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>(<a class="reference download internal" download="" href="_downloads/7f7a115c2b83c92f47f29b447e7a0f78/examples-1.png"><code class="xref download docutils literal notranslate"><span class="pre">png</span></code></a>, <a class="reference download internal" download="" href="_downloads/c495367c1be077bf728b0dd521bef86d/examples-1.svg"><code class="xref download docutils literal notranslate"><span class="pre">svg</span></code></a>)</p>
+<figure class="align-default">
+<img alt="_images/examples-1.png" class="plot-directive" src="_images/examples-1.png" />
+</figure>
+<p>The solution shows the characteristic exponential decay of a damped oscillator. The phase portrait
+spirals inward to the equilibrium point at the origin.</p>
+</section>
+<section id="simple-pendulum">
+<h3>Simple Pendulum<a class="headerlink" href="#simple-pendulum" title="Link to this heading"></a></h3>
+<p>A nonlinear pendulum demonstrating chaotic behavior for large angles.</p>
+<p><strong>Mathematical Model:</strong></p>
+<p>The equation of motion for a simple pendulum is:</p>
+<div class="math notranslate nohighlight">
+\[\frac{d^2\theta}{dt^2} + \frac{g}{L}\sin(\theta) = 0\]</div>
+<p>For small angles, <span class="math notranslate nohighlight">\(\sin(\theta) \approx \theta\)</span>, giving the linear approximation:</p>
+<div class="math notranslate nohighlight">
+\[\frac{d^2\theta}{dt^2} + \frac{g}{L}\theta = 0\]</div>
+<p>For this demonstration, we’ll compare the linear case with a nonlinear variant
+that includes a cubic restoring force to show the effect of nonlinearity.</p>
+<p><strong>Implementation:</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sympy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sp</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">odecast</span><span class="w"> </span><span class="kn">import</span> <span class="n">var</span><span class="p">,</span> <span class="n">Eq</span><span class="p">,</span> <span class="n">solve</span>
+
+<span class="c1"># Parameters</span>
+<span class="n">g</span> <span class="o">=</span> <span class="mf">9.81</span>  <span class="c1"># acceleration due to gravity (m/s²)</span>
+<span class="n">L</span> <span class="o">=</span> <span class="mf">1.0</span>   <span class="c1"># pendulum length (m)</span>
+
+<span class="c1"># Define the variable</span>
+<span class="n">theta</span> <span class="o">=</span> <span class="n">var</span><span class="p">(</span><span class="s2">&quot;theta&quot;</span><span class="p">)</span>
+
+<span class="c1"># Compare linear vs nonlinear pendulum (using small-angle approximation for demo)</span>
+<span class="n">eq_linear</span> <span class="o">=</span> <span class="n">Eq</span><span class="p">(</span><span class="n">theta</span><span class="o">.</span><span class="n">d</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">g</span><span class="o">/</span><span class="n">L</span><span class="p">)</span><span class="o">*</span><span class="n">theta</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="c1"># For nonlinear demo, we&#39;ll use a cubic term to show nonlinearity</span>
+<span class="n">eq_nonlinear</span> <span class="o">=</span> <span class="n">Eq</span><span class="p">(</span><span class="n">theta</span><span class="o">.</span><span class="n">d</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">g</span><span class="o">/</span><span class="n">L</span><span class="p">)</span><span class="o">*</span><span class="n">theta</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="mf">0.1</span><span class="o">*</span><span class="n">theta</span><span class="o">*</span><span class="n">theta</span><span class="p">),</span> <span class="mi">0</span><span class="p">)</span>
+
+<span class="c1"># Initial conditions: large angle</span>
+<span class="n">theta0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">3</span>  <span class="c1"># 60 degrees</span>
+<span class="n">initial_conditions</span> <span class="o">=</span> <span class="p">{</span><span class="n">theta</span><span class="p">:</span> <span class="n">theta0</span><span class="p">,</span> <span class="n">theta</span><span class="o">.</span><span class="n">d</span><span class="p">():</span> <span class="mf">0.0</span><span class="p">}</span>
+
+<span class="c1"># Solve both equations with fine resolution</span>
+<span class="n">sol_linear</span> <span class="o">=</span> <span class="n">solve</span><span class="p">(</span><span class="n">eq_linear</span><span class="p">,</span> <span class="n">ivp</span><span class="o">=</span><span class="n">initial_conditions</span><span class="p">,</span> <span class="n">tspan</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span>
+                  <span class="n">backend</span><span class="o">=</span><span class="s2">&quot;scipy&quot;</span><span class="p">,</span> <span class="n">max_step</span><span class="o">=</span><span class="mf">0.02</span><span class="p">)</span>
+<span class="n">sol_nonlinear</span> <span class="o">=</span> <span class="n">solve</span><span class="p">(</span><span class="n">eq_nonlinear</span><span class="p">,</span> <span class="n">ivp</span><span class="o">=</span><span class="n">initial_conditions</span><span class="p">,</span> <span class="n">tspan</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span>
+                     <span class="n">backend</span><span class="o">=</span><span class="s2">&quot;scipy&quot;</span><span class="p">,</span> <span class="n">max_step</span><span class="o">=</span><span class="mf">0.02</span><span class="p">)</span>
+
+<span class="c1"># Create fine time grid for smooth evaluation</span>
+<span class="n">t_fine</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span>
+<span class="n">theta_linear</span> <span class="o">=</span> <span class="n">sol_linear</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">t_fine</span><span class="p">)</span>
+<span class="n">theta_nonlinear</span> <span class="o">=</span> <span class="n">sol_nonlinear</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">t_fine</span><span class="p">)</span>
+<span class="n">thetadot_linear</span> <span class="o">=</span> <span class="n">sol_linear</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">theta</span><span class="o">.</span><span class="n">d</span><span class="p">(),</span> <span class="n">t_fine</span><span class="p">)</span>
+<span class="n">thetadot_nonlinear</span> <span class="o">=</span> <span class="n">sol_nonlinear</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">theta</span><span class="o">.</span><span class="n">d</span><span class="p">(),</span> <span class="n">t_fine</span><span class="p">)</span>
+
+<span class="c1"># Create comparison plot</span>
+<span class="n">fig</span><span class="p">,</span> <span class="p">(</span><span class="n">ax1</span><span class="p">,</span> <span class="n">ax2</span><span class="p">)</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+
+<span class="c1"># Time series comparison</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t_fine</span><span class="p">,</span> <span class="n">theta_linear</span><span class="o">*</span><span class="mi">180</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="s1">&#39;b--&#39;</span><span class="p">,</span>
+        <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Linear pendulum&#39;</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t_fine</span><span class="p">,</span> <span class="n">theta_nonlinear</span><span class="o">*</span><span class="mi">180</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="s1">&#39;r-&#39;</span><span class="p">,</span>
+        <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Nonlinear pendulum&#39;</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Time (s)&#39;</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Angle (degrees)&#39;</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Linear vs Nonlinear Pendulum Dynamics&#39;</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+
+<span class="c1"># Phase portraits</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">theta_linear</span><span class="o">*</span><span class="mi">180</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">thetadot_linear</span><span class="o">*</span><span class="mi">180</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span>
+        <span class="s1">&#39;b--&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Linear&#39;</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">theta_nonlinear</span><span class="o">*</span><span class="mi">180</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">thetadot_nonlinear</span><span class="o">*</span><span class="mi">180</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span>
+        <span class="s1">&#39;r-&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Nonlinear&#39;</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Angle (degrees)&#39;</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Angular velocity (deg/s)&#39;</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Phase Portraits&#39;</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>(<a class="reference download internal" download="" href="_downloads/39315b7abb87ed2ccb496b6527419b5d/examples-2.png"><code class="xref download docutils literal notranslate"><span class="pre">png</span></code></a>, <a class="reference download internal" download="" href="_downloads/ce4800ebc2a8948122ec30bd9c612aaa/examples-2.svg"><code class="xref download docutils literal notranslate"><span class="pre">svg</span></code></a>)</p>
+<figure class="align-default">
+<img alt="_images/examples-2.png" class="plot-directive" src="_images/examples-2.png" />
+</figure>
+<p>The nonlinear pendulum shows a longer period than the linear approximation,
+especially for large initial angles.</p>
+</section>
+<section id="d-harmonic-oscillator">
+<h3>2D Harmonic Oscillator<a class="headerlink" href="#d-harmonic-oscillator" title="Link to this heading"></a></h3>
+<p>A particle moving in a 2D harmonic potential, demonstrating vector variables.</p>
+<p><strong>Mathematical Model:</strong></p>
+<p>The equations of motion for a 2D isotropic harmonic oscillator are:</p>
+<div class="math notranslate nohighlight">
+\[\frac{d^2\mathbf{r}}{dt^2} + \omega^2 \mathbf{r} = 0\]</div>
+<p>where <span class="math notranslate nohighlight">\(\mathbf{r} = (x, y)\)</span> is the position vector and <span class="math notranslate nohighlight">\(\omega\)</span> is the angular frequency.</p>
+<p><strong>Implementation:</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">odecast</span><span class="w"> </span><span class="kn">import</span> <span class="n">var</span><span class="p">,</span> <span class="n">Eq</span><span class="p">,</span> <span class="n">solve</span>
+
+<span class="c1"># Define 2D position vector</span>
+<span class="n">r</span> <span class="o">=</span> <span class="n">var</span><span class="p">(</span><span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="c1"># System parameter</span>
+<span class="n">omega</span> <span class="o">=</span> <span class="mf">1.0</span>  <span class="c1"># Angular frequency</span>
+
+<span class="c1"># 2D harmonic oscillator: r&#39;&#39; + omega^2 * r = 0</span>
+<span class="n">equation</span> <span class="o">=</span> <span class="n">Eq</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">d</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">omega</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">r</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+<span class="c1"># Initial conditions: elliptical orbit</span>
+<span class="n">initial_conditions</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">r</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span>      <span class="c1"># r(0) = [1, 0]</span>
+    <span class="n">r</span><span class="o">.</span><span class="n">d</span><span class="p">():</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">]</span>   <span class="c1"># r&#39;(0) = [0, 1.5]</span>
+<span class="p">}</span>
+
+<span class="c1"># Solve the system with fine resolution</span>
+<span class="n">solution</span> <span class="o">=</span> <span class="n">solve</span><span class="p">(</span><span class="n">equation</span><span class="p">,</span> <span class="n">ivp</span><span class="o">=</span><span class="n">initial_conditions</span><span class="p">,</span> <span class="n">tspan</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">),</span>
+                <span class="n">backend</span><span class="o">=</span><span class="s2">&quot;scipy&quot;</span><span class="p">,</span> <span class="n">max_step</span><span class="o">=</span><span class="mf">0.05</span><span class="p">)</span>
+
+<span class="c1"># Create fine time grid for smooth evaluation</span>
+<span class="n">t_fine</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span>
+<span class="n">r_vals</span> <span class="o">=</span> <span class="n">solution</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">t_fine</span><span class="p">)</span>  <span class="c1"># This returns a 2D array</span>
+<span class="n">rdot_vals</span> <span class="o">=</span> <span class="n">solution</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">d</span><span class="p">(),</span> <span class="n">t_fine</span><span class="p">)</span>
+
+<span class="c1"># Extract x and y components</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">r_vals</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">r_vals</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">vx</span> <span class="o">=</span> <span class="n">rdot_vals</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">vy</span> <span class="o">=</span> <span class="n">rdot_vals</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+<span class="c1"># Create visualization</span>
+<span class="n">fig</span><span class="p">,</span> <span class="p">((</span><span class="n">ax1</span><span class="p">,</span> <span class="n">ax2</span><span class="p">),</span> <span class="p">(</span><span class="n">ax3</span><span class="p">,</span> <span class="n">ax4</span><span class="p">))</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+
+<span class="c1"># Trajectory in phase space</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="s1">&#39;b-&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;go&#39;</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Start&#39;</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">y</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="s1">&#39;ro&#39;</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;End&#39;</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;x position&#39;</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;y position&#39;</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;2D Trajectory&#39;</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="s1">&#39;equal&#39;</span><span class="p">)</span>
+
+<span class="c1"># Time series for x component</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t_fine</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="s1">&#39;r-&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;x(t)&#39;</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t_fine</span><span class="p">,</span> <span class="n">vx</span><span class="p">,</span> <span class="s1">&#39;r--&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;x&#39;(t)&quot;</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Time&#39;</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;x component&#39;</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;X Component vs Time&#39;</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+
+<span class="c1"># Time series for y component</span>
+<span class="n">ax3</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t_fine</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="s1">&#39;b-&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;y(t)&#39;</span><span class="p">)</span>
+<span class="n">ax3</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t_fine</span><span class="p">,</span> <span class="n">vy</span><span class="p">,</span> <span class="s1">&#39;b--&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;y&#39;(t)&quot;</span><span class="p">)</span>
+<span class="n">ax3</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Time&#39;</span><span class="p">)</span>
+<span class="n">ax3</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;y component&#39;</span><span class="p">)</span>
+<span class="n">ax3</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Y Component vs Time&#39;</span><span class="p">)</span>
+<span class="n">ax3</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">ax3</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+
+<span class="c1"># Energy conservation check</span>
+<span class="n">kinetic</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">vx</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">vy</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">potential</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">omega</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">y</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">total_energy</span> <span class="o">=</span> <span class="n">kinetic</span> <span class="o">+</span> <span class="n">potential</span>
+
+<span class="n">ax4</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t_fine</span><span class="p">,</span> <span class="n">kinetic</span><span class="p">,</span> <span class="s1">&#39;g-&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Kinetic&#39;</span><span class="p">)</span>
+<span class="n">ax4</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t_fine</span><span class="p">,</span> <span class="n">potential</span><span class="p">,</span> <span class="s1">&#39;r-&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Potential&#39;</span><span class="p">)</span>
+<span class="n">ax4</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t_fine</span><span class="p">,</span> <span class="n">total_energy</span><span class="p">,</span> <span class="s1">&#39;k--&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Total&#39;</span><span class="p">)</span>
+<span class="n">ax4</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Time&#39;</span><span class="p">)</span>
+<span class="n">ax4</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Energy&#39;</span><span class="p">)</span>
+<span class="n">ax4</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Energy Conservation&#39;</span><span class="p">)</span>
+<span class="n">ax4</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">ax4</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>(<a class="reference download internal" download="" href="_downloads/f9dc9f2411250edd9b00e3b94995e319/examples-3.png"><code class="xref download docutils literal notranslate"><span class="pre">png</span></code></a>, <a class="reference download internal" download="" href="_downloads/60449b6b50f2d6006c80c0d5d36fd3d0/examples-3.svg"><code class="xref download docutils literal notranslate"><span class="pre">svg</span></code></a>)</p>
+<figure class="align-default">
+<img alt="_images/examples-3.png" class="plot-directive" src="_images/examples-3.png" />
+</figure>
+<p>The solution demonstrates perfect energy conservation and the characteristic
+elliptical motion of a 2D harmonic oscillator.</p>
+</section>
+</section>
+<section id="biology-examples">
+<h2>Biology Examples<a class="headerlink" href="#biology-examples" title="Link to this heading"></a></h2>
+<section id="lotka-volterra-model">
+<h3>Lotka-Volterra Model<a class="headerlink" href="#lotka-volterra-model" title="Link to this heading"></a></h3>
+<p>The classic predator-prey model from population dynamics.</p>
+<p><strong>Mathematical Model:</strong></p>
+<p>The Lotka-Volterra equations describe the dynamics of biological systems
+with predator and prey interactions:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\frac{dx}{dt} &amp;= ax - bxy \\
+\frac{dy}{dt} &amp;= -cy + dxy\end{split}\]</div>
+<p>where:
+- <span class="math notranslate nohighlight">\(x(t)\)</span> is the prey population
+- <span class="math notranslate nohighlight">\(y(t)\)</span> is the predator population
+- <span class="math notranslate nohighlight">\(a, c &gt; 0\)</span> are growth/death rates
+- <span class="math notranslate nohighlight">\(b, d &gt; 0\)</span> are interaction coefficients</p>
+<p><strong>Conservation Property:</strong></p>
+<p>The system has a conserved quantity (Hamiltonian):</p>
+<div class="math notranslate nohighlight">
+\[H(x,y) = d \cdot x + c \ln(x) + b \cdot y + a \ln(y) = \text{constant}\]</div>
+<p><strong>Implementation:</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">odecast</span><span class="w"> </span><span class="kn">import</span> <span class="n">var</span><span class="p">,</span> <span class="n">Eq</span><span class="p">,</span> <span class="n">solve</span>
+
+<span class="c1"># Define variables</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">var</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">)</span>  <span class="c1"># Prey population</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">var</span><span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">)</span>  <span class="c1"># Predator population</span>
+
+<span class="c1"># Model parameters</span>
+<span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">,</span> <span class="mf">0.075</span>
+
+<span class="c1"># Lotka-Volterra equations</span>
+<span class="n">equations</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">Eq</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">d</span><span class="p">()</span> <span class="o">-</span> <span class="n">a</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="n">b</span><span class="o">*</span><span class="n">x</span><span class="o">*</span><span class="n">y</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>  <span class="c1"># dx/dt = ax - bxy</span>
+    <span class="n">Eq</span><span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">d</span><span class="p">()</span> <span class="o">+</span> <span class="n">c</span><span class="o">*</span><span class="n">y</span> <span class="o">-</span> <span class="n">d</span><span class="o">*</span><span class="n">x</span><span class="o">*</span><span class="n">y</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>   <span class="c1"># dy/dt = -cy + dxy</span>
+<span class="p">]</span>
+
+<span class="c1"># Initial conditions</span>
+<span class="n">initial_conditions</span> <span class="o">=</span> <span class="p">{</span><span class="n">x</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="mi">5</span><span class="p">}</span>
+
+<span class="c1"># Solve the system with fine resolution</span>
+<span class="n">solution</span> <span class="o">=</span> <span class="n">solve</span><span class="p">(</span><span class="n">equations</span><span class="p">,</span> <span class="n">ivp</span><span class="o">=</span><span class="n">initial_conditions</span><span class="p">,</span> <span class="n">tspan</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">15</span><span class="p">),</span>
+                <span class="n">backend</span><span class="o">=</span><span class="s2">&quot;scipy&quot;</span><span class="p">,</span> <span class="n">max_step</span><span class="o">=</span><span class="mf">0.05</span><span class="p">)</span>
+
+<span class="c1"># Create fine time grid for smooth evaluation</span>
+<span class="n">t_fine</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span>
+<span class="n">x_vals</span> <span class="o">=</span> <span class="n">solution</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">t_fine</span><span class="p">)</span>
+<span class="n">y_vals</span> <span class="o">=</span> <span class="n">solution</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">t_fine</span><span class="p">)</span>
+
+<span class="c1"># Create comprehensive visualization</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+
+<span class="c1"># Population vs time</span>
+<span class="n">ax1</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t_fine</span><span class="p">,</span> <span class="n">x_vals</span><span class="p">,</span> <span class="s1">&#39;b-&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Prey&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t_fine</span><span class="p">,</span> <span class="n">y_vals</span><span class="p">,</span> <span class="s1">&#39;r-&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Predator&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Time&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Population&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Population Dynamics&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+
+<span class="c1"># Phase portrait</span>
+<span class="n">ax2</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x_vals</span><span class="p">,</span> <span class="n">y_vals</span><span class="p">,</span> <span class="s1">&#39;g-&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x_vals</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">y_vals</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;go&#39;</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Start&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x_vals</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">y_vals</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="s1">&#39;ro&#39;</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;End&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Prey Population&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Predator Population&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Phase Portrait&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+
+<span class="c1"># Conservation quantity verification</span>
+<span class="n">ax3</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="n">H</span> <span class="o">=</span> <span class="n">d</span><span class="o">*</span><span class="n">x_vals</span> <span class="o">+</span> <span class="n">c</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">x_vals</span><span class="p">)</span> <span class="o">+</span> <span class="n">b</span><span class="o">*</span><span class="n">y_vals</span> <span class="o">+</span> <span class="n">a</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">y_vals</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t_fine</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="s1">&#39;k-&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Time&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;H (conserved quantity)&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Conservation Check&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+
+<span class="c1"># Growth rates</span>
+<span class="n">ax4</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+<span class="n">prey_growth</span> <span class="o">=</span> <span class="n">a</span><span class="o">*</span><span class="n">x_vals</span> <span class="o">-</span> <span class="n">b</span><span class="o">*</span><span class="n">x_vals</span><span class="o">*</span><span class="n">y_vals</span>
+<span class="n">pred_growth</span> <span class="o">=</span> <span class="o">-</span><span class="n">c</span><span class="o">*</span><span class="n">y_vals</span> <span class="o">+</span> <span class="n">d</span><span class="o">*</span><span class="n">x_vals</span><span class="o">*</span><span class="n">y_vals</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t_fine</span><span class="p">,</span> <span class="n">prey_growth</span><span class="p">,</span> <span class="s1">&#39;b-&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Prey growth rate&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t_fine</span><span class="p">,</span> <span class="n">pred_growth</span><span class="p">,</span> <span class="s1">&#39;r-&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Predator growth rate&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Time&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Growth rate&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Population Growth Rates&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+
+<span class="c1"># Vector field (direction field)</span>
+<span class="n">ax5</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+<span class="n">x_range</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">18</span><span class="p">,</span> <span class="mi">15</span><span class="p">)</span>
+<span class="n">y_range</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">12</span><span class="p">)</span>
+<span class="n">X</span><span class="p">,</span> <span class="n">Y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">x_range</span><span class="p">,</span> <span class="n">y_range</span><span class="p">)</span>
+
+<span class="c1"># Calculate direction field</span>
+<span class="n">DX</span> <span class="o">=</span> <span class="n">a</span><span class="o">*</span><span class="n">X</span> <span class="o">-</span> <span class="n">b</span><span class="o">*</span><span class="n">X</span><span class="o">*</span><span class="n">Y</span>
+<span class="n">DY</span> <span class="o">=</span> <span class="o">-</span><span class="n">c</span><span class="o">*</span><span class="n">Y</span> <span class="o">+</span> <span class="n">d</span><span class="o">*</span><span class="n">X</span><span class="o">*</span><span class="n">Y</span>
+
+<span class="c1"># Normalize arrows</span>
+<span class="n">M</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">DX</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">DY</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">M</span><span class="p">[</span><span class="n">M</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">DX_norm</span> <span class="o">=</span> <span class="n">DX</span><span class="o">/</span><span class="n">M</span>
+<span class="n">DY_norm</span> <span class="o">=</span> <span class="n">DY</span><span class="o">/</span><span class="n">M</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">quiver</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">DX_norm</span><span class="p">,</span> <span class="n">DY_norm</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;viridis&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x_vals</span><span class="p">,</span> <span class="n">y_vals</span><span class="p">,</span> <span class="s1">&#39;r-&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Solution trajectory&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Prey Population&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Predator Population&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Direction Field&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+
+<span class="c1"># Equilibrium analysis</span>
+<span class="n">ax6</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>
+<span class="c1"># Equilibrium points: (0,0) and (c/d, a/b)</span>
+<span class="n">eq_x</span><span class="p">,</span> <span class="n">eq_y</span> <span class="o">=</span> <span class="n">c</span><span class="o">/</span><span class="n">d</span><span class="p">,</span> <span class="n">a</span><span class="o">/</span><span class="n">b</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x_vals</span><span class="p">,</span> <span class="n">y_vals</span><span class="p">,</span> <span class="s1">&#39;g-&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Trajectory&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;ks&#39;</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Extinction equilibrium&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">eq_x</span><span class="p">,</span> <span class="n">eq_y</span><span class="p">,</span> <span class="s1">&#39;ro&#39;</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Coexistence equilibrium&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Prey Population&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Predator Population&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Equilibrium Points&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>(<a class="reference download internal" download="" href="_downloads/f063d315e25369535465136ceed55d38/examples-4.png"><code class="xref download docutils literal notranslate"><span class="pre">png</span></code></a>, <a class="reference download internal" download="" href="_downloads/1c63377ff9ac0d230c2e0fde457ba37f/examples-4.svg"><code class="xref download docutils literal notranslate"><span class="pre">svg</span></code></a>)</p>
+<figure class="align-default">
+<img alt="_images/examples-4.png" class="plot-directive" src="_images/examples-4.png" />
+</figure>
+<p>The Lotka-Volterra model shows periodic oscillations with perfect conservation
+of the Hamiltonian. The coexistence equilibrium at <span class="math notranslate nohighlight">\((c/d, a/b) = (20, 10)\)</span>
+is a center surrounded by closed orbits.</p>
+</section>
+</section>
+<section id="engineering-examples">
+<h2>Engineering Examples<a class="headerlink" href="#engineering-examples" title="Link to this heading"></a></h2>
+<section id="rlc-circuit">
+<h3>RLC Circuit<a class="headerlink" href="#rlc-circuit" title="Link to this heading"></a></h3>
+<p>An electrical circuit with resistance, inductance, and capacitance.</p>
+<p><strong>Mathematical Model:</strong></p>
+<p>The voltage equation for an RLC circuit is derived from Kirchhoff’s voltage law:</p>
+<div class="math notranslate nohighlight">
+\[L\frac{d^2q}{dt^2} + R\frac{dq}{dt} + \frac{q}{C} = V(t)\]</div>
+<p>where:
+- <span class="math notranslate nohighlight">\(q(t)\)</span> is the charge on the capacitor
+- <span class="math notranslate nohighlight">\(L\)</span> is inductance (H)
+- <span class="math notranslate nohighlight">\(R\)</span> is resistance (Ω)
+- <span class="math notranslate nohighlight">\(C\)</span> is capacitance (F)
+- <span class="math notranslate nohighlight">\(V(t)\)</span> is the applied voltage</p>
+<p>The current is <span class="math notranslate nohighlight">\(i(t) = dq/dt\)</span> and the capacitor voltage is <span class="math notranslate nohighlight">\(v_C = q/C\)</span>.</p>
+<p><strong>Circuit Analysis:</strong></p>
+<p>This is a second-order system with characteristic equation:</p>
+<div class="math notranslate nohighlight">
+\[Ls^2 + Rs + \frac{1}{C} = 0\]</div>
+<p>The damping ratio is <span class="math notranslate nohighlight">\(\zeta = \frac{R}{2}\sqrt{\frac{C}{L}}\)</span> and
+natural frequency is <span class="math notranslate nohighlight">\(\omega_n = \frac{1}{\sqrt{LC}}\)</span>.</p>
+<p><strong>Implementation:</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">odecast</span><span class="w"> </span><span class="kn">import</span> <span class="n">var</span><span class="p">,</span> <span class="n">Eq</span><span class="p">,</span> <span class="n">solve</span>
+
+<span class="c1"># Circuit parameters</span>
+<span class="n">L</span> <span class="o">=</span> <span class="mf">1e-3</span>   <span class="c1"># Inductance (H)</span>
+<span class="n">R</span> <span class="o">=</span> <span class="mi">10</span>     <span class="c1"># Resistance (Ω)</span>
+<span class="n">C</span> <span class="o">=</span> <span class="mf">1e-6</span>   <span class="c1"># Capacitance (F)</span>
+<span class="n">V0</span> <span class="o">=</span> <span class="mi">12</span>    <span class="c1"># Applied voltage (V)</span>
+
+<span class="c1"># Calculate characteristic parameters</span>
+<span class="n">omega_n</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">L</span><span class="o">*</span><span class="n">C</span><span class="p">)</span>
+<span class="n">zeta</span> <span class="o">=</span> <span class="n">R</span><span class="o">/</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">C</span><span class="o">/</span><span class="n">L</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Natural frequency: </span><span class="si">{</span><span class="n">omega_n</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> rad/s&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Damping ratio: </span><span class="si">{</span><span class="n">zeta</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># Define charge variable</span>
+<span class="n">q</span> <span class="o">=</span> <span class="n">var</span><span class="p">(</span><span class="s2">&quot;q&quot;</span><span class="p">)</span>
+
+<span class="c1"># RLC equation: L*q&#39;&#39; + R*q&#39; + q/C = V0</span>
+<span class="n">equation</span> <span class="o">=</span> <span class="n">Eq</span><span class="p">(</span><span class="n">L</span><span class="o">*</span><span class="n">q</span><span class="o">.</span><span class="n">d</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">R</span><span class="o">*</span><span class="n">q</span><span class="o">.</span><span class="n">d</span><span class="p">()</span> <span class="o">+</span> <span class="n">q</span><span class="o">/</span><span class="n">C</span><span class="p">,</span> <span class="n">V0</span><span class="p">)</span>
+
+<span class="c1"># Initial conditions: no initial charge or current</span>
+<span class="n">initial_conditions</span> <span class="o">=</span> <span class="p">{</span><span class="n">q</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="n">q</span><span class="o">.</span><span class="n">d</span><span class="p">():</span> <span class="mi">0</span><span class="p">}</span>
+
+<span class="c1"># Solve the circuit with fine resolution</span>
+<span class="n">solution</span> <span class="o">=</span> <span class="n">solve</span><span class="p">(</span><span class="n">equation</span><span class="p">,</span> <span class="n">ivp</span><span class="o">=</span><span class="n">initial_conditions</span><span class="p">,</span> <span class="n">tspan</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">5e-3</span><span class="p">),</span>
+                <span class="n">backend</span><span class="o">=</span><span class="s2">&quot;scipy&quot;</span><span class="p">,</span> <span class="n">max_step</span><span class="o">=</span><span class="mf">5e-6</span><span class="p">)</span>
+
+<span class="c1"># Create fine time grid for smooth evaluation</span>
+<span class="n">t_fine</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">5e-3</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span>
+<span class="n">q_vals</span> <span class="o">=</span> <span class="n">solution</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">t_fine</span><span class="p">)</span>
+<span class="n">current_vals</span> <span class="o">=</span> <span class="n">solution</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">q</span><span class="o">.</span><span class="n">d</span><span class="p">(),</span> <span class="n">t_fine</span><span class="p">)</span>
+
+<span class="c1"># Calculate derived quantities</span>
+<span class="n">v_capacitor</span> <span class="o">=</span> <span class="n">q_vals</span> <span class="o">/</span> <span class="n">C</span>
+<span class="n">v_resistor</span> <span class="o">=</span> <span class="n">R</span> <span class="o">*</span> <span class="n">current_vals</span>
+
+<span class="c1"># Create comprehensive circuit analysis</span>
+<span class="n">fig</span><span class="p">,</span> <span class="p">((</span><span class="n">ax1</span><span class="p">,</span> <span class="n">ax2</span><span class="p">),</span> <span class="p">(</span><span class="n">ax3</span><span class="p">,</span> <span class="n">ax4</span><span class="p">))</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">14</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+
+<span class="c1"># Charge vs time</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t_fine</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">,</span> <span class="n">q_vals</span> <span class="o">*</span> <span class="mf">1e6</span><span class="p">,</span> <span class="s1">&#39;b-&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Time (ms)&#39;</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Charge (μC)&#39;</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Capacitor Charge vs Time&#39;</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+
+<span class="c1"># Current vs time</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t_fine</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">,</span> <span class="n">current_vals</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">,</span> <span class="s1">&#39;r-&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Time (ms)&#39;</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Current (mA)&#39;</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Circuit Current vs Time&#39;</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+
+<span class="c1"># Voltage analysis</span>
+<span class="n">ax3</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t_fine</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">,</span> <span class="n">v_capacitor</span><span class="p">,</span> <span class="s1">&#39;g-&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Capacitor&#39;</span><span class="p">)</span>
+<span class="n">ax3</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t_fine</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">,</span> <span class="n">v_resistor</span><span class="p">,</span> <span class="s1">&#39;r-&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Resistor&#39;</span><span class="p">)</span>
+<span class="n">ax3</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="n">V0</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Applied&#39;</span><span class="p">)</span>
+<span class="n">ax3</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Time (ms)&#39;</span><span class="p">)</span>
+<span class="n">ax3</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Voltage (V)&#39;</span><span class="p">)</span>
+<span class="n">ax3</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Component Voltages&#39;</span><span class="p">)</span>
+<span class="n">ax3</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">ax3</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+
+<span class="c1"># Energy analysis</span>
+<span class="n">energy_C</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">C</span> <span class="o">*</span> <span class="n">v_capacitor</span><span class="o">**</span><span class="mi">2</span>  <span class="c1"># Capacitor energy</span>
+<span class="n">energy_L</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">L</span> <span class="o">*</span> <span class="n">current_vals</span><span class="o">**</span><span class="mi">2</span>      <span class="c1"># Inductor energy</span>
+<span class="n">power_R</span> <span class="o">=</span> <span class="n">R</span> <span class="o">*</span> <span class="n">current_vals</span><span class="o">**</span><span class="mi">2</span>             <span class="c1"># Resistor power dissipation</span>
+
+<span class="n">ax4</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t_fine</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">,</span> <span class="n">energy_C</span> <span class="o">*</span> <span class="mf">1e9</span><span class="p">,</span> <span class="s1">&#39;g-&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Capacitor energy&#39;</span><span class="p">)</span>
+<span class="n">ax4</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t_fine</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">,</span> <span class="n">energy_L</span> <span class="o">*</span> <span class="mf">1e9</span><span class="p">,</span> <span class="s1">&#39;b-&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Inductor energy&#39;</span><span class="p">)</span>
+<span class="n">ax4_twin</span> <span class="o">=</span> <span class="n">ax4</span><span class="o">.</span><span class="n">twinx</span><span class="p">()</span>
+<span class="n">ax4_twin</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t_fine</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">,</span> <span class="n">power_R</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">,</span> <span class="s1">&#39;r-&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Resistor power&#39;</span><span class="p">)</span>
+
+<span class="n">ax4</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Time (ms)&#39;</span><span class="p">)</span>
+<span class="n">ax4</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Energy (nJ)&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">)</span>
+<span class="n">ax4_twin</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Power (mW)&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
+<span class="n">ax4</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Energy Storage and Power Dissipation&#39;</span><span class="p">)</span>
+<span class="n">ax4</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s1">&#39;upper left&#39;</span><span class="p">)</span>
+<span class="n">ax4_twin</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s1">&#39;upper right&#39;</span><span class="p">)</span>
+<span class="n">ax4</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>(<a class="reference download internal" download="" href="_downloads/039bbc53e7bb010c2751905d5d7bdc38/examples-5.png"><code class="xref download docutils literal notranslate"><span class="pre">png</span></code></a>, <a class="reference download internal" download="" href="_downloads/44637b639a2f4811e632caf91e7c1a40/examples-5.svg"><code class="xref download docutils literal notranslate"><span class="pre">svg</span></code></a>)</p>
+<figure class="align-default">
+<img alt="_images/examples-5.png" class="plot-directive" src="_images/examples-5.png" />
+</figure>
+<p>The circuit shows <span class="math notranslate nohighlight">\(\zeta &lt; 1\)</span> (underdamped) behavior with oscillatory
+approach to steady state. Energy oscillates between capacitor and inductor
+while being dissipated in the resistor.</p>
+</section>
+<section id="control-systems">
+<h3>Control Systems<a class="headerlink" href="#control-systems" title="Link to this heading"></a></h3>
+<p>A second-order control system with PID controller.</p>
+<p><strong>Mathematical Model:</strong></p>
+<div class="math notranslate nohighlight">
+\[\ddot{y} + 2\zeta\omega_n\dot{y} + \omega_n^2 y = \omega_n^2 u\]</div>
+<p>Where <span class="math notranslate nohighlight">\(u\)</span> is the control input.</p>
+<p><strong>Implementation:</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">odecast</span><span class="w"> </span><span class="kn">import</span> <span class="n">var</span><span class="p">,</span> <span class="n">Eq</span><span class="p">,</span> <span class="n">solve</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+
+<span class="c1"># System parameters</span>
+<span class="n">omega_n</span> <span class="o">=</span> <span class="mf">2.0</span>  <span class="c1"># Natural frequency</span>
+<span class="n">zeta</span> <span class="o">=</span> <span class="mf">0.1</span>     <span class="c1"># Damping ratio</span>
+
+<span class="c1"># Define variables</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">var</span><span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">)</span>     <span class="c1"># Output</span>
+<span class="n">r</span> <span class="o">=</span> <span class="mf">1.0</span>          <span class="c1"># Reference (step input)</span>
+
+<span class="c1"># PID controller parameters</span>
+<span class="n">Kp</span><span class="p">,</span> <span class="n">Ki</span><span class="p">,</span> <span class="n">Kd</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.1</span>
+
+<span class="c1"># For simplicity, we&#39;ll solve the closed-loop system directly</span>
+<span class="c1"># Open-loop transfer function: G(s) = ωn²/(s² + 2ζωn*s + ωn²)</span>
+<span class="c1"># With unity feedback: y&#39;&#39; + 2ζωn*y&#39; + ωn²*y = ωn²*r</span>
+
+<span class="n">equation</span> <span class="o">=</span> <span class="n">Eq</span><span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">d</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="mi">2</span><span class="o">*</span><span class="n">zeta</span><span class="o">*</span><span class="n">omega_n</span><span class="o">*</span><span class="n">y</span><span class="o">.</span><span class="n">d</span><span class="p">()</span> <span class="o">+</span> <span class="n">omega_n</span><span class="o">**</span><span class="mi">2</span><span class="o">*</span><span class="n">y</span><span class="p">,</span> <span class="n">omega_n</span><span class="o">**</span><span class="mi">2</span><span class="o">*</span><span class="n">r</span><span class="p">)</span>
+
+<span class="c1"># Initial conditions: system at rest</span>
+<span class="n">initial_conditions</span> <span class="o">=</span> <span class="p">{</span><span class="n">y</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="n">y</span><span class="o">.</span><span class="n">d</span><span class="p">():</span> <span class="mi">0</span><span class="p">}</span>
+
+<span class="c1"># Solve</span>
+<span class="n">solution</span> <span class="o">=</span> <span class="n">solve</span><span class="p">(</span><span class="n">equation</span><span class="p">,</span> <span class="n">ivp</span><span class="o">=</span><span class="n">initial_conditions</span><span class="p">,</span> <span class="n">tspan</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+
+<span class="c1"># Plot step response</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">solution</span><span class="o">.</span><span class="n">t</span><span class="p">,</span> <span class="n">solution</span><span class="p">[</span><span class="n">y</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;System Output&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="n">r</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Reference&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Time (s)&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Output&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Step Response of Second-Order System&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="c1"># Calculate performance metrics</span>
+<span class="n">steady_state_value</span> <span class="o">=</span> <span class="n">solution</span><span class="p">[</span><span class="n">y</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">steady_state_error</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">r</span> <span class="o">-</span> <span class="n">steady_state_value</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Steady-state error: </span><span class="si">{</span><span class="n">steady_state_error</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="symbolic-examples">
+<h2>Symbolic Examples<a class="headerlink" href="#symbolic-examples" title="Link to this heading"></a></h2>
+<section id="exact-solutions">
+<h3>Exact Solutions<a class="headerlink" href="#exact-solutions" title="Link to this heading"></a></h3>
+<p>Using SymPy backend for exact symbolic solutions.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">  1</span><span class="ch">#!/usr/bin/env python3</span>
+<span class="linenos">  2</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="linenos">  3</span><span class="sd">Example 2: Symbolic Solution (SymPy Backend)</span>
+<span class="linenos">  4</span>
+<span class="linenos">  5</span><span class="sd">This example demonstrates solving a simple ODE symbolically using the SymPy backend</span>
+<span class="linenos">  6</span><span class="sd">to obtain a closed-form analytical solution.</span>
+<span class="linenos">  7</span>
+<span class="linenos">  8</span><span class="sd">The equation: y&#39;&#39; + y = 0 (simple harmonic oscillator)</span>
+<span class="linenos">  9</span>
+<span class="linenos"> 10</span><span class="sd">This is a classic example where symbolic solution provides exact expressions</span>
+<span class="linenos"> 11</span><span class="sd">rather than numerical approximations.</span>
+<span class="linenos"> 12</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="linenos"> 13</span>
+<span class="linenos"> 14</span><span class="kn">import</span><span class="w"> </span><span class="nn">sympy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sp</span>
+<span class="linenos"> 15</span><span class="kn">from</span><span class="w"> </span><span class="nn">odecast</span><span class="w"> </span><span class="kn">import</span> <span class="n">t</span><span class="p">,</span> <span class="n">var</span><span class="p">,</span> <span class="n">Eq</span><span class="p">,</span> <span class="n">solve</span>
+<span class="linenos"> 16</span>
+<span class="linenos"> 17</span>
+<span class="linenos"> 18</span><span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
+<span class="linenos"> 19</span>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;🎯 Symbolic Solution Example&quot;</span><span class="p">)</span>
+<span class="linenos"> 20</span>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">40</span><span class="p">)</span>
+<span class="linenos"> 21</span>
+<span class="linenos"> 22</span>    <span class="c1"># Define the dependent variable</span>
+<span class="linenos"> 23</span>    <span class="n">y</span> <span class="o">=</span> <span class="n">var</span><span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">)</span>
+<span class="linenos"> 24</span>
+<span class="linenos"> 25</span>    <span class="c1"># Create the differential equation: y&#39;&#39; + y = 0</span>
+<span class="linenos"> 26</span>    <span class="n">eq</span> <span class="o">=</span> <span class="n">Eq</span><span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">d</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">y</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="linenos"> 27</span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Equation: </span><span class="si">{</span><span class="n">eq</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="linenos"> 28</span>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;This is the simple harmonic oscillator equation.&quot;</span><span class="p">)</span>
+<span class="linenos"> 29</span>
+<span class="linenos"> 30</span>    <span class="c1"># Solve symbolically using SymPy backend</span>
+<span class="linenos"> 31</span>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">🔄 Solving symbolically...&quot;</span><span class="p">)</span>
+<span class="linenos"> 32</span>    <span class="n">sol</span> <span class="o">=</span> <span class="n">solve</span><span class="p">(</span><span class="n">eq</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s2">&quot;sympy&quot;</span><span class="p">)</span>
+<span class="linenos"> 33</span>
+<span class="linenos"> 34</span>    <span class="c1"># Get the symbolic expression</span>
+<span class="linenos"> 35</span>    <span class="n">expr</span> <span class="o">=</span> <span class="n">sol</span><span class="o">.</span><span class="n">as_expr</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+<span class="linenos"> 36</span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;✅ Symbolic solution: y(t) = </span><span class="si">{</span><span class="n">expr</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="linenos"> 37</span>
+<span class="linenos"> 38</span>    <span class="c1"># Verify the solution by substituting back into the ODE</span>
+<span class="linenos"> 39</span>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">🔍 Verification:&quot;</span><span class="p">)</span>
+<span class="linenos"> 40</span>    <span class="n">t_sym</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">symbol</span>  <span class="c1"># Get the SymPy symbol for t</span>
+<span class="linenos"> 41</span>
+<span class="linenos"> 42</span>    <span class="c1"># Compute derivatives</span>
+<span class="linenos"> 43</span>    <span class="n">y_expr</span> <span class="o">=</span> <span class="n">expr</span>
+<span class="linenos"> 44</span>    <span class="n">yprime_expr</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">y_expr</span><span class="p">,</span> <span class="n">t_sym</span><span class="p">)</span>
+<span class="linenos"> 45</span>    <span class="n">ydoubleprime_expr</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">y_expr</span><span class="p">,</span> <span class="n">t_sym</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="linenos"> 46</span>
+<span class="linenos"> 47</span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;y(t)    = </span><span class="si">{</span><span class="n">y_expr</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="linenos"> 48</span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;y&#39;(t)   = </span><span class="si">{</span><span class="n">yprime_expr</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="linenos"> 49</span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;y&#39;&#39;(t)  = </span><span class="si">{</span><span class="n">ydoubleprime_expr</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="linenos"> 50</span>
+<span class="linenos"> 51</span>    <span class="c1"># Check if y&#39;&#39; + y = 0</span>
+<span class="linenos"> 52</span>    <span class="n">lhs</span> <span class="o">=</span> <span class="n">ydoubleprime_expr</span> <span class="o">+</span> <span class="n">y_expr</span>
+<span class="linenos"> 53</span>    <span class="n">simplified</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">simplify</span><span class="p">(</span><span class="n">lhs</span><span class="p">)</span>
+<span class="linenos"> 54</span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;y&#39;&#39;(t) + y(t) = </span><span class="si">{</span><span class="n">lhs</span><span class="si">}</span><span class="s2"> = </span><span class="si">{</span><span class="n">simplified</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="linenos"> 55</span>
+<span class="linenos"> 56</span>    <span class="k">if</span> <span class="n">simplified</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+<span class="linenos"> 57</span>        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;✅ Verification successful: the solution satisfies the ODE!&quot;</span><span class="p">)</span>
+<span class="linenos"> 58</span>    <span class="k">else</span><span class="p">:</span>
+<span class="linenos"> 59</span>        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;❌ Verification failed!&quot;</span><span class="p">)</span>
+<span class="linenos"> 60</span>
+<span class="linenos"> 61</span>    <span class="c1"># Show general form with constants</span>
+<span class="linenos"> 62</span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">📝 General solution form:&quot;</span><span class="p">)</span>
+<span class="linenos"> 63</span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The solution contains arbitrary constants C1 and C2,&quot;</span><span class="p">)</span>
+<span class="linenos"> 64</span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;which would be determined by initial or boundary conditions.&quot;</span><span class="p">)</span>
+<span class="linenos"> 65</span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;General form: y(t) = C1*cos(t) + C2*sin(t)&quot;</span><span class="p">)</span>
+<span class="linenos"> 66</span>
+<span class="linenos"> 67</span>    <span class="c1"># Demonstrate symbolic manipulation</span>
+<span class="linenos"> 68</span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">🔧 Symbolic manipulation examples:&quot;</span><span class="p">)</span>
+<span class="linenos"> 69</span>
+<span class="linenos"> 70</span>    <span class="c1"># Extract coefficients if possible</span>
+<span class="linenos"> 71</span>    <span class="k">try</span><span class="p">:</span>
+<span class="linenos"> 72</span>        <span class="c1"># Try to collect terms (this depends on SymPy&#39;s output format)</span>
+<span class="linenos"> 73</span>        <span class="n">cos_coeff</span> <span class="o">=</span> <span class="n">expr</span><span class="o">.</span><span class="n">coeff</span><span class="p">(</span><span class="n">sp</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">t_sym</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
+<span class="linenos"> 74</span>        <span class="n">sin_coeff</span> <span class="o">=</span> <span class="n">expr</span><span class="o">.</span><span class="n">coeff</span><span class="p">(</span><span class="n">sp</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">t_sym</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
+<span class="linenos"> 75</span>
+<span class="linenos"> 76</span>        <span class="k">if</span> <span class="n">cos_coeff</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<span class="linenos"> 77</span>            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Coefficient of cos(t): </span><span class="si">{</span><span class="n">cos_coeff</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="linenos"> 78</span>        <span class="k">if</span> <span class="n">sin_coeff</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<span class="linenos"> 79</span>            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Coefficient of sin(t): </span><span class="si">{</span><span class="n">sin_coeff</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="linenos"> 80</span>    <span class="k">except</span><span class="p">:</span>
+<span class="linenos"> 81</span>        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Coefficients depend on the specific form SymPy returns&quot;</span><span class="p">)</span>
+<span class="linenos"> 82</span>
+<span class="linenos"> 83</span>    <span class="c1"># Show derivative relationships</span>
+<span class="linenos"> 84</span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Derivative relationship:&quot;</span><span class="p">)</span>
+<span class="linenos"> 85</span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;If y(t) = A*cos(t) + B*sin(t), then:&quot;</span><span class="p">)</span>
+<span class="linenos"> 86</span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;y&#39;(t) = -A*sin(t) + B*cos(t)&quot;</span><span class="p">)</span>
+<span class="linenos"> 87</span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;y&#39;&#39;(t) = -A*cos(t) - B*sin(t) = -y(t)&quot;</span><span class="p">)</span>
+<span class="linenos"> 88</span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Therefore: y&#39;&#39;(t) + y(t) = 0 ✓&quot;</span><span class="p">)</span>
+<span class="linenos"> 89</span>
+<span class="linenos"> 90</span>    <span class="c1"># Demonstrate evaluation at specific points</span>
+<span class="linenos"> 91</span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">📊 Symbolic evaluation:&quot;</span><span class="p">)</span>
+<span class="linenos"> 92</span>    <span class="n">eval_points</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">sp</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">4</span><span class="p">,</span> <span class="n">sp</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="n">sp</span><span class="o">.</span><span class="n">pi</span><span class="p">]</span>
+<span class="linenos"> 93</span>    <span class="k">for</span> <span class="n">t_val</span> <span class="ow">in</span> <span class="n">eval_points</span><span class="p">:</span>
+<span class="linenos"> 94</span>        <span class="n">y_val</span> <span class="o">=</span> <span class="n">expr</span><span class="o">.</span><span class="n">subs</span><span class="p">(</span><span class="n">t_sym</span><span class="p">,</span> <span class="n">t_val</span><span class="p">)</span>
+<span class="linenos"> 95</span>        <span class="n">y_val_simplified</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">simplify</span><span class="p">(</span><span class="n">y_val</span><span class="p">)</span>
+<span class="linenos"> 96</span>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;y(</span><span class="si">{</span><span class="n">t_val</span><span class="si">}</span><span class="s2">) = </span><span class="si">{</span><span class="n">y_val_simplified</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="linenos"> 97</span>
+<span class="linenos"> 98</span>
+<span class="linenos"> 99</span><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+<span class="linenos">100</span>    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+<section id="mixed-systems">
+<h3>Mixed Systems<a class="headerlink" href="#mixed-systems" title="Link to this heading"></a></h3>
+<p>Systems with different equation orders.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">  1</span><span class="ch">#!/usr/bin/env python3</span>
+<span class="linenos">  2</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="linenos">  3</span><span class="sd">Example 3: Coupled Mixed-Order System</span>
+<span class="linenos">  4</span>
+<span class="linenos">  5</span><span class="sd">This example demonstrates solving a system of coupled differential equations</span>
+<span class="linenos">  6</span><span class="sd">with different orders using the numeric backend.</span>
+<span class="linenos">  7</span>
+<span class="linenos">  8</span><span class="sd">System:</span>
+<span class="linenos">  9</span><span class="sd">- x&#39;&#39; + 0.1*x&#39; + x - 0.5*y = 0  (second-order in x)</span>
+<span class="linenos"> 10</span><span class="sd">- y&#39; + 2*y + 0.3*x = 0          (first-order in y)</span>
+<span class="linenos"> 11</span>
+<span class="linenos"> 12</span><span class="sd">This represents a coupled oscillator system where one variable affects the other.</span>
+<span class="linenos"> 13</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="linenos"> 14</span>
+<span class="linenos"> 15</span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="linenos"> 16</span><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="linenos"> 17</span><span class="kn">from</span><span class="w"> </span><span class="nn">odecast</span><span class="w"> </span><span class="kn">import</span> <span class="n">t</span><span class="p">,</span> <span class="n">var</span><span class="p">,</span> <span class="n">Eq</span><span class="p">,</span> <span class="n">solve</span>
+<span class="linenos"> 18</span>
+<span class="linenos"> 19</span>
+<span class="linenos"> 20</span><span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
+<span class="linenos"> 21</span>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;🎯 Coupled Mixed-Order System Example&quot;</span><span class="p">)</span>
+<span class="linenos"> 22</span>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">45</span><span class="p">)</span>
+<span class="linenos"> 23</span>
+<span class="linenos"> 24</span>    <span class="c1"># Define the dependent variables</span>
+<span class="linenos"> 25</span>    <span class="n">x</span> <span class="o">=</span> <span class="n">var</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">)</span>
+<span class="linenos"> 26</span>    <span class="n">y</span> <span class="o">=</span> <span class="n">var</span><span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">)</span>
+<span class="linenos"> 27</span>
+<span class="linenos"> 28</span>    <span class="c1"># Create the system of coupled equations</span>
+<span class="linenos"> 29</span>    <span class="n">eq1</span> <span class="o">=</span> <span class="n">Eq</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">d</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.1</span> <span class="o">*</span> <span class="n">x</span><span class="o">.</span><span class="n">d</span><span class="p">()</span> <span class="o">+</span> <span class="n">x</span> <span class="o">-</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">y</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>  <span class="c1"># Second-order in x</span>
+<span class="linenos"> 30</span>    <span class="n">eq2</span> <span class="o">=</span> <span class="n">Eq</span><span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">d</span><span class="p">()</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">y</span> <span class="o">+</span> <span class="mf">0.3</span> <span class="o">*</span> <span class="n">x</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>  <span class="c1"># First-order in y</span>
+<span class="linenos"> 31</span>
+<span class="linenos"> 32</span>    <span class="n">equations</span> <span class="o">=</span> <span class="p">[</span><span class="n">eq1</span><span class="p">,</span> <span class="n">eq2</span><span class="p">]</span>
+<span class="linenos"> 33</span>
+<span class="linenos"> 34</span>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;System of equations:&quot;</span><span class="p">)</span>
+<span class="linenos"> 35</span>    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">eq</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">equations</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span>
+<span class="linenos"> 36</span>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Eq </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">eq</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="linenos"> 37</span>
+<span class="linenos"> 38</span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Variable orders:&quot;</span><span class="p">)</span>
+<span class="linenos"> 39</span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  x: 2nd order (requires x(0) and x&#39;(0))&quot;</span><span class="p">)</span>
+<span class="linenos"> 40</span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  y: 1st order (requires y(0))&quot;</span><span class="p">)</span>
+<span class="linenos"> 41</span>
+<span class="linenos"> 42</span>    <span class="c1"># Set initial conditions</span>
+<span class="linenos"> 43</span>    <span class="n">initial_conditions</span> <span class="o">=</span> <span class="p">{</span>
+<span class="linenos"> 44</span>        <span class="n">x</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>  <span class="c1"># x(0) = 1</span>
+<span class="linenos"> 45</span>        <span class="n">x</span><span class="o">.</span><span class="n">d</span><span class="p">():</span> <span class="mf">0.0</span><span class="p">,</span>  <span class="c1"># x&#39;(0) = 0</span>
+<span class="linenos"> 46</span>        <span class="n">y</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span>  <span class="c1"># y(0) = 0.5</span>
+<span class="linenos"> 47</span>    <span class="p">}</span>
+<span class="linenos"> 48</span>
+<span class="linenos"> 49</span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Initial conditions:&quot;</span><span class="p">)</span>
+<span class="linenos"> 50</span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  x(0) = </span><span class="si">{</span><span class="n">initial_conditions</span><span class="p">[</span><span class="n">x</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="linenos"> 51</span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  x&#39;(0) = </span><span class="si">{</span><span class="n">initial_conditions</span><span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">d</span><span class="p">()]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="linenos"> 52</span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  y(0) = </span><span class="si">{</span><span class="n">initial_conditions</span><span class="p">[</span><span class="n">y</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="linenos"> 53</span>
+<span class="linenos"> 54</span>    <span class="c1"># Solve over time span [0, 15] seconds</span>
+<span class="linenos"> 55</span>    <span class="n">time_span</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">15.0</span><span class="p">)</span>
+<span class="linenos"> 56</span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Time span: </span><span class="si">{</span><span class="n">time_span</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="linenos"> 57</span>
+<span class="linenos"> 58</span>    <span class="c1"># Solve using the SciPy numeric backend</span>
+<span class="linenos"> 59</span>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">🔄 Solving coupled system...&quot;</span><span class="p">)</span>
+<span class="linenos"> 60</span>    <span class="n">sol</span> <span class="o">=</span> <span class="n">solve</span><span class="p">(</span><span class="n">equations</span><span class="p">,</span> <span class="n">ivp</span><span class="o">=</span><span class="n">initial_conditions</span><span class="p">,</span> <span class="n">tspan</span><span class="o">=</span><span class="n">time_span</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s2">&quot;scipy&quot;</span><span class="p">)</span>
+<span class="linenos"> 61</span>
+<span class="linenos"> 62</span>    <span class="c1"># Extract solution data</span>
+<span class="linenos"> 63</span>    <span class="n">t_vals</span> <span class="o">=</span> <span class="n">sol</span><span class="o">.</span><span class="n">t</span>
+<span class="linenos"> 64</span>    <span class="n">x_vals</span> <span class="o">=</span> <span class="n">sol</span><span class="p">[</span><span class="n">x</span><span class="p">]</span>  <span class="c1"># Position x</span>
+<span class="linenos"> 65</span>    <span class="n">xprime_vals</span> <span class="o">=</span> <span class="n">sol</span><span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">d</span><span class="p">()]</span>  <span class="c1"># Velocity x&#39;</span>
+<span class="linenos"> 66</span>    <span class="n">y_vals</span> <span class="o">=</span> <span class="n">sol</span><span class="p">[</span><span class="n">y</span><span class="p">]</span>  <span class="c1"># Variable y</span>
+<span class="linenos"> 67</span>
+<span class="linenos"> 68</span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;✅ Solution computed with </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">t_vals</span><span class="p">)</span><span class="si">}</span><span class="s2"> time points&quot;</span><span class="p">)</span>
+<span class="linenos"> 69</span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;   Final values at t = </span><span class="si">{</span><span class="n">t_vals</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">:&quot;</span><span class="p">)</span>
+<span class="linenos"> 70</span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;     x(</span><span class="si">{</span><span class="n">t_vals</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">) = </span><span class="si">{</span><span class="n">x_vals</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s2">.6f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="linenos"> 71</span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;     x&#39;(</span><span class="si">{</span><span class="n">t_vals</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">) = </span><span class="si">{</span><span class="n">xprime_vals</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s2">.6f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="linenos"> 72</span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;     y(</span><span class="si">{</span><span class="n">t_vals</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">) = </span><span class="si">{</span><span class="n">y_vals</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s2">.6f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="linenos"> 73</span>
+<span class="linenos"> 74</span>    <span class="c1"># Create comprehensive plots</span>
+<span class="linenos"> 75</span>    <span class="n">fig</span><span class="p">,</span> <span class="p">((</span><span class="n">ax1</span><span class="p">,</span> <span class="n">ax2</span><span class="p">),</span> <span class="p">(</span><span class="n">ax3</span><span class="p">,</span> <span class="n">ax4</span><span class="p">))</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+<span class="linenos"> 76</span>
+<span class="linenos"> 77</span>    <span class="c1"># Plot x position vs time</span>
+<span class="linenos"> 78</span>    <span class="n">ax1</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t_vals</span><span class="p">,</span> <span class="n">x_vals</span><span class="p">,</span> <span class="s2">&quot;b-&quot;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;x(t)&quot;</span><span class="p">)</span>
+<span class="linenos"> 79</span>    <span class="n">ax1</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Time (s)&quot;</span><span class="p">)</span>
+<span class="linenos"> 80</span>    <span class="n">ax1</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;x Position&quot;</span><span class="p">)</span>
+<span class="linenos"> 81</span>    <span class="n">ax1</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Variable x vs Time&quot;</span><span class="p">)</span>
+<span class="linenos"> 82</span>    <span class="n">ax1</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+<span class="linenos"> 83</span>    <span class="n">ax1</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="linenos"> 84</span>
+<span class="linenos"> 85</span>    <span class="c1"># Plot y vs time</span>
+<span class="linenos"> 86</span>    <span class="n">ax2</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t_vals</span><span class="p">,</span> <span class="n">y_vals</span><span class="p">,</span> <span class="s2">&quot;r-&quot;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;y(t)&quot;</span><span class="p">)</span>
+<span class="linenos"> 87</span>    <span class="n">ax2</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Time (s)&quot;</span><span class="p">)</span>
+<span class="linenos"> 88</span>    <span class="n">ax2</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;y Value&quot;</span><span class="p">)</span>
+<span class="linenos"> 89</span>    <span class="n">ax2</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Variable y vs Time&quot;</span><span class="p">)</span>
+<span class="linenos"> 90</span>    <span class="n">ax2</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+<span class="linenos"> 91</span>    <span class="n">ax2</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="linenos"> 92</span>
+<span class="linenos"> 93</span>    <span class="c1"># Plot x velocity vs time</span>
+<span class="linenos"> 94</span>    <span class="n">ax3</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t_vals</span><span class="p">,</span> <span class="n">xprime_vals</span><span class="p">,</span> <span class="s2">&quot;g-&quot;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;x&#39;(t)&quot;</span><span class="p">)</span>
+<span class="linenos"> 95</span>    <span class="n">ax3</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Time (s)&quot;</span><span class="p">)</span>
+<span class="linenos"> 96</span>    <span class="n">ax3</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;x Velocity&quot;</span><span class="p">)</span>
+<span class="linenos"> 97</span>    <span class="n">ax3</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Velocity of x vs Time&quot;</span><span class="p">)</span>
+<span class="linenos"> 98</span>    <span class="n">ax3</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+<span class="linenos"> 99</span>    <span class="n">ax3</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="linenos">100</span>
+<span class="linenos">101</span>    <span class="c1"># Plot phase space for x (position vs velocity)</span>
+<span class="linenos">102</span>    <span class="n">ax4</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x_vals</span><span class="p">,</span> <span class="n">xprime_vals</span><span class="p">,</span> <span class="s2">&quot;m-&quot;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.8</span><span class="p">)</span>
+<span class="linenos">103</span>    <span class="n">ax4</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x_vals</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">xprime_vals</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s2">&quot;go&quot;</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Start&quot;</span><span class="p">)</span>
+<span class="linenos">104</span>    <span class="n">ax4</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x_vals</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">xprime_vals</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="s2">&quot;rs&quot;</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;End&quot;</span><span class="p">)</span>
+<span class="linenos">105</span>    <span class="n">ax4</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;x Position&quot;</span><span class="p">)</span>
+<span class="linenos">106</span>    <span class="n">ax4</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;x Velocity (x&#39;)&quot;</span><span class="p">)</span>
+<span class="linenos">107</span>    <span class="n">ax4</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Phase Space of x&quot;</span><span class="p">)</span>
+<span class="linenos">108</span>    <span class="n">ax4</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+<span class="linenos">109</span>    <span class="n">ax4</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="linenos">110</span>
+<span class="linenos">111</span>    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="linenos">112</span>    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="linenos">113</span>
+<span class="linenos">114</span>    <span class="c1"># Show coupling effects</span>
+<span class="linenos">115</span>    <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="linenos">116</span>    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t_vals</span><span class="p">,</span> <span class="n">x_vals</span><span class="p">,</span> <span class="s2">&quot;b-&quot;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;x(t)&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.8</span><span class="p">)</span>
+<span class="linenos">117</span>    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t_vals</span><span class="p">,</span> <span class="n">y_vals</span><span class="p">,</span> <span class="s2">&quot;r-&quot;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;y(t)&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.8</span><span class="p">)</span>
+<span class="linenos">118</span>    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Time (s)&quot;</span><span class="p">)</span>
+<span class="linenos">119</span>    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Value&quot;</span><span class="p">)</span>
+<span class="linenos">120</span>    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Coupled Variables x and y&quot;</span><span class="p">)</span>
+<span class="linenos">121</span>    <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="linenos">122</span>    <span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+<span class="linenos">123</span>    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="linenos">124</span>
+<span class="linenos">125</span>    <span class="c1"># Demonstrate solution evaluation</span>
+<span class="linenos">126</span>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">📊 Solution evaluation at specific times:&quot;</span><span class="p">)</span>
+<span class="linenos">127</span>    <span class="n">eval_times</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">15</span><span class="p">]</span>
+<span class="linenos">128</span>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;   Time   x(t)      x&#39;(t)     y(t)&quot;</span><span class="p">)</span>
+<span class="linenos">129</span>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;   &quot;</span> <span class="o">+</span> <span class="s2">&quot;-&quot;</span> <span class="o">*</span> <span class="mi">35</span><span class="p">)</span>
+<span class="linenos">130</span>    <span class="k">for</span> <span class="n">t_eval</span> <span class="ow">in</span> <span class="n">eval_times</span><span class="p">:</span>
+<span class="linenos">131</span>        <span class="n">x_eval</span> <span class="o">=</span> <span class="n">sol</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">t_eval</span><span class="p">)</span>
+<span class="linenos">132</span>        <span class="n">xprime_eval</span> <span class="o">=</span> <span class="n">sol</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">d</span><span class="p">(),</span> <span class="n">t_eval</span><span class="p">)</span>
+<span class="linenos">133</span>        <span class="n">y_eval</span> <span class="o">=</span> <span class="n">sol</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">t_eval</span><span class="p">)</span>
+<span class="linenos">134</span>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;   </span><span class="si">{</span><span class="n">t_eval</span><span class="si">:</span><span class="s2">4.0f</span><span class="si">}</span><span class="s2">   </span><span class="si">{</span><span class="n">x_eval</span><span class="si">:</span><span class="s2">8.4f</span><span class="si">}</span><span class="s2">  </span><span class="si">{</span><span class="n">xprime_eval</span><span class="si">:</span><span class="s2">8.4f</span><span class="si">}</span><span class="s2">  </span><span class="si">{</span><span class="n">y_eval</span><span class="si">:</span><span class="s2">8.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="linenos">135</span>
+<span class="linenos">136</span>    <span class="c1"># Show system properties</span>
+<span class="linenos">137</span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">🔧 System Analysis:&quot;</span><span class="p">)</span>
+<span class="linenos">138</span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;This coupled system demonstrates:&quot;</span><span class="p">)</span>
+<span class="linenos">139</span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  • Mixed orders: x is 2nd order, y is 1st order&quot;</span><span class="p">)</span>
+<span class="linenos">140</span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  • Coupling: x affects y through the +0.3*x term&quot;</span><span class="p">)</span>
+<span class="linenos">141</span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  • Coupling: y affects x through the -0.5*y term&quot;</span><span class="p">)</span>
+<span class="linenos">142</span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  • Damping: x has damping (0.1*x&#39; term), y has decay (2*y term)&quot;</span><span class="p">)</span>
+<span class="linenos">143</span>
+<span class="linenos">144</span>    <span class="c1"># Inspect the first-order system</span>
+<span class="linenos">145</span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">🔍 First-order system inspection:&quot;</span><span class="p">)</span>
+<span class="linenos">146</span>    <span class="n">f</span><span class="p">,</span> <span class="n">jac</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">t0</span><span class="p">,</span> <span class="n">mapping</span> <span class="o">=</span> <span class="n">sol</span><span class="o">.</span><span class="n">as_first_order</span><span class="p">()</span>
+<span class="linenos">147</span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  State vector dimension: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">x0</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="linenos">148</span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  State mapping:&quot;</span><span class="p">)</span>
+<span class="linenos">149</span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;    x    -&gt; index </span><span class="si">{</span><span class="n">mapping</span><span class="p">[(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">)]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="linenos">150</span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;    x&#39;   -&gt; index </span><span class="si">{</span><span class="n">mapping</span><span class="p">[(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">)]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="linenos">151</span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;    y    -&gt; index </span><span class="si">{</span><span class="n">mapping</span><span class="p">[(</span><span class="n">y</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">)]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="linenos">152</span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Initial state vector: </span><span class="si">{</span><span class="n">x0</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="linenos">153</span>
+<span class="linenos">154</span>
+<span class="linenos">155</span><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+<span class="linenos">156</span>    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="complete-example-scripts">
+<h2>Complete Example Scripts<a class="headerlink" href="#complete-example-scripts" title="Link to this heading"></a></h2>
+<p>All examples shown above are available as complete, runnable scripts in the
+<code class="docutils literal notranslate"><span class="pre">examples/</span></code> directory of the Odecast repository:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">01_ivp_damped_oscillator.py</span></code> - Damped harmonic oscillator with visualization</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">02_symbolic_simple.py</span></code> - Symbolic solutions using SymPy</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">03_mixed_orders.py</span></code> - Systems with mixed derivative orders</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">04_vector_harmonic_oscillator.py</span></code> - 2D harmonic oscillator</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">05_vector_mixed_system.py</span></code> - Mixed scalar-vector systems</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">06_vector_simple.py</span></code> - Introduction to vector variables</p></li>
+</ul>
+<p>To run any example:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>examples/01_ivp_damped_oscillator.py
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="api_reference.html" class="btn btn-neutral float-left" title="API Reference" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="contributing.html" class="btn btn-neutral float-right" title="Contributing" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Matthias Baer.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

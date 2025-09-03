@@ -1,0 +1,432 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contributing &mdash; Odecast 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/plot_directive.css" />
+
+  
+    <link rel="shortcut icon" href="_static/odecast-logo.png"/>
+    <link rel="canonical" href="https://maroba.github.io/odecast/contributing.html" />
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=01f34227"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Examples" href="examples.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Odecast
+              <img src="_static/odecast-logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quick Start Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user_guide.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_reference.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Contributing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#development-setup">Development Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#code-quality">Code Quality</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#running-tests">Running Tests</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#code-formatting">Code Formatting</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#linting">Linting</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#type-checking">Type Checking</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pre-commit-hooks">Pre-commit Hooks</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#testing-guidelines">Testing Guidelines</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#test-driven-development">Test-Driven Development</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#writing-tests">Writing Tests</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#documentation">Documentation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#code-documentation">Code Documentation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#sphinx-documentation">Sphinx Documentation</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#contribution-workflow">Contribution Workflow</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#pull-request-guidelines">Pull Request Guidelines</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#commit-message-format">Commit Message Format</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#types-of-contributions">Types of Contributions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#bug-reports">Bug Reports</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#feature-requests">Feature Requests</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#code-contributions">Code Contributions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#examples-and-tutorials">Examples and Tutorials</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#community-guidelines">Community Guidelines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#getting-help">Getting Help</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#recognition">Recognition</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Odecast</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Contributing</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/contributing.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="contributing">
+<h1>Contributing<a class="headerlink" href="#contributing" title="Link to this heading"></a></h1>
+<p>We welcome contributions to Odecast! This guide will help you get started.</p>
+<section id="development-setup">
+<h2>Development Setup<a class="headerlink" href="#development-setup" title="Link to this heading"></a></h2>
+<p>First, fork the repository on GitHub and clone your fork:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/yourusername/odecast.git
+<span class="nb">cd</span><span class="w"> </span>odecast
+</pre></div>
+</div>
+<p>Create a virtual environment and install development dependencies:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>venv
+<span class="nb">source</span><span class="w"> </span>venv/bin/activate<span class="w">  </span><span class="c1"># On Windows: venv\Scripts\activate</span>
+pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;.[dev]&quot;</span>
+</pre></div>
+</div>
+<p>This installs Odecast in editable mode with all development tools.</p>
+</section>
+<section id="code-quality">
+<h2>Code Quality<a class="headerlink" href="#code-quality" title="Link to this heading"></a></h2>
+<p>We maintain high code quality standards using several tools:</p>
+<section id="running-tests">
+<h3>Running Tests<a class="headerlink" href="#running-tests" title="Link to this heading"></a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Run all tests</span>
+pytest
+
+<span class="c1"># Run with coverage</span>
+pytest<span class="w"> </span>--cov<span class="o">=</span>odecast
+
+<span class="c1"># Run specific test file</span>
+pytest<span class="w"> </span>tests/test_api.py
+
+<span class="c1"># Run with verbose output</span>
+pytest<span class="w"> </span>-v
+</pre></div>
+</div>
+</section>
+<section id="code-formatting">
+<h3>Code Formatting<a class="headerlink" href="#code-formatting" title="Link to this heading"></a></h3>
+<p>We use Black for code formatting:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Format all code</span>
+black<span class="w"> </span>.
+
+<span class="c1"># Check formatting without making changes</span>
+black<span class="w"> </span>--check<span class="w"> </span>.
+</pre></div>
+</div>
+</section>
+<section id="linting">
+<h3>Linting<a class="headerlink" href="#linting" title="Link to this heading"></a></h3>
+<p>We use Ruff for fast linting:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Lint all code</span>
+ruff<span class="w"> </span>check<span class="w"> </span>.
+
+<span class="c1"># Fix auto-fixable issues</span>
+ruff<span class="w"> </span>check<span class="w"> </span>--fix<span class="w"> </span>.
+</pre></div>
+</div>
+</section>
+<section id="type-checking">
+<h3>Type Checking<a class="headerlink" href="#type-checking" title="Link to this heading"></a></h3>
+<p>We use mypy for static type checking:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mypy<span class="w"> </span>src/odecast
+</pre></div>
+</div>
+</section>
+<section id="pre-commit-hooks">
+<h3>Pre-commit Hooks<a class="headerlink" href="#pre-commit-hooks" title="Link to this heading"></a></h3>
+<p>Install pre-commit hooks to automatically run checks:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pre-commit<span class="w"> </span>install
+
+<span class="c1"># Run hooks manually</span>
+pre-commit<span class="w"> </span>run<span class="w"> </span>--all-files
+</pre></div>
+</div>
+</section>
+</section>
+<section id="testing-guidelines">
+<h2>Testing Guidelines<a class="headerlink" href="#testing-guidelines" title="Link to this heading"></a></h2>
+<section id="test-driven-development">
+<h3>Test-Driven Development<a class="headerlink" href="#test-driven-development" title="Link to this heading"></a></h3>
+<p>Odecast follows a test-driven development approach. All functionality should be
+defined by comprehensive tests before implementation.</p>
+</section>
+<section id="writing-tests">
+<h3>Writing Tests<a class="headerlink" href="#writing-tests" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Place tests in the <code class="docutils literal notranslate"><span class="pre">tests/</span></code> directory</p></li>
+<li><p>Use descriptive test names: <code class="docutils literal notranslate"><span class="pre">test_solve_second_order_with_initial_conditions</span></code></p></li>
+<li><p>Test both success and failure cases</p></li>
+<li><p>Include edge cases and boundary conditions</p></li>
+<li><p>Use pytest fixtures for common setup</p></li>
+</ul>
+<p>Example test structure:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pytest</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">odecast</span><span class="w"> </span><span class="kn">import</span> <span class="n">var</span><span class="p">,</span> <span class="n">Eq</span><span class="p">,</span> <span class="n">solve</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">odecast.errors</span><span class="w"> </span><span class="kn">import</span> <span class="n">ODEValidationError</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test_simple_harmonic_oscillator</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Test solving y&#39;&#39; + y = 0 with initial conditions.&quot;&quot;&quot;</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">var</span><span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">)</span>
+    <span class="n">eq</span> <span class="o">=</span> <span class="n">Eq</span><span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">d</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">y</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">sol</span> <span class="o">=</span> <span class="n">solve</span><span class="p">(</span><span class="n">eq</span><span class="p">,</span> <span class="n">ivp</span><span class="o">=</span><span class="p">{</span><span class="n">y</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="n">y</span><span class="o">.</span><span class="n">d</span><span class="p">():</span> <span class="mi">0</span><span class="p">},</span> <span class="n">tspan</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+
+    <span class="k">assert</span> <span class="n">sol</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">sol</span><span class="o">.</span><span class="n">t</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">sol</span><span class="p">[</span><span class="n">y</span><span class="p">])</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">sol</span><span class="o">.</span><span class="n">t</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test_missing_initial_condition_raises_error</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Test that missing initial conditions raise validation errors.&quot;&quot;&quot;</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">var</span><span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">)</span>
+    <span class="n">eq</span> <span class="o">=</span> <span class="n">Eq</span><span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">d</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">y</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="n">pytest</span><span class="o">.</span><span class="n">raises</span><span class="p">(</span><span class="n">ODEValidationError</span><span class="p">):</span>
+        <span class="n">solve</span><span class="p">(</span><span class="n">eq</span><span class="p">,</span> <span class="n">ivp</span><span class="o">=</span><span class="p">{</span><span class="n">y</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span> <span class="n">tspan</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>  <span class="c1"># Missing y.d()</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="documentation">
+<h2>Documentation<a class="headerlink" href="#documentation" title="Link to this heading"></a></h2>
+<section id="code-documentation">
+<h3>Code Documentation<a class="headerlink" href="#code-documentation" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Use Google-style docstrings for all public functions and classes</p></li>
+<li><p>Include parameter types and descriptions</p></li>
+<li><p>Provide usage examples in docstrings</p></li>
+<li><p>Document return values and exceptions</p></li>
+</ul>
+<p>Example docstring:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">solve</span><span class="p">(</span><span class="n">equations</span><span class="p">,</span> <span class="n">ivp</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">bvp</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tspan</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Solve a system of ordinary differential equations.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        equations: Single equation or list of equations to solve.</span>
+<span class="sd">        ivp: Initial value conditions as a dictionary.</span>
+<span class="sd">        bvp: Boundary value conditions as a dictionary.</span>
+<span class="sd">        tspan: Time span as a tuple (t_start, t_end).</span>
+<span class="sd">        backend: Solver backend (&quot;scipy&quot;, &quot;sympy&quot;, or &quot;auto&quot;).</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Solution: Object containing the solution data.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ODEValidationError: If initial/boundary conditions are invalid.</span>
+<span class="sd">        ValueError: If equation system is malformed.</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; y = var(&quot;y&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; eq = Eq(y.d(2) + y, 0)</span>
+<span class="sd">        &gt;&gt;&gt; sol = solve(eq, ivp={y: 1, y.d(): 0}, tspan=(0, 10))</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+</pre></div>
+</div>
+</section>
+<section id="sphinx-documentation">
+<h3>Sphinx Documentation<a class="headerlink" href="#sphinx-documentation" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Update relevant .rst files when adding new features</p></li>
+<li><p>Include examples in the documentation</p></li>
+<li><p>Build docs locally to test changes:</p></li>
+</ul>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>docs
+make<span class="w"> </span>html
+open<span class="w"> </span>_build/html/index.html
+</pre></div>
+</div>
+</section>
+</section>
+<section id="contribution-workflow">
+<h2>Contribution Workflow<a class="headerlink" href="#contribution-workflow" title="Link to this heading"></a></h2>
+<ol class="arabic simple">
+<li><p><strong>Create an Issue</strong>: Discuss your idea or bug report in a GitHub issue</p></li>
+<li><p><strong>Fork and Branch</strong>: Create a feature branch from main</p></li>
+<li><p><strong>Implement</strong>: Write code following our guidelines</p></li>
+<li><p><strong>Test</strong>: Ensure all tests pass and add new tests for your changes</p></li>
+<li><p><strong>Document</strong>: Update documentation if needed</p></li>
+<li><p><strong>Submit PR</strong>: Create a pull request with a clear description</p></li>
+</ol>
+<section id="pull-request-guidelines">
+<h3>Pull Request Guidelines<a class="headerlink" href="#pull-request-guidelines" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Use descriptive commit messages</p></li>
+<li><p>Keep changes focused and atomic</p></li>
+<li><p>Update CHANGELOG.md if applicable</p></li>
+<li><p>Ensure all CI checks pass</p></li>
+<li><p>Request review from maintainers</p></li>
+</ul>
+</section>
+<section id="commit-message-format">
+<h3>Commit Message Format<a class="headerlink" href="#commit-message-format" title="Link to this heading"></a></h3>
+<p>Use conventional commit format:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">type</span><span class="p">(</span><span class="n">scope</span><span class="p">):</span> <span class="n">description</span>
+
+<span class="n">body</span> <span class="p">(</span><span class="n">optional</span><span class="p">)</span>
+
+<span class="n">footer</span> <span class="p">(</span><span class="n">optional</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Types: <code class="docutils literal notranslate"><span class="pre">feat</span></code>, <code class="docutils literal notranslate"><span class="pre">fix</span></code>, <code class="docutils literal notranslate"><span class="pre">docs</span></code>, <code class="docutils literal notranslate"><span class="pre">test</span></code>, <code class="docutils literal notranslate"><span class="pre">refactor</span></code>, <code class="docutils literal notranslate"><span class="pre">perf</span></code>, <code class="docutils literal notranslate"><span class="pre">ci</span></code></p>
+<p>Examples:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">feat</span><span class="p">(</span><span class="n">api</span><span class="p">):</span> <span class="n">add</span> <span class="n">support</span> <span class="k">for</span> <span class="n">boundary</span> <span class="n">value</span> <span class="n">problems</span>
+<span class="n">fix</span><span class="p">(</span><span class="n">solve</span><span class="p">):</span> <span class="n">handle</span> <span class="n">edge</span> <span class="n">case</span> <span class="ow">in</span> <span class="n">vector</span> <span class="n">validation</span>
+<span class="n">docs</span><span class="p">:</span> <span class="n">update</span> <span class="n">installation</span> <span class="n">instructions</span>
+<span class="n">test</span><span class="p">:</span> <span class="n">add</span> <span class="n">comprehensive</span> <span class="n">tests</span> <span class="k">for</span> <span class="n">symbolic</span> <span class="n">backend</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="types-of-contributions">
+<h2>Types of Contributions<a class="headerlink" href="#types-of-contributions" title="Link to this heading"></a></h2>
+<section id="bug-reports">
+<h3>Bug Reports<a class="headerlink" href="#bug-reports" title="Link to this heading"></a></h3>
+<p>When reporting bugs, please include:</p>
+<ul class="simple">
+<li><p>Clear description of the problem</p></li>
+<li><p>Minimal reproducible example</p></li>
+<li><p>Expected vs. actual behavior</p></li>
+<li><p>Environment details (Python version, OS, package versions)</p></li>
+</ul>
+</section>
+<section id="feature-requests">
+<h3>Feature Requests<a class="headerlink" href="#feature-requests" title="Link to this heading"></a></h3>
+<p>For new features, provide:</p>
+<ul class="simple">
+<li><p>Clear use case and motivation</p></li>
+<li><p>Proposed API design</p></li>
+<li><p>Examples of intended usage</p></li>
+<li><p>Discussion of alternatives considered</p></li>
+</ul>
+</section>
+<section id="code-contributions">
+<h3>Code Contributions<a class="headerlink" href="#code-contributions" title="Link to this heading"></a></h3>
+<p>Areas where contributions are especially welcome:</p>
+<ul class="simple">
+<li><p>New example applications</p></li>
+<li><p>Performance improvements</p></li>
+<li><p>Additional solver backends</p></li>
+<li><p>Enhanced error messages</p></li>
+<li><p>Documentation improvements</p></li>
+</ul>
+</section>
+<section id="examples-and-tutorials">
+<h3>Examples and Tutorials<a class="headerlink" href="#examples-and-tutorials" title="Link to this heading"></a></h3>
+<p>We particularly welcome:</p>
+<ul class="simple">
+<li><p>Real-world application examples</p></li>
+<li><p>Jupyter notebook tutorials</p></li>
+<li><p>Domain-specific use cases</p></li>
+<li><p>Performance comparisons</p></li>
+</ul>
+</section>
+</section>
+<section id="community-guidelines">
+<h2>Community Guidelines<a class="headerlink" href="#community-guidelines" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Be respectful and inclusive</p></li>
+<li><p>Help others learn and contribute</p></li>
+<li><p>Provide constructive feedback</p></li>
+<li><p>Follow the project’s coding standards</p></li>
+<li><p>Credit others for their contributions</p></li>
+</ul>
+</section>
+<section id="getting-help">
+<h2>Getting Help<a class="headerlink" href="#getting-help" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>GitHub Issues: Bug reports and feature requests</p></li>
+<li><p>GitHub Discussions: General questions and community chat</p></li>
+<li><p>Documentation: Read the docs for detailed guidance</p></li>
+</ul>
+</section>
+<section id="recognition">
+<h2>Recognition<a class="headerlink" href="#recognition" title="Link to this heading"></a></h2>
+<p>Contributors are recognized in:</p>
+<ul class="simple">
+<li><p>CONTRIBUTORS.md file</p></li>
+<li><p>Release notes for significant contributions</p></li>
+<li><p>GitHub contributor statistics</p></li>
+</ul>
+<p>Thank you for helping make Odecast better!</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="examples.html" class="btn btn-neutral float-left" title="Examples" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Matthias Baer.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

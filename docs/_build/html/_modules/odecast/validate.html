@@ -1,0 +1,314 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>odecast.validate &mdash; Odecast 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
+
+  
+    <link rel="shortcut icon" href="../../_static/odecast-logo.png"/>
+    <link rel="canonical" href="https://maroba.github.io/odecast/_modules/odecast/validate.html" />
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Odecast
+              <img src="../../_static/odecast-logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">Quick Start Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user_guide.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api_reference.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Odecast</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">odecast.validate</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for odecast.validate</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Validation functions for ODEs and initial/boundary conditions</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">List</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.symbols</span><span class="w"> </span><span class="kn">import</span> <span class="n">Variable</span><span class="p">,</span> <span class="n">Derivative</span><span class="p">,</span> <span class="n">VectorDerivative</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.equation</span><span class="w"> </span><span class="kn">import</span> <span class="n">Eq</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.errors</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">MissingInitialConditionError</span><span class="p">,</span>
+    <span class="n">OverdeterminedConditionsError</span><span class="p">,</span>
+    <span class="n">OrderMismatchError</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<div class="viewcode-block" id="normalize_ivp">
+<a class="viewcode-back" href="../../api_reference.html#odecast.validate.normalize_ivp">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">normalize_ivp</span><span class="p">(</span>
+    <span class="n">ivp_dict</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">Variable</span><span class="p">,</span> <span class="n">Derivative</span><span class="p">],</span> <span class="nb">float</span><span class="p">],</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Variable</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="nb">float</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Normalize IVP dictionary to use (Variable, level) keys.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        ivp_dict: Dictionary with Variable (level 0), Derivative (level n≥1),</span>
+<span class="sd">                 or VectorDerivative keys, with values that can be floats or lists</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Dictionary with (Variable, level) keys for all components</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">normalized</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">ivp_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">Variable</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">key</span><span class="o">.</span><span class="n">shape</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="c1"># Vector variable - expand to components</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Vector variable </span><span class="si">{</span><span class="n">key</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> requires list/tuple initial condition, got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="p">)</span>
+
+                <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">comp_value</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+                    <span class="n">component_var</span> <span class="o">=</span> <span class="n">key</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>  <span class="c1"># Get ComponentVariable</span>
+                    <span class="n">normalized</span><span class="p">[(</span><span class="n">component_var</span><span class="p">,</span> <span class="mi">0</span><span class="p">)]</span> <span class="o">=</span> <span class="n">comp_value</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Scalar variable - level 0</span>
+                <span class="n">normalized</span><span class="p">[(</span><span class="n">key</span><span class="p">,</span> <span class="mi">0</span><span class="p">)]</span> <span class="o">=</span> <span class="n">value</span>
+
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">Derivative</span><span class="p">):</span>
+            <span class="c1"># Derivative has specified level</span>
+            <span class="n">normalized</span><span class="p">[(</span><span class="n">key</span><span class="o">.</span><span class="n">variable</span><span class="p">,</span> <span class="n">key</span><span class="o">.</span><span class="n">order</span><span class="p">)]</span> <span class="o">=</span> <span class="n">value</span>
+
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">VectorDerivative</span><span class="p">):</span>
+            <span class="c1"># Vector derivative - expand to component derivatives</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Vector derivative requires list/tuple initial condition, got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">comp_value</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+                <span class="n">component_var</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="n">variable</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>  <span class="c1"># Get ComponentVariable</span>
+                <span class="n">normalized</span><span class="p">[(</span><span class="n">component_var</span><span class="p">,</span> <span class="n">key</span><span class="o">.</span><span class="n">order</span><span class="p">)]</span> <span class="o">=</span> <span class="n">comp_value</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;IVP key must be Variable, Derivative, or VectorDerivative, got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">key</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">normalized</span></div>
+
+
+
+<div class="viewcode-block" id="validate_ivp">
+<a class="viewcode-back" href="../../api_reference.html#odecast.validate.validate_ivp">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">validate_ivp</span><span class="p">(</span>
+    <span class="n">orders</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Variable</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span>
+    <span class="n">ivp</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">Variable</span><span class="p">,</span> <span class="n">Derivative</span><span class="p">],</span> <span class="nb">float</span><span class="p">],</span>
+    <span class="n">t0</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Validate that IVP has correct number of initial conditions.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        orders: Dictionary mapping variables to their orders</span>
+<span class="sd">        ivp: IVP dictionary with initial conditions</span>
+<span class="sd">        t0: Initial time</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        MissingInitialConditionError: When required initial conditions are missing</span>
+<span class="sd">        OverdeterminedConditionsError: When too many conditions are provided</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Normalize the IVP dictionary</span>
+    <span class="n">normalized_ivp</span> <span class="o">=</span> <span class="n">normalize_ivp</span><span class="p">(</span><span class="n">ivp</span><span class="p">)</span>
+
+    <span class="c1"># Check each variable</span>
+    <span class="k">for</span> <span class="n">var</span><span class="p">,</span> <span class="n">order</span> <span class="ow">in</span> <span class="n">orders</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="c1"># Collect all conditions for this variable</span>
+        <span class="n">var_conditions</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">var_key</span><span class="p">,</span> <span class="n">level</span><span class="p">),</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">normalized_ivp</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">var_key</span> <span class="ow">is</span> <span class="n">var</span><span class="p">:</span>
+                <span class="n">var_conditions</span><span class="p">[</span><span class="n">level</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
+        <span class="c1"># For a variable of order k, we need exactly k initial conditions:</span>
+        <span class="c1"># levels 0, 1, 2, ..., k-1</span>
+        <span class="n">required_levels</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">order</span><span class="p">))</span>
+        <span class="n">provided_levels</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">var_conditions</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+
+        <span class="c1"># Check for missing conditions</span>
+        <span class="n">missing_levels</span> <span class="o">=</span> <span class="n">required_levels</span> <span class="o">-</span> <span class="n">provided_levels</span>
+        <span class="k">if</span> <span class="n">missing_levels</span><span class="p">:</span>
+            <span class="n">missing_level</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">missing_levels</span><span class="p">)</span>  <span class="c1"># Report the lowest missing level</span>
+            <span class="k">if</span> <span class="n">order</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="c1"># Zero-order variables don&#39;t need any conditions</span>
+                <span class="k">continue</span>
+            <span class="k">elif</span> <span class="n">order</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">level_desc</span> <span class="o">=</span> <span class="s2">&quot;level 0&quot;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">level_desc</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;levels 0 to </span><span class="si">{</span><span class="n">order</span><span class="o">-</span><span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span>
+
+            <span class="k">raise</span> <span class="n">MissingInitialConditionError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Missing initial condition for </span><span class="si">{</span><span class="n">var</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">^(</span><span class="si">{</span><span class="n">missing_level</span><span class="si">}</span><span class="s2">). &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Variable has order </span><span class="si">{</span><span class="n">order</span><span class="si">}</span><span class="s2"> and requires conditions for </span><span class="si">{</span><span class="n">level_desc</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Check for extra conditions - but be lenient with vector derivatives</span>
+        <span class="n">extra_levels</span> <span class="o">=</span> <span class="n">provided_levels</span> <span class="o">-</span> <span class="n">required_levels</span>
+        <span class="k">if</span> <span class="n">extra_levels</span><span class="p">:</span>
+            <span class="c1"># Check if this might be from vector derivative expansion</span>
+            <span class="c1"># In that case, we can just ignore the extra conditions</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">.symbols</span><span class="w"> </span><span class="kn">import</span> <span class="n">VectorDerivative</span>
+
+            <span class="n">has_vector_derivative</span> <span class="o">=</span> <span class="nb">any</span><span class="p">(</span>
+                <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">VectorDerivative</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">ivp</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+            <span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">has_vector_derivative</span><span class="p">:</span>
+                <span class="c1"># Filter out the extra conditions silently - they came from vector derivative expansion</span>
+                <span class="c1"># where some components don&#39;t need as high an order</span>
+                <span class="k">continue</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Strict validation for non-vector cases</span>
+                <span class="k">if</span> <span class="n">order</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">level_desc</span> <span class="o">=</span> <span class="s2">&quot;no conditions&quot;</span>
+                <span class="k">elif</span> <span class="n">order</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">level_desc</span> <span class="o">=</span> <span class="s2">&quot;level 0 only&quot;</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">level_desc</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;levels 0 to </span><span class="si">{</span><span class="n">order</span><span class="o">-</span><span class="mi">1</span><span class="si">}</span><span class="s2"> only&quot;</span>
+
+                <span class="k">raise</span> <span class="n">OverdeterminedConditionsError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Too many initial conditions for variable </span><span class="si">{</span><span class="n">var</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">. &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;Variable has order </span><span class="si">{</span><span class="n">order</span><span class="si">}</span><span class="s2"> and needs </span><span class="si">{</span><span class="n">level_desc</span><span class="si">}</span><span class="s2">, &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;but got conditions for levels </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="n">provided_levels</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span>
+                <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="validate_variable_orders">
+<a class="viewcode-back" href="../../api_reference.html#odecast.validate.validate_variable_orders">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">validate_variable_orders</span><span class="p">(</span>
+    <span class="n">equations</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Eq</span><span class="p">],</span>
+    <span class="n">declared_orders</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Variable</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Validate that declared variable orders match equation requirements.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        equations: List of equations to check</span>
+<span class="sd">        declared_orders: Dictionary of explicitly declared variable orders</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        OrderMismatchError: When declared order doesn&#39;t match equation usage</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">.analyze</span><span class="w"> </span><span class="kn">import</span> <span class="n">collect_variables</span><span class="p">,</span> <span class="n">infer_orders</span>
+
+    <span class="c1"># Get all variables used in equations</span>
+    <span class="n">all_variables</span> <span class="o">=</span> <span class="n">collect_variables</span><span class="p">(</span><span class="n">equations</span><span class="p">)</span>
+
+    <span class="c1"># Infer orders from equation usage</span>
+    <span class="n">inferred_orders</span> <span class="o">=</span> <span class="n">infer_orders</span><span class="p">(</span><span class="n">equations</span><span class="p">)</span>
+
+    <span class="c1"># Check for mismatches between declared and inferred orders</span>
+    <span class="k">for</span> <span class="n">var</span><span class="p">,</span> <span class="n">declared_order</span> <span class="ow">in</span> <span class="n">declared_orders</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">inferred_orders</span><span class="p">:</span>
+            <span class="n">inferred_order</span> <span class="o">=</span> <span class="n">inferred_orders</span><span class="p">[</span><span class="n">var</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">declared_order</span> <span class="o">!=</span> <span class="n">inferred_order</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">OrderMismatchError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Variable </span><span class="si">{</span><span class="n">var</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> declared with order </span><span class="si">{</span><span class="n">declared_order</span><span class="si">}</span><span class="s2"> &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;but equations require order </span><span class="si">{</span><span class="n">inferred_order</span><span class="si">}</span><span class="s2">. &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;Either update the declaration or check your equations.&quot;</span>
+                <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="validate_initial_conditions">
+<a class="viewcode-back" href="../../api_reference.html#odecast.validate.validate_initial_conditions">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">validate_initial_conditions</span><span class="p">(</span><span class="n">equation</span><span class="p">,</span> <span class="n">conditions</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Validate that initial conditions match the equation requirements.</span>
+
+<span class="sd">    This is a placeholder that will be removed once the above functions are integrated.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+        <span class="s2">&quot;validate_initial_conditions will be implemented in later playbooks&quot;</span>
+    <span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Matthias Baer.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

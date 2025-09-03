@@ -1,0 +1,257 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>odecast.backends.scipy_ivp &mdash; Odecast 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/plot_directive.css" />
+
+  
+    <link rel="shortcut icon" href="../../../_static/odecast-logo.png"/>
+    <link rel="canonical" href="https://maroba.github.io/odecast/_modules/odecast/backends/scipy_ivp.html" />
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Odecast
+              <img src="../../../_static/odecast-logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">Quick Start Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../user_guide.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api_reference.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Odecast</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">odecast.backends.scipy_ivp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for odecast.backends.scipy_ivp</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">SciPy-based backend for solving initial value problems</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.integrate</span><span class="w"> </span><span class="kn">import</span> <span class="n">solve_ivp</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">..symbols</span><span class="w"> </span><span class="kn">import</span> <span class="n">Variable</span><span class="p">,</span> <span class="n">Derivative</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..solution</span><span class="w"> </span><span class="kn">import</span> <span class="n">SolutionIVP</span>
+
+
+<div class="viewcode-block" id="ScipyIVPBackend">
+<a class="viewcode-back" href="../../../api_reference.html#odecast.backends.scipy_ivp.ScipyIVPBackend">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ScipyIVPBackend</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Backend for solving IVPs using SciPy&#39;s solve_ivp.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="ScipyIVPBackend.solve">
+<a class="viewcode-back" href="../../../api_reference.html#odecast.backends.scipy_ivp.ScipyIVPBackend.solve">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">solve</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">f_compiled</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
+        <span class="n">jac_compiled</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">],</span>
+        <span class="n">x0</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+        <span class="n">t0</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">tspan</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span>
+        <span class="n">mapping</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">Variable</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Variable</span><span class="p">,</span> <span class="nb">int</span><span class="p">]],</span> <span class="n">Union</span><span class="p">[</span><span class="nb">list</span><span class="p">,</span> <span class="nb">int</span><span class="p">]],</span>
+        <span class="n">options</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SolutionIVP</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Solve the IVP using SciPy&#39;s solve_ivp.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            f_compiled: Compiled RHS function f(t, x) -&gt; dx/dt</span>
+<span class="sd">            jac_compiled: Compiled Jacobian function (optional)</span>
+<span class="sd">            x0: Initial state vector</span>
+<span class="sd">            t0: Initial time</span>
+<span class="sd">            tspan: Tuple of (t_start, t_end)</span>
+<span class="sd">            mapping: State mapping from build_state_map</span>
+<span class="sd">            options: Additional solver options</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            SolutionIVP object with results</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">options</span> <span class="o">=</span> <span class="n">options</span> <span class="ow">or</span> <span class="p">{}</span>
+
+        <span class="c1"># Extract solver options</span>
+        <span class="n">method</span> <span class="o">=</span> <span class="n">options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;method&quot;</span><span class="p">,</span> <span class="s2">&quot;RK45&quot;</span><span class="p">)</span>
+        <span class="n">rtol</span> <span class="o">=</span> <span class="n">options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;rtol&quot;</span><span class="p">,</span> <span class="mf">1e-3</span><span class="p">)</span>
+        <span class="n">atol</span> <span class="o">=</span> <span class="n">options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;atol&quot;</span><span class="p">,</span> <span class="mf">1e-6</span><span class="p">)</span>
+        <span class="n">events</span> <span class="o">=</span> <span class="n">options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;events&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">dense_output</span> <span class="o">=</span> <span class="n">options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;dense_output&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="n">max_step</span> <span class="o">=</span> <span class="n">options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;max_step&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>
+
+        <span class="c1"># Solve using scipy.integrate.solve_ivp</span>
+        <span class="n">sol</span> <span class="o">=</span> <span class="n">solve_ivp</span><span class="p">(</span>
+            <span class="n">fun</span><span class="o">=</span><span class="n">f_compiled</span><span class="p">,</span>
+            <span class="n">t_span</span><span class="o">=</span><span class="n">tspan</span><span class="p">,</span>
+            <span class="n">y0</span><span class="o">=</span><span class="n">x0</span><span class="p">,</span>
+            <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">,</span>
+            <span class="n">rtol</span><span class="o">=</span><span class="n">rtol</span><span class="p">,</span>
+            <span class="n">atol</span><span class="o">=</span><span class="n">atol</span><span class="p">,</span>
+            <span class="n">events</span><span class="o">=</span><span class="n">events</span><span class="p">,</span>
+            <span class="n">dense_output</span><span class="o">=</span><span class="n">dense_output</span><span class="p">,</span>
+            <span class="n">max_step</span><span class="o">=</span><span class="n">max_step</span><span class="p">,</span>
+            <span class="n">jac</span><span class="o">=</span><span class="n">jac_compiled</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">sol</span><span class="o">.</span><span class="n">success</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;SciPy solve_ivp failed: </span><span class="si">{</span><span class="n">sol</span><span class="o">.</span><span class="n">message</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Create and return SolutionIVP object</span>
+        <span class="k">return</span> <span class="n">SolutionIVP</span><span class="p">(</span>
+            <span class="n">t</span><span class="o">=</span><span class="n">sol</span><span class="o">.</span><span class="n">t</span><span class="p">,</span>
+            <span class="n">y</span><span class="o">=</span><span class="n">sol</span><span class="o">.</span><span class="n">y</span><span class="p">,</span>
+            <span class="n">mapping</span><span class="o">=</span><span class="n">mapping</span><span class="p">,</span>
+            <span class="n">t0</span><span class="o">=</span><span class="n">t0</span><span class="p">,</span>
+            <span class="n">f_compiled</span><span class="o">=</span><span class="n">f_compiled</span><span class="p">,</span>
+            <span class="n">jac_compiled</span><span class="o">=</span><span class="n">jac_compiled</span><span class="p">,</span>
+            <span class="n">x0</span><span class="o">=</span><span class="n">x0</span><span class="p">,</span>
+        <span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="convert_ivp_to_state_vector">
+<a class="viewcode-back" href="../../../api_reference.html#odecast.backends.scipy_ivp.convert_ivp_to_state_vector">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">convert_ivp_to_state_vector</span><span class="p">(</span>
+    <span class="n">ivp_dict</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">Variable</span><span class="p">,</span> <span class="n">Derivative</span><span class="p">],</span> <span class="nb">float</span><span class="p">],</span>
+    <span class="n">mapping</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">Variable</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Variable</span><span class="p">,</span> <span class="nb">int</span><span class="p">]],</span> <span class="n">Union</span><span class="p">[</span><span class="nb">list</span><span class="p">,</span> <span class="nb">int</span><span class="p">]],</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convert IVP dictionary to initial state vector.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        ivp_dict: Dictionary mapping variables/derivatives to initial values</span>
+<span class="sd">        mapping: State mapping from build_state_map</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Initial state vector x0</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Import here to avoid circular import</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">..validate</span><span class="w"> </span><span class="kn">import</span> <span class="n">normalize_ivp</span>
+
+    <span class="c1"># Normalize the IVP dictionary to handle vector variables</span>
+    <span class="n">normalized_ivp</span> <span class="o">=</span> <span class="n">normalize_ivp</span><span class="p">(</span><span class="n">ivp_dict</span><span class="p">)</span>
+
+    <span class="c1"># Determine the size of the state vector</span>
+    <span class="n">max_index</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">mapping</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>  <span class="c1"># (var, level) keys</span>
+            <span class="n">max_index</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">max_index</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">Variable</span><span class="p">):</span>  <span class="c1"># var keys with lists</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="n">value</span><span class="p">:</span>
+                <span class="n">max_index</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">max_index</span><span class="p">,</span> <span class="nb">max</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+
+    <span class="n">n_states</span> <span class="o">=</span> <span class="n">max_index</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">x0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_states</span><span class="p">)</span>
+
+    <span class="c1"># Fill in the initial conditions using normalized format</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">var</span><span class="p">,</span> <span class="n">level</span><span class="p">),</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">normalized_ivp</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">var</span><span class="p">,</span> <span class="n">level</span><span class="p">)</span> <span class="ow">in</span> <span class="n">mapping</span><span class="p">:</span>
+            <span class="n">state_index</span> <span class="o">=</span> <span class="n">mapping</span><span class="p">[(</span><span class="n">var</span><span class="p">,</span> <span class="n">level</span><span class="p">)]</span>
+            <span class="n">x0</span><span class="p">[</span><span class="n">state_index</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="c1"># else: silently ignore conditions that aren&#39;t needed</span>
+        <span class="c1"># This happens when vector derivatives are provided but some</span>
+        <span class="c1"># components don&#39;t need that level of derivative</span>
+
+    <span class="k">return</span> <span class="n">x0</span></div>
+
+
+
+<div class="viewcode-block" id="solve_ivp_scipy">
+<a class="viewcode-back" href="../../../api_reference.html#odecast.backends.scipy_ivp.solve_ivp_scipy">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">solve_ivp_scipy</span><span class="p">(</span><span class="n">equation</span><span class="p">,</span> <span class="n">initial_conditions</span><span class="p">,</span> <span class="n">tspan</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Solve an IVP using SciPy&#39;s solve_ivp.</span>
+
+<span class="sd">    This is a placeholder that will be removed once the ScipyIVPBackend is integrated.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+        <span class="s2">&quot;SciPy IVP backend will be implemented in later playbooks&quot;</span>
+    <span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Matthias Baer.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

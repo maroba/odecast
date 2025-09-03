@@ -1,0 +1,265 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>odecast.compile &mdash; Odecast 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
+
+  
+    <link rel="shortcut icon" href="../../_static/odecast-logo.png"/>
+    <link rel="canonical" href="https://maroba.github.io/odecast/_modules/odecast/compile.html" />
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Odecast
+              <img src="../../_static/odecast-logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">Quick Start Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user_guide.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api_reference.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Odecast</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">odecast.compile</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for odecast.compile</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Compilation of symbolic expressions to numerical functions</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sympy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sp</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+
+<div class="viewcode-block" id="lambdify_rhs">
+<a class="viewcode-back" href="../../api_reference.html#odecast.compile.lambdify_rhs">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">lambdify_rhs</span><span class="p">(</span>
+    <span class="n">f_sym_vec</span><span class="p">:</span> <span class="n">sp</span><span class="o">.</span><span class="n">Matrix</span><span class="p">,</span>
+    <span class="n">t_symbol</span><span class="p">:</span> <span class="n">sp</span><span class="o">.</span><span class="n">Symbol</span><span class="p">,</span>
+    <span class="n">state_syms</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">sp</span><span class="o">.</span><span class="n">Symbol</span><span class="p">],</span>
+    <span class="n">param_names</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compile symbolic RHS vector to a numerical function.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        f_sym_vec: SymPy Matrix representing the RHS vector f(t, x)</span>
+<span class="sd">        t_symbol: SymPy symbol for time</span>
+<span class="sd">        state_syms: List of SymPy symbols for state variables [x0, x1, ...]</span>
+<span class="sd">        param_names: Optional list of parameter names to include in the function</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Callable function f(t, x) -&gt; np.ndarray</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Convert Matrix to a list of expressions</span>
+    <span class="n">f_exprs</span> <span class="o">=</span> <span class="p">[</span><span class="n">f_sym_vec</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">f_sym_vec</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])]</span>
+
+    <span class="c1"># Build argument list: t, then state variables, then parameters</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="p">[</span><span class="n">t_symbol</span><span class="p">]</span> <span class="o">+</span> <span class="n">state_syms</span>
+    <span class="k">if</span> <span class="n">param_names</span><span class="p">:</span>
+        <span class="n">param_syms</span> <span class="o">=</span> <span class="p">[</span><span class="n">sp</span><span class="o">.</span><span class="n">Symbol</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">param_names</span><span class="p">]</span>
+        <span class="n">args</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">param_syms</span><span class="p">)</span>
+
+    <span class="c1"># Use SymPy&#39;s lambdify with numpy backend</span>
+    <span class="n">f_lambdified</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">lambdify</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">f_exprs</span><span class="p">,</span> <span class="n">modules</span><span class="o">=</span><span class="s2">&quot;numpy&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">rhs_function</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="o">*</span><span class="n">params</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        RHS function compatible with scipy.integrate.solve_ivp.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            t: Time value (scalar)</span>
+<span class="sd">            x: State vector (numpy array)</span>
+<span class="sd">            *params: Optional parameter values</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            numpy array representing dx/dt</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Ensure x is a numpy array</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+        <span class="c1"># Build argument list for the lambdified function</span>
+        <span class="n">args_vals</span> <span class="o">=</span> <span class="p">[</span><span class="n">t</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">state_syms</span><span class="p">))]</span>
+        <span class="k">if</span> <span class="n">params</span><span class="p">:</span>
+            <span class="n">args_vals</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+
+        <span class="c1"># Call the lambdified function</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">f_lambdified</span><span class="p">(</span><span class="o">*</span><span class="n">args_vals</span><span class="p">)</span>
+
+        <span class="c1"># Ensure result is a numpy array</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isscalar</span><span class="p">(</span><span class="n">result</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">result</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">rhs_function</span></div>
+
+
+
+<div class="viewcode-block" id="lambdify_jac">
+<a class="viewcode-back" href="../../api_reference.html#odecast.compile.lambdify_jac">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">lambdify_jac</span><span class="p">(</span>
+    <span class="n">jac_sym</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">sp</span><span class="o">.</span><span class="n">Matrix</span><span class="p">],</span>
+    <span class="n">t_symbol</span><span class="p">:</span> <span class="n">sp</span><span class="o">.</span><span class="n">Symbol</span><span class="p">,</span>
+    <span class="n">state_syms</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">sp</span><span class="o">.</span><span class="n">Symbol</span><span class="p">],</span>
+    <span class="n">param_names</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compile symbolic Jacobian matrix to a numerical function.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        jac_sym: SymPy Matrix representing the Jacobian df/dx (can be None)</span>
+<span class="sd">        t_symbol: SymPy symbol for time</span>
+<span class="sd">        state_syms: List of SymPy symbols for state variables</span>
+<span class="sd">        param_names: Optional list of parameter names</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Callable function jac(t, x) -&gt; np.ndarray, or None if jac_sym is None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">jac_sym</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="c1"># Convert Matrix to nested list of expressions</span>
+    <span class="n">jac_exprs</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">[</span><span class="n">jac_sym</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">jac_sym</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">jac_sym</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="p">]</span>
+
+    <span class="c1"># Build argument list</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="p">[</span><span class="n">t_symbol</span><span class="p">]</span> <span class="o">+</span> <span class="n">state_syms</span>
+    <span class="k">if</span> <span class="n">param_names</span><span class="p">:</span>
+        <span class="n">param_syms</span> <span class="o">=</span> <span class="p">[</span><span class="n">sp</span><span class="o">.</span><span class="n">Symbol</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">param_names</span><span class="p">]</span>
+        <span class="n">args</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">param_syms</span><span class="p">)</span>
+
+    <span class="c1"># Use SymPy&#39;s lambdify</span>
+    <span class="n">jac_lambdified</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">lambdify</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">jac_exprs</span><span class="p">,</span> <span class="n">modules</span><span class="o">=</span><span class="s2">&quot;numpy&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">jac_function</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="o">*</span><span class="n">params</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Jacobian function compatible with scipy.integrate.solve_ivp.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            t: Time value (scalar)</span>
+<span class="sd">            x: State vector (numpy array)</span>
+<span class="sd">            *params: Optional parameter values</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            numpy array representing df/dx</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Ensure x is a numpy array</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+        <span class="c1"># Build argument list</span>
+        <span class="n">args_vals</span> <span class="o">=</span> <span class="p">[</span><span class="n">t</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">state_syms</span><span class="p">))]</span>
+        <span class="k">if</span> <span class="n">params</span><span class="p">:</span>
+            <span class="n">args_vals</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+
+        <span class="c1"># Call the lambdified function</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">jac_lambdified</span><span class="p">(</span><span class="o">*</span><span class="n">args_vals</span><span class="p">)</span>
+
+        <span class="c1"># Ensure result is a 2D numpy array</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">jac_function</span></div>
+
+
+
+<div class="viewcode-block" id="compile_to_function">
+<a class="viewcode-back" href="../../api_reference.html#odecast.compile.compile_to_function">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">compile_to_function</span><span class="p">(</span><span class="n">expression</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compile a symbolic expression to a numerical function.</span>
+
+<span class="sd">    This is a placeholder that will be removed once the above functions are integrated.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+        <span class="s2">&quot;compile_to_function will be implemented in later playbooks&quot;</span>
+    <span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Matthias Baer.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

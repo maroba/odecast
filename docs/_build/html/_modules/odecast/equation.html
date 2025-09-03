@@ -1,0 +1,302 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>odecast.equation &mdash; Odecast 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
+
+  
+    <link rel="shortcut icon" href="../../_static/odecast-logo.png"/>
+    <link rel="canonical" href="https://maroba.github.io/odecast/_modules/odecast/equation.html" />
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Odecast
+              <img src="../../_static/odecast-logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">Quick Start Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user_guide.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api_reference.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Odecast</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">odecast.equation</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for odecast.equation</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Equation objects for representing ODEs</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sympy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sp</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.symbols</span><span class="w"> </span><span class="kn">import</span> <span class="n">as_sympy</span><span class="p">,</span> <span class="n">VectorExpression</span><span class="p">,</span> <span class="n">VectorDerivative</span><span class="p">,</span> <span class="n">Variable</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">expand_vector_equations</span><span class="p">(</span><span class="n">equations</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;Eq&quot;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;Eq&quot;</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Expand vector equations to component equations.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        equations: List of equations that may contain vector operations</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        List of expanded component equations</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">expanded</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">eq</span> <span class="ow">in</span> <span class="n">equations</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">_has_vector_operations</span><span class="p">(</span><span class="n">eq</span><span class="p">):</span>
+            <span class="c1"># Expand this vector equation to component equations</span>
+            <span class="n">component_eqs</span> <span class="o">=</span> <span class="n">_expand_vector_equation</span><span class="p">(</span><span class="n">eq</span><span class="p">)</span>
+            <span class="n">expanded</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">component_eqs</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Regular scalar equation</span>
+            <span class="n">expanded</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">eq</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">expanded</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_has_vector_operations</span><span class="p">(</span><span class="n">eq</span><span class="p">:</span> <span class="s2">&quot;Eq&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Check if equation contains vector operations.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_contains_vector_ops</span><span class="p">(</span><span class="n">eq</span><span class="o">.</span><span class="n">lhs</span><span class="p">)</span> <span class="ow">or</span> <span class="n">_contains_vector_ops</span><span class="p">(</span><span class="n">eq</span><span class="o">.</span><span class="n">rhs</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_contains_vector_ops</span><span class="p">(</span><span class="n">expr</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Recursively check if expression contains vector operations.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">expr</span><span class="p">,</span> <span class="p">(</span><span class="n">VectorExpression</span><span class="p">,</span> <span class="n">VectorDerivative</span><span class="p">)):</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">expr</span><span class="p">,</span> <span class="s2">&quot;left&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">expr</span><span class="p">,</span> <span class="s2">&quot;right&quot;</span><span class="p">):</span>
+        <span class="c1"># Expression with left/right operands</span>
+        <span class="k">return</span> <span class="n">_contains_vector_ops</span><span class="p">(</span><span class="n">expr</span><span class="o">.</span><span class="n">left</span><span class="p">)</span> <span class="ow">or</span> <span class="n">_contains_vector_ops</span><span class="p">(</span><span class="n">expr</span><span class="o">.</span><span class="n">right</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">expr</span><span class="p">,</span> <span class="n">Variable</span><span class="p">)</span> <span class="ow">and</span> <span class="n">expr</span><span class="o">.</span><span class="n">shape</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">return</span> <span class="kc">False</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_expand_vector_equation</span><span class="p">(</span><span class="n">eq</span><span class="p">:</span> <span class="s2">&quot;Eq&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;Eq&quot;</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Expand a single vector equation to component equations.</span>
+
+<span class="sd">    For example: Eq(u.d(2) + u, 0) where u is shape (2,)</span>
+<span class="sd">    Expands to: [Eq(u[0].d(2) + u[0], 0), Eq(u[1].d(2) + u[1], 0)]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Find vector variables in the equation to determine shape</span>
+    <span class="n">vector_vars</span> <span class="o">=</span> <span class="n">_find_vector_variables</span><span class="p">(</span><span class="n">eq</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">vector_vars</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">eq</span><span class="p">]</span>  <span class="c1"># No vector variables found</span>
+
+    <span class="c1"># For now, assume all vector variables have the same shape</span>
+    <span class="c1"># This is a simplification for Playbook 11</span>
+    <span class="n">shape</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">vector_vars</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span>
+    <span class="n">component_eqs</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>  <span class="c1"># Handle 1D vectors for now</span>
+        <span class="c1"># Expand LHS and RHS for component i</span>
+        <span class="n">lhs_component</span> <span class="o">=</span> <span class="n">_expand_expression_component</span><span class="p">(</span><span class="n">eq</span><span class="o">.</span><span class="n">lhs</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+        <span class="n">rhs_component</span> <span class="o">=</span> <span class="n">_expand_expression_component</span><span class="p">(</span><span class="n">eq</span><span class="o">.</span><span class="n">rhs</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+
+        <span class="c1"># Create component equation</span>
+        <span class="n">component_eq</span> <span class="o">=</span> <span class="n">Eq</span><span class="p">(</span><span class="n">lhs_component</span><span class="p">,</span> <span class="n">rhs_component</span><span class="p">)</span>
+        <span class="n">component_eqs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">component_eq</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">component_eqs</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_find_vector_variables</span><span class="p">(</span><span class="n">eq</span><span class="p">:</span> <span class="s2">&quot;Eq&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">set</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Find all vector variables in the equation.&quot;&quot;&quot;</span>
+    <span class="n">vector_vars</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">collect_vectors</span><span class="p">(</span><span class="n">expr</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">expr</span><span class="p">,</span> <span class="n">Variable</span><span class="p">)</span> <span class="ow">and</span> <span class="n">expr</span><span class="o">.</span><span class="n">shape</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">vector_vars</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">expr</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">expr</span><span class="p">,</span> <span class="n">VectorDerivative</span><span class="p">):</span>
+            <span class="n">vector_vars</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">expr</span><span class="o">.</span><span class="n">variable</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">expr</span><span class="p">,</span> <span class="s2">&quot;left&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">expr</span><span class="p">,</span> <span class="s2">&quot;right&quot;</span><span class="p">):</span>
+            <span class="n">collect_vectors</span><span class="p">(</span><span class="n">expr</span><span class="o">.</span><span class="n">left</span><span class="p">)</span>
+            <span class="n">collect_vectors</span><span class="p">(</span><span class="n">expr</span><span class="o">.</span><span class="n">right</span><span class="p">)</span>
+
+    <span class="n">collect_vectors</span><span class="p">(</span><span class="n">eq</span><span class="o">.</span><span class="n">lhs</span><span class="p">)</span>
+    <span class="n">collect_vectors</span><span class="p">(</span><span class="n">eq</span><span class="o">.</span><span class="n">rhs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">vector_vars</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_expand_expression_component</span><span class="p">(</span><span class="n">expr</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Expand an expression to its component for the given index.</span>
+
+<span class="sd">    For example: u.d(2) + u with index=0 becomes u[0].d(2) + u[0]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">expr</span><span class="p">,</span> <span class="n">Variable</span><span class="p">)</span> <span class="ow">and</span> <span class="n">expr</span><span class="o">.</span><span class="n">shape</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Vector variable -&gt; component variable</span>
+        <span class="k">return</span> <span class="n">expr</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">expr</span><span class="p">,</span> <span class="n">VectorDerivative</span><span class="p">):</span>
+        <span class="c1"># Vector derivative -&gt; component derivative</span>
+        <span class="k">return</span> <span class="n">expr</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">expr</span><span class="p">,</span> <span class="n">VectorExpression</span><span class="p">):</span>
+        <span class="c1"># Vector expression -&gt; expand operands and combine</span>
+        <span class="n">left_comp</span> <span class="o">=</span> <span class="n">_expand_expression_component</span><span class="p">(</span><span class="n">expr</span><span class="o">.</span><span class="n">left</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span>
+        <span class="n">right_comp</span> <span class="o">=</span> <span class="n">_expand_expression_component</span><span class="p">(</span><span class="n">expr</span><span class="o">.</span><span class="n">right</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span>
+
+        <span class="c1"># Create scalar expression</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">.symbols</span><span class="w"> </span><span class="kn">import</span> <span class="n">Expression</span>
+
+        <span class="k">return</span> <span class="n">Expression</span><span class="p">(</span><span class="n">expr</span><span class="o">.</span><span class="n">operator</span><span class="p">,</span> <span class="n">left_comp</span><span class="p">,</span> <span class="n">right_comp</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">expr</span><span class="p">,</span> <span class="s2">&quot;left&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">expr</span><span class="p">,</span> <span class="s2">&quot;right&quot;</span><span class="p">):</span>
+        <span class="c1"># Regular expression with vector operands</span>
+        <span class="n">left_comp</span> <span class="o">=</span> <span class="n">_expand_expression_component</span><span class="p">(</span><span class="n">expr</span><span class="o">.</span><span class="n">left</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span>
+        <span class="n">right_comp</span> <span class="o">=</span> <span class="n">_expand_expression_component</span><span class="p">(</span><span class="n">expr</span><span class="o">.</span><span class="n">right</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span>
+
+        <span class="c1"># Preserve the expression type</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">.symbols</span><span class="w"> </span><span class="kn">import</span> <span class="n">Expression</span>
+
+        <span class="k">return</span> <span class="n">Expression</span><span class="p">(</span><span class="n">expr</span><span class="o">.</span><span class="n">operator</span><span class="p">,</span> <span class="n">left_comp</span><span class="p">,</span> <span class="n">right_comp</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># Scalar or constant - same for all components</span>
+        <span class="k">return</span> <span class="n">expr</span>
+
+
+<div class="viewcode-block" id="Eq">
+<a class="viewcode-back" href="../../api_reference.html#odecast.Eq">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Eq</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Represents an ordinary differential equation.</span>
+
+<span class="sd">    The Eq class is used to create equations of the form lhs = rhs, where the</span>
+<span class="sd">    left and right sides can contain variables, derivatives, and expressions.</span>
+<span class="sd">    This mirrors SymPy&#39;s Eq class but works with odecast&#39;s Variable and Derivative objects.</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        Simple harmonic oscillator:</span>
+<span class="sd">        &gt;&gt;&gt; y = var(&quot;y&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; eq = Eq(y.d(2) + y, 0)</span>
+
+<span class="sd">        Damped oscillator with forcing:</span>
+<span class="sd">        &gt;&gt;&gt; eq = Eq(y.d(2) + 0.3*y.d() + y, sp.sin(t.symbol))</span>
+
+<span class="sd">        First-order ODE:</span>
+<span class="sd">        &gt;&gt;&gt; eq = Eq(y.d() - 2*y, 0)</span>
+
+<span class="sd">        Coupled system:</span>
+<span class="sd">        &gt;&gt;&gt; y, z = var(&quot;y&quot;), var(&quot;z&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; eq1 = Eq(y.d() - z, 0)</span>
+<span class="sd">        &gt;&gt;&gt; eq2 = Eq(z.d() + y, 0)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lhs</span><span class="p">,</span> <span class="n">rhs</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create an equation lhs = rhs.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            lhs: Left-hand side expression (can contain variables, derivatives, constants)</span>
+<span class="sd">            rhs: Right-hand side expression (default 0)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lhs</span> <span class="o">=</span> <span class="n">lhs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rhs</span> <span class="o">=</span> <span class="n">rhs</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">sympy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">sp</span><span class="o">.</span><span class="n">Eq</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert this equation to a SymPy equation.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            SymPy Eq object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">sp</span><span class="o">.</span><span class="n">Eq</span><span class="p">(</span><span class="n">as_sympy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lhs</span><span class="p">),</span> <span class="n">as_sympy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rhs</span><span class="p">))</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">rhs</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Eq(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">lhs</span><span class="si">}</span><span class="s2">, 0)&quot;</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Eq(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">lhs</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">rhs</span><span class="si">}</span><span class="s2">)&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check equality of equations.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Eq</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">lhs</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">lhs</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">rhs</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">rhs</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Matthias Baer.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

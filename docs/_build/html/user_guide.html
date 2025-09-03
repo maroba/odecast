@@ -1,0 +1,362 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>User Guide &mdash; Odecast 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/plot_directive.css" />
+
+  
+    <link rel="shortcut icon" href="_static/odecast-logo.png"/>
+    <link rel="canonical" href="https://maroba.github.io/odecast/user_guide.html" />
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=01f34227"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="API Reference" href="api_reference.html" />
+    <link rel="prev" title="Quick Start Guide" href="quickstart.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Odecast
+              <img src="_static/odecast-logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quick Start Guide</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">User Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#vector-variables">Vector Variables</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#creating-vector-variables">Creating Vector Variables</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#component-access">Component Access</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#vector-operations">Vector Operations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#vector-initial-conditions">Vector Initial Conditions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#mixed-systems">Mixed Systems</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#backend-selection">Backend Selection</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#scipy-backend">SciPy Backend</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#sympy-backend">SymPy Backend</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#auto-backend">Auto Backend</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#error-handling-and-validation">Error Handling and Validation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#missing-initial-conditions">Missing Initial Conditions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#inconsistent-dimensions">Inconsistent Dimensions</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#advanced-features">Advanced Features</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#time-dependent-forcing">Time-Dependent Forcing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#nonlinear-systems">Nonlinear Systems</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#parameter-studies">Parameter Studies</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#best-practices">Best Practices</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api_reference.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Odecast</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">User Guide</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/user_guide.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="user-guide">
+<h1>User Guide<a class="headerlink" href="#user-guide" title="Link to this heading"></a></h1>
+<p>This guide covers advanced features and usage patterns in Odecast.</p>
+<section id="vector-variables">
+<h2>Vector Variables<a class="headerlink" href="#vector-variables" title="Link to this heading"></a></h2>
+<p>Vector variables enable solving systems of coupled differential equations with
+elegant syntax.</p>
+<section id="creating-vector-variables">
+<h3>Creating Vector Variables<a class="headerlink" href="#creating-vector-variables" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">odecast</span><span class="w"> </span><span class="kn">import</span> <span class="n">var</span>
+
+<span class="c1"># 2D vector variable</span>
+<span class="n">u</span> <span class="o">=</span> <span class="n">var</span><span class="p">(</span><span class="s2">&quot;u&quot;</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>  <span class="c1"># Components: u[0], u[1]</span>
+
+<span class="c1"># 3D vector variable</span>
+<span class="n">v</span> <span class="o">=</span> <span class="n">var</span><span class="p">(</span><span class="s2">&quot;v&quot;</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>  <span class="c1"># Components: v[0], v[1], v[2]</span>
+</pre></div>
+</div>
+</section>
+<section id="component-access">
+<h3>Component Access<a class="headerlink" href="#component-access" title="Link to this heading"></a></h3>
+<p>Individual components behave like scalar variables:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">u</span> <span class="o">=</span> <span class="n">var</span><span class="p">(</span><span class="s2">&quot;u&quot;</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="c1"># Access components</span>
+<span class="n">u0</span> <span class="o">=</span> <span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># First component</span>
+<span class="n">u1</span> <span class="o">=</span> <span class="n">u</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>  <span class="c1"># Second component</span>
+
+<span class="c1"># Use in equations</span>
+<span class="n">eq1</span> <span class="o">=</span> <span class="n">Eq</span><span class="p">(</span><span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">d</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">0</span><span class="p">)</span>  <span class="c1"># u₀&#39;&#39; + u₀ = 0</span>
+<span class="n">eq2</span> <span class="o">=</span> <span class="n">Eq</span><span class="p">(</span><span class="n">u</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">d</span><span class="p">()</span> <span class="o">+</span> <span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">0</span><span class="p">)</span>   <span class="c1"># u₁&#39; + u₀ = 0</span>
+</pre></div>
+</div>
+</section>
+<section id="vector-operations">
+<h3>Vector Operations<a class="headerlink" href="#vector-operations" title="Link to this heading"></a></h3>
+<p>Vector variables support mathematical operations:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">u</span> <span class="o">=</span> <span class="n">var</span><span class="p">(</span><span class="s2">&quot;u&quot;</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="c1"># Vector derivatives</span>
+<span class="n">u_dot</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">d</span><span class="p">()</span>    <span class="c1"># [u[0]&#39;, u[1]&#39;]</span>
+<span class="n">u_ddot</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">d</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>  <span class="c1"># [u[0]&#39;&#39;, u[1]&#39;&#39;]</span>
+
+<span class="c1"># Vector equations automatically expand</span>
+<span class="n">eq</span> <span class="o">=</span> <span class="n">Eq</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">d</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">u</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="c1"># Equivalent to: u[0]&#39;&#39; + u[0] = 0, u[1]&#39;&#39; + u[1] = 0</span>
+</pre></div>
+</div>
+</section>
+<section id="vector-initial-conditions">
+<h3>Vector Initial Conditions<a class="headerlink" href="#vector-initial-conditions" title="Link to this heading"></a></h3>
+<p>Specify initial conditions using lists or arrays:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">u</span> <span class="o">=</span> <span class="n">var</span><span class="p">(</span><span class="s2">&quot;u&quot;</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">eq</span> <span class="o">=</span> <span class="n">Eq</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">d</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">u</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+<span class="c1"># Vector initial conditions</span>
+<span class="n">ivp</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">u</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">],</span>        <span class="c1"># u(0) = [1.0, 0.5]</span>
+    <span class="n">u</span><span class="o">.</span><span class="n">d</span><span class="p">():</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.2</span><span class="p">]</span>    <span class="c1"># u&#39;(0) = [0.0, -0.2]</span>
+<span class="p">}</span>
+
+<span class="n">sol</span> <span class="o">=</span> <span class="n">solve</span><span class="p">(</span><span class="n">eq</span><span class="p">,</span> <span class="n">ivp</span><span class="o">=</span><span class="n">ivp</span><span class="p">,</span> <span class="n">tspan</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+
+<span class="c1"># Access vector solutions</span>
+<span class="n">u_trajectory</span> <span class="o">=</span> <span class="n">sol</span><span class="p">[</span><span class="n">u</span><span class="p">]</span>      <span class="c1"># Shape: (2, n_points)</span>
+<span class="n">u0_trajectory</span> <span class="o">=</span> <span class="n">sol</span><span class="p">[</span><span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>  <span class="c1"># Shape: (n_points,)</span>
+<span class="n">u1_trajectory</span> <span class="o">=</span> <span class="n">sol</span><span class="p">[</span><span class="n">u</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>  <span class="c1"># Shape: (n_points,)</span>
+</pre></div>
+</div>
+</section>
+<section id="mixed-systems">
+<h3>Mixed Systems<a class="headerlink" href="#mixed-systems" title="Link to this heading"></a></h3>
+<p>Combine scalar and vector variables in the same system:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Coupled scalar-vector system</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">var</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">)</span>           <span class="c1"># Scalar</span>
+<span class="n">u</span> <span class="o">=</span> <span class="n">var</span><span class="p">(</span><span class="s2">&quot;u&quot;</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>  <span class="c1"># Vector</span>
+
+<span class="n">equations</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">Eq</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">d</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">x</span> <span class="o">-</span> <span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">0</span><span class="p">),</span>    <span class="c1"># x&#39;&#39; + x - u₀ = 0</span>
+    <span class="n">Eq</span><span class="p">(</span><span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">d</span><span class="p">()</span> <span class="o">+</span> <span class="n">u</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">x</span><span class="p">),</span>      <span class="c1"># u₀&#39; + u₁ = x</span>
+    <span class="n">Eq</span><span class="p">(</span><span class="n">u</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">d</span><span class="p">()</span> <span class="o">+</span> <span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">0</span><span class="p">)</span>       <span class="c1"># u₁&#39; + u₀ = 0</span>
+<span class="p">]</span>
+
+<span class="n">initial_conditions</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">x</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+    <span class="n">x</span><span class="o">.</span><span class="n">d</span><span class="p">():</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">u</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span>
+    <span class="n">u</span><span class="o">.</span><span class="n">d</span><span class="p">():</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]</span>
+<span class="p">}</span>
+
+<span class="n">solution</span> <span class="o">=</span> <span class="n">solve</span><span class="p">(</span><span class="n">equations</span><span class="p">,</span> <span class="n">ivp</span><span class="o">=</span><span class="n">initial_conditions</span><span class="p">,</span> <span class="n">tspan</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="backend-selection">
+<h2>Backend Selection<a class="headerlink" href="#backend-selection" title="Link to this heading"></a></h2>
+<p>Odecast supports multiple solver backends for different use cases.</p>
+<section id="scipy-backend">
+<h3>SciPy Backend<a class="headerlink" href="#scipy-backend" title="Link to this heading"></a></h3>
+<p>The SciPy backend provides fast numerical solutions:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Numeric solution using SciPy</span>
+<span class="n">solution</span> <span class="o">=</span> <span class="n">solve</span><span class="p">(</span><span class="n">equation</span><span class="p">,</span> <span class="n">ivp</span><span class="o">=</span><span class="n">conditions</span><span class="p">,</span> <span class="n">tspan</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="n">backend</span><span class="o">=</span><span class="s2">&quot;scipy&quot;</span><span class="p">)</span>
+
+<span class="c1"># Access numeric arrays</span>
+<span class="n">times</span> <span class="o">=</span> <span class="n">solution</span><span class="o">.</span><span class="n">t</span>          <span class="c1"># NumPy array</span>
+<span class="n">values</span> <span class="o">=</span> <span class="n">solution</span><span class="p">[</span><span class="n">y</span><span class="p">]</span>        <span class="c1"># NumPy array</span>
+</pre></div>
+</div>
+</section>
+<section id="sympy-backend">
+<h3>SymPy Backend<a class="headerlink" href="#sympy-backend" title="Link to this heading"></a></h3>
+<p>The SymPy backend provides exact symbolic solutions:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Symbolic solution using SymPy</span>
+<span class="n">solution</span> <span class="o">=</span> <span class="n">solve</span><span class="p">(</span><span class="n">equation</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s2">&quot;sympy&quot;</span><span class="p">)</span>
+
+<span class="c1"># Get symbolic expression</span>
+<span class="n">symbolic_expr</span> <span class="o">=</span> <span class="n">solution</span><span class="o">.</span><span class="n">as_expr</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">symbolic_expr</span><span class="p">)</span>  <span class="c1"># Prints SymPy expression</span>
+
+<span class="c1"># Evaluate symbolically</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">solution</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">)</span>  <span class="c1"># Exact evaluation</span>
+</pre></div>
+</div>
+</section>
+<section id="auto-backend">
+<h3>Auto Backend<a class="headerlink" href="#auto-backend" title="Link to this heading"></a></h3>
+<p>The auto backend tries symbolic first, falling back to numeric:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Automatic backend selection</span>
+<span class="n">solution</span> <span class="o">=</span> <span class="n">solve</span><span class="p">(</span><span class="n">equation</span><span class="p">,</span> <span class="n">ivp</span><span class="o">=</span><span class="n">conditions</span><span class="p">,</span> <span class="n">tspan</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="n">backend</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="error-handling-and-validation">
+<h2>Error Handling and Validation<a class="headerlink" href="#error-handling-and-validation" title="Link to this heading"></a></h2>
+<p>Odecast provides comprehensive validation with clear error messages.</p>
+<section id="missing-initial-conditions">
+<h3>Missing Initial Conditions<a class="headerlink" href="#missing-initial-conditions" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">y</span> <span class="o">=</span> <span class="n">var</span><span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">)</span>
+<span class="n">eq</span> <span class="o">=</span> <span class="n">Eq</span><span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">d</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">y</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+<span class="c1"># This will raise ODEValidationError</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">sol</span> <span class="o">=</span> <span class="n">solve</span><span class="p">(</span><span class="n">eq</span><span class="p">,</span> <span class="n">ivp</span><span class="o">=</span><span class="p">{</span><span class="n">y</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">},</span> <span class="n">tspan</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>  <span class="c1"># Missing y.d()</span>
+<span class="k">except</span> <span class="n">odecast</span><span class="o">.</span><span class="n">ODEValidationError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Validation error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="inconsistent-dimensions">
+<h3>Inconsistent Dimensions<a class="headerlink" href="#inconsistent-dimensions" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">u</span> <span class="o">=</span> <span class="n">var</span><span class="p">(</span><span class="s2">&quot;u&quot;</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">eq</span> <span class="o">=</span> <span class="n">Eq</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">d</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">u</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+<span class="c1"># This will raise an error</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">sol</span> <span class="o">=</span> <span class="n">solve</span><span class="p">(</span><span class="n">eq</span><span class="p">,</span> <span class="n">ivp</span><span class="o">=</span><span class="p">{</span><span class="n">u</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">]},</span> <span class="n">tspan</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>  <span class="c1"># Wrong dimension</span>
+<span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Dimension error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="advanced-features">
+<h2>Advanced Features<a class="headerlink" href="#advanced-features" title="Link to this heading"></a></h2>
+<section id="time-dependent-forcing">
+<h3>Time-Dependent Forcing<a class="headerlink" href="#time-dependent-forcing" title="Link to this heading"></a></h3>
+<p>Include time-dependent terms in your equations:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">odecast</span><span class="w"> </span><span class="kn">import</span> <span class="n">t</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sympy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sp</span>
+
+<span class="n">y</span> <span class="o">=</span> <span class="n">var</span><span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">)</span>
+<span class="c1"># Driven oscillator: y&#39;&#39; + y = cos(2*t)</span>
+<span class="n">eq</span> <span class="o">=</span> <span class="n">Eq</span><span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">d</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">y</span><span class="p">,</span> <span class="n">sp</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">t</span><span class="p">))</span>
+<span class="n">sol</span> <span class="o">=</span> <span class="n">solve</span><span class="p">(</span><span class="n">eq</span><span class="p">,</span> <span class="n">ivp</span><span class="o">=</span><span class="p">{</span><span class="n">y</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="n">y</span><span class="o">.</span><span class="n">d</span><span class="p">():</span> <span class="mi">1</span><span class="p">},</span> <span class="n">tspan</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+</pre></div>
+</div>
+</section>
+<section id="nonlinear-systems">
+<h3>Nonlinear Systems<a class="headerlink" href="#nonlinear-systems" title="Link to this heading"></a></h3>
+<p>Odecast handles nonlinear differential equations:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Van der Pol oscillator: y&#39;&#39; - μ(1 - y²)y&#39; + y = 0</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">var</span><span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">)</span>
+<span class="n">mu</span> <span class="o">=</span> <span class="mf">1.0</span>
+<span class="n">eq</span> <span class="o">=</span> <span class="n">Eq</span><span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">d</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">-</span> <span class="n">mu</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">y</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="n">y</span><span class="o">.</span><span class="n">d</span><span class="p">()</span> <span class="o">+</span> <span class="n">y</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="n">sol</span> <span class="o">=</span> <span class="n">solve</span><span class="p">(</span><span class="n">eq</span><span class="p">,</span> <span class="n">ivp</span><span class="o">=</span><span class="p">{</span><span class="n">y</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span> <span class="n">y</span><span class="o">.</span><span class="n">d</span><span class="p">():</span> <span class="mi">0</span><span class="p">},</span> <span class="n">tspan</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">20</span><span class="p">))</span>
+</pre></div>
+</div>
+</section>
+<section id="parameter-studies">
+<h3>Parameter Studies<a class="headerlink" href="#parameter-studies" title="Link to this heading"></a></h3>
+<p>Solve equations with different parameters:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="n">y</span> <span class="o">=</span> <span class="n">var</span><span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">)</span>
+<span class="n">damping_values</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]</span>
+<span class="n">solutions</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="k">for</span> <span class="n">damping</span> <span class="ow">in</span> <span class="n">damping_values</span><span class="p">:</span>
+    <span class="n">eq</span> <span class="o">=</span> <span class="n">Eq</span><span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">d</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">damping</span><span class="o">*</span><span class="n">y</span><span class="o">.</span><span class="n">d</span><span class="p">()</span> <span class="o">+</span> <span class="n">y</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">sol</span> <span class="o">=</span> <span class="n">solve</span><span class="p">(</span><span class="n">eq</span><span class="p">,</span> <span class="n">ivp</span><span class="o">=</span><span class="p">{</span><span class="n">y</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">y</span><span class="o">.</span><span class="n">d</span><span class="p">():</span> <span class="mf">0.0</span><span class="p">},</span> <span class="n">tspan</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+    <span class="n">solutions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sol</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="best-practices">
+<h2>Best Practices<a class="headerlink" href="#best-practices" title="Link to this heading"></a></h2>
+<ol class="arabic simple">
+<li><p><strong>Use descriptive variable names</strong>: <code class="docutils literal notranslate"><span class="pre">position</span> <span class="pre">=</span> <span class="pre">var(&quot;x&quot;)</span></code> instead of <code class="docutils literal notranslate"><span class="pre">x</span> <span class="pre">=</span> <span class="pre">var(&quot;x&quot;)</span></code></p></li>
+<li><p><strong>Group related equations</strong>: Use lists for systems of equations</p></li>
+<li><p><strong>Validate inputs</strong>: Check dimensions and initial conditions before solving</p></li>
+<li><p><strong>Choose appropriate backends</strong>: Use SymPy for exact solutions, SciPy for large systems</p></li>
+<li><p><strong>Handle errors gracefully</strong>: Wrap solve calls in try-except blocks for production code</p></li>
+</ol>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="quickstart.html" class="btn btn-neutral float-left" title="Quick Start Guide" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="api_reference.html" class="btn btn-neutral float-right" title="API Reference" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Matthias Baer.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
