@@ -6,7 +6,6 @@
 
 [![PyPI version](https://img.shields.io/pypi/v/odecast.svg)](https://pypi.org/project/odecast/)
 [![Documentation](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://maroba.github.io/odecast)
-![License](https://img.shields.io/github/license/maroba/odecast)
 [![Tests](https://github.com/maroba/odecast/actions/workflows/test.yml/badge.svg)](https://github.com/maroba/odecast/actions)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
