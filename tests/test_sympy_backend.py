@@ -159,16 +159,18 @@ class TestSymPyIntegration:
         expr = sol.as_expr(y)
         assert isinstance(expr, sp.Expr)
 
-    def test_solve_with_auto_backend_fallback_to_scipy(self):
-        """Test auto backend falling back to SciPy when SymPy fails."""
+    def test_solve_with_auto_backend_fallback_to_sympy(self):
+        """Test auto backend falling back to SymPy when SciPy fails."""
         y = var("y")
         z = var("z")
-        # Create a system that SymPy can't handle (multiple equations)
+        # Create a system that SciPy can't handle without IVP conditions
         eq1 = Eq(y.d(2) + z, 0)
         eq2 = Eq(z.d() - y, 0)
 
-        # Auto should fall back to SciPy, but SciPy needs IVP conditions
-        with pytest.raises(ValueError, match="IVP conditions required"):
+        # Auto should try SciPy first (which fails due to no IVP), 
+        # then fall back to SymPy (which also fails due to coupled system)
+        # So we expect RuntimeError about both backends failing
+        with pytest.raises(RuntimeError, match="Auto backend failed.*Both SciPy and SymPy backends failed"):
             solve([eq1, eq2], backend="auto")
 
     def test_different_ode_types(self):

@@ -105,7 +105,7 @@ Eq(u.d(2) + u, 0)  # Automatically expands to u₀'' + u₀ = 0, u₁'' + u₁ =
 ### **Multiple Backends**
 - **SciPy**: Lightning-fast numerics for engineering
 - **SymPy**: Exact symbolic solutions for analysis  
-- **Auto**: Tries symbolic first, falls back to numeric
+- **Auto**: Tries numeric first, falls back to symbolic
 
 ### **Bulletproof Validation**
 ```python
@@ -217,7 +217,7 @@ expr = sol.as_expr(y)  # Returns SymPy expression
 
 ### Auto Backend Selection
 ```python
-# Try symbolic first, fall back to numeric
+# Try numeric first, fall back to symbolic
 sol = solve(eq, ivp=conditions, tspan=(0, 10), backend="auto")
 ```
 

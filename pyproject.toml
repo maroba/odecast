@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "odecast"
-version = "0.1.0"
+version = "0.1.1"
 description = "A Python library for solving higher-order ordinary differential equations (ODEs) without manual reduction."
 readme = "README.md"
 requires-python = ">=3.10"

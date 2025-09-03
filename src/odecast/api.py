@@ -129,18 +129,67 @@ def solve(equation, *, ivp=None, bvp=None, tspan=None, backend=None, **kwargs):
         backend = "scipy"  # Default to scipy for IVP
 
     if backend == "auto":
-        # Try SymPy first, fall back to SciPy on failure
+        # Try SciPy first, fall back to SymPy on failure
         try:
-            from .backends.sympy_backend import SymPyBackend
+            # Check basic requirements for SciPy backend
+            if ivp is None:
+                raise ValueError("SciPy backend requires IVP conditions")
+            if tspan is None:
+                raise ValueError("SciPy backend requires tspan")
 
-            backend_instance = SymPyBackend()
-            solution = backend_instance.solve(
-                equations=eqs, t_symbol=t.symbol, **kwargs
+            # Try SciPy backend
+            t0 = tspan[0]
+            validate_ivp(orders, ivp, t0)
+
+            # Step 3: Reduce to first-order system
+            mapping = build_state_map(orders)
+            highest_rules = isolate_highest_derivatives(eqs, orders)
+            f_sym_vec, jac_sym = make_rhs(t.symbol, mapping, highest_rules)
+
+            # Step 4: Convert IVP to state vector
+            x0 = convert_ivp_to_state_vector(ivp, mapping)
+
+            # Step 5: Compile to numerical functions
+            n_states = len(x0)
+            state_syms = [sp.Symbol(f"x{i}") for i in range(n_states)]
+
+            f_compiled = lambdify_rhs(f_sym_vec, t.symbol, state_syms)
+            jac_compiled = (
+                lambdify_jac(jac_sym, t.symbol, state_syms)
+                if jac_sym is not None
+                else None
             )
+
+            # Step 6: Solve using SciPy backend
+            backend_instance = ScipyIVPBackend()
+            solution = backend_instance.solve(
+                f_compiled=f_compiled,
+                jac_compiled=jac_compiled,
+                x0=x0,
+                t0=t0,
+                tspan=tspan,
+                mapping=mapping,
+                options=kwargs,
+            )
+
             return solution
+
         except Exception:
-            # Fall back to SciPy backend
-            backend = "scipy"
+            # Fall back to SymPy backend
+            try:
+                from .backends.sympy_backend import SymPyBackend
+
+                backend_instance = SymPyBackend()
+                solution = backend_instance.solve(
+                    equations=eqs, t_symbol=t.symbol, **kwargs
+                )
+                return solution
+            except Exception as sympy_error:
+                # If both fail, raise informative error
+                raise RuntimeError(
+                    f"Auto backend failed: Both SciPy and SymPy backends failed to solve the equation. "
+                    f"SymPy error: {sympy_error}"
+                )
 
     if backend == "scipy":
         if ivp is None:
