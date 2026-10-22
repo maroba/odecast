@@ -337,6 +337,9 @@ def _solve_numeric(
                 "Boundary value problems are only supported for algebraic equations "
                 "that determine the algebraic variables directly (index 1)"
             )
+        from .delay import reject_delays
+
+        reject_delays(system.f_sym, "A boundary value problem")
         params = _dae_params(system, params, options)
         sol = ScipyBVPBackend().solve(
             fun=system.rhs_vectorized(params),
@@ -349,6 +352,23 @@ def _solve_numeric(
         return _attach_algebraic(sol, system, orders, params, z_guess)
 
     x0 = convert_ivp_to_state_vector(ivp, mapping)
+
+    from .delay import find_delays, solve_dde
+
+    history = options.pop("history", None)
+    if find_delays(system.f_sym):
+        if system.is_dae:
+            raise ValueError(
+                "Delays are not supported together with algebraic equations"
+            )
+        if events is not None or sensitivities is not None:
+            raise ValueError(
+                "Events and sensitivities are not supported for delay equations"
+            )
+        return solve_dde(system, mapping, x0, tspan, params, history, options)
+    if history is not None:
+        raise ValueError("history is only used for delay differential equations")
+
     params = _dae_params(system, params, options, tspan[0], x0, z_guess)
     system.check_consistency(tspan[0], x0, params)
     if system.is_dae:
