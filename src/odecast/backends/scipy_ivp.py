@@ -63,7 +63,7 @@ class ScipyIVPBackend:
             events=events,
             dense_output=dense_output,
             max_step=max_step,
-            jac=jac_compiled,
+            **({"jac": jac_compiled} if jac_compiled is not None else {}),
         )
 
         if not sol.success:

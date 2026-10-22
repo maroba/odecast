@@ -2,12 +2,13 @@
 Comprehensive tests for Playbook 7 - SymPy backend implementation
 """
 
+import numpy as np
 import pytest
 import sympy as sp
 
-from odecast import Eq, solve, t, var
+from odecast import BC, Eq, solve, t, var
 from odecast.backends.sympy_backend import SolutionExpr, SymPyBackend
-from odecast.errors import BackendError
+from odecast.errors import BackendError, OverdeterminedConditionsError
 
 
 class TestSolutionExpr:
@@ -86,16 +87,28 @@ class TestSymPyBackend:
         ode_check = sp.simplify(y_second + 2 * y_prime + expr)
         assert ode_check == 0
 
-    def test_multiple_equations_raises_error(self):
-        """Test that coupled equations raise an error."""
+    def test_coupled_linear_system(self):
+        """Test that coupled linear systems are solved as a whole."""
         backend = SymPyBackend()
         y = var("y")
         z = var("z")
         eq1 = Eq(y.d(2) + y, 0)
         eq2 = Eq(z.d() - y, 0)
 
-        with pytest.raises(BackendError, match="only supports decoupled systems"):
-            backend.solve([eq1, eq2], t.symbol)
+        sol = backend.solve([eq1, eq2], t.symbol)
+        y_expr, z_expr = sol.as_expr(y), sol.as_expr(z)
+        assert sp.simplify(sp.diff(y_expr, t.symbol, 2) + y_expr) == 0
+        assert sp.simplify(sp.diff(z_expr, t.symbol) - y_expr) == 0
+
+    def test_nonlinear_coupled_system_raises_error(self):
+        """Test that SymPy failures are reported as BackendError."""
+        backend = SymPyBackend()
+        y = var("y")
+        z = var("z")
+        eqs = [Eq(y.d(2) - sp.sin(z), 0), Eq(z.d() - y * z, 0)]
+
+        with pytest.raises(BackendError, match="SymPy failed"):
+            backend.solve(eqs, t.symbol)
 
     def test_multiple_variables_raises_error(self):
         """Test that multiple variables in single equation raise an error."""
@@ -104,9 +117,7 @@ class TestSymPyBackend:
         z = var("z")
         eq = Eq(y.d() + z, 0)  # Two variables in one equation
 
-        with pytest.raises(
-            BackendError, match="only supports single-variable equations"
-        ):
+        with pytest.raises(BackendError, match="one equation per variable"):
             backend.solve([eq], t.symbol)
 
     def test_unsolvable_equation_raises_error(self):
@@ -164,13 +175,11 @@ class TestSymPyIntegration:
         """Test auto backend falling back to SymPy when SciPy fails."""
         y = var("y")
         z = var("z")
-        # Create a system that SciPy can't handle without IVP conditions
-        eq1 = Eq(y.d(2) + z, 0)
-        eq2 = Eq(z.d() - y, 0)
+        # Without conditions SciPy cannot be used, and SymPy cannot solve
+        # this nonlinear coupled system, so both backends fail
+        eq1 = Eq(y.d(2) - sp.sin(z), 0)
+        eq2 = Eq(z.d() - y * z, 0)
 
-        # Auto should try SciPy first (which fails due to no IVP),
-        # then fall back to SymPy (which also fails due to coupled system)
-        # So we expect RuntimeError about both backends failing
         with pytest.raises(
             RuntimeError,
             match="Auto backend failed.*Both SciPy and SymPy backends failed",
@@ -207,23 +216,73 @@ class TestSymPyErrorHandling:
         """Test that BackendError contains the original exception."""
         backend = SymPyBackend()
         y = var("y")
-        # Force an error by trying to solve multiple variables
         z = var("z")
-        eq = Eq(y.d() + z, 0)
+        eqs = [Eq(y.d(2) - sp.sin(z), 0), Eq(z.d() - y * z, 0)]
 
         with pytest.raises(BackendError) as excinfo:
-            backend.solve([eq], t.symbol)
+            backend.solve(eqs, t.symbol)
 
-        # Check that error message is informative
-        assert "only supports single-variable equations" in str(excinfo.value)
+        assert "SymPy failed" in str(excinfo.value)
 
     def test_solve_integration_error_propagation(self):
         """Test that errors from SymPy backend propagate correctly through solve."""
         y = var("y")
         z = var("z")
-        eq1 = Eq(y.d() + z, 0)
-        eq2 = Eq(z.d() - y, 0)
+        eq = Eq(y.d() + z, 0)
 
-        # Should raise BackendError due to coupled equations
-        with pytest.raises(BackendError, match="only supports decoupled systems"):
-            solve([eq1, eq2], backend="sympy")
+        with pytest.raises(BackendError, match="one equation per variable"):
+            solve(eq, backend="sympy")
+
+
+class TestSymPyConditions:
+    """Initial and boundary conditions with the SymPy backend."""
+
+    def test_initial_conditions(self):
+        y = var("y")
+        sol = solve(Eq(y.d(2) + y, 0), backend="sympy", ivp={y: 1, y.d(): 0})
+        assert sp.simplify(sol.as_expr(y) - sp.cos(t.symbol)) == 0
+
+    def test_initial_time_from_tspan(self):
+        y = var("y")
+        sol = solve(Eq(y.d() - y, 0), backend="sympy", ivp={y: 1}, tspan=(1, 2))
+        assert sp.simplify(sol.as_expr(y) - sp.exp(t.symbol - 1)) == 0
+
+    def test_partial_conditions_leave_constants(self):
+        y = var("y")
+        sol = solve(Eq(y.d(2) + y, 0), backend="sympy", ivp={y: 0})
+        assert len(sol.as_expr(y).free_symbols) == 2  # t and one constant
+        with pytest.raises(ValueError, match="undetermined constants"):
+            sol.eval(y, 1.0)
+
+    def test_boundary_conditions(self):
+        y = var("y")
+        sol = solve(
+            Eq(y.d(2) + y, 0),
+            backend="sympy",
+            bvp=[BC(y, t=0, value=0), BC(y, t=1, value=1)],
+        )
+        assert sp.simplify(sol.as_expr(y) - sp.sin(t.symbol) / sp.sin(1)) == 0
+
+    def test_coupled_system_with_conditions(self):
+        y, z = var("y"), var("z")
+        sol = solve([Eq(y.d(), z), Eq(z.d(), -y)], backend="sympy", ivp={y: 1, z: 0})
+        assert sp.simplify(sol.as_expr(y) - sp.cos(t.symbol)) == 0
+        assert sp.simplify(sol.as_expr(z) + sp.sin(t.symbol)) == 0
+
+    def test_eval_and_derivative(self):
+        y = var("y")
+        sol = solve(Eq(y.d(2) + y, 0), backend="sympy", ivp={y: 1, y.d(): 0})
+        np.testing.assert_allclose(sol.eval(y, [0, np.pi]), [1, -1], atol=1e-12)
+        assert sol.eval(y.d(), np.pi / 2) == pytest.approx(-1)
+
+    def test_vector_variable(self):
+        u = var("u", shape=2)
+        sol = solve(Eq(u.d() + u, 0), backend="sympy", ivp={u: [1, 2]})
+        np.testing.assert_allclose(
+            sol.eval(u, [0, 1]), [[1, np.exp(-1)], [2, 2 * np.exp(-1)]]
+        )
+
+    def test_condition_on_highest_derivative(self):
+        y = var("y")
+        with pytest.raises(OverdeterminedConditionsError):
+            solve(Eq(y.d(2) + y, 0), backend="sympy", ivp={y: 1, y.d(2): 0})

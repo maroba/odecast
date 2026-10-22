@@ -21,6 +21,11 @@ Solutions
 .. autoclass:: odecast.solution.SolutionIVP
    :members:
 
+.. autoclass:: odecast.solution.SolutionBVP
+
+.. autoclass:: odecast.backends.sympy_backend.SolutionExpr
+   :members:
+
 Exceptions
 ----------
 
@@ -82,5 +87,6 @@ Backends
 
 .. automodule:: odecast.backends.sympy_backend
    :members:
+   :exclude-members: SolutionExpr
    :undoc-members:
    :show-inheritance:

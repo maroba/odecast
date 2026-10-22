@@ -32,15 +32,16 @@ Equations
    Eq(y.d(2) + y, 0)               # y'' + y = 0
    Eq(y.d(2) + 0.1*y.d() + y, 0)   # y'' + 0.1 y' + y = 0
 
-Terms that depend explicitly on :math:`t` are written with SymPy functions
-of ``t.symbol``:
+Nonlinear terms and terms that depend explicitly on the independent
+variable :data:`odecast.t` are written with SymPy (or NumPy) functions:
 
 .. code-block:: python
 
    import sympy as sp
    from odecast import t
 
-   Eq(y.d(2) + y, sp.sin(t.symbol))   # y'' + y = sin(t)
+   Eq(y.d(2) + sp.sin(y), 0)    # y'' + sin(y) = 0
+   Eq(y.d(2) + y, sp.sin(t))    # y'' + y = sin(t)
 
 Solving
 -------
@@ -90,5 +91,5 @@ Full example
    plt.legend()
    plt.show()
 
-Where to go next: the :doc:`user_guide` covers systems, vector variables and
-backends; :doc:`examples` contains worked problems from several fields.
+Where to go next: the :doc:`user_guide` covers systems, vector variables,
+boundary value problems and backends; :doc:`examples` contains worked problems from several fields.

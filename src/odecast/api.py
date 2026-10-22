@@ -60,21 +60,27 @@ def solve(equation, *, ivp=None, bvp=None, tspan=None, backend=None, **kwargs):
         ivp: Dictionary of initial conditions for initial value problems (IVP).
              Keys can be Variable objects (for y(t0)) or Derivative objects (for y'(t0)).
              Example: {y: 1.0, y.d(): 0.0} for y(0)=1, y'(0)=0
-        bvp: List of boundary conditions for boundary value problems (BVP).
-             Currently not implemented - will be available in future versions.
-        tspan: Tuple of (t_start, t_end) for numeric solutions.
-               Required for scipy backend, ignored for sympy backend.
+        bvp: List of BC objects for two-point boundary value problems (BVP).
+             Example: [BC(y, t=0, value=0), BC(y, t=1, value=1)]
+        tspan: Tuple of (t_start, t_end). Required for numeric solutions;
+               initial conditions apply at t_start. For the sympy backend it
+               is optional and only sets the time of the initial conditions
+               (default 0).
         backend: Solution backend to use:
-                 - "scipy": Numeric integration using SciPy (default)
+                 - "scipy": Numeric solution using SciPy (default)
                  - "sympy": Symbolic solution using SymPy
                  - "auto": Try SciPy first, fall back to SymPy if needed
-                 - "scipy_bvp": BVP solver (not yet implemented)
+                 - "scipy_bvp": Same as "scipy" with bvp
+
+                 SciPy uses solve_ivp for an IVP and solve_bvp for a BVP.
         **kwargs: Additional backend-specific options:
-                  For scipy: method, rtol, atol, max_step, etc.
+                  For an IVP: method, rtol, atol, max_step, etc.
+                  For a BVP: guess, mesh, tol, max_nodes, bc_tol
 
     Returns:
         Solution object that depends on the backend:
-        - SolutionIVP: For numeric solutions, supports sol[y], sol[y.d()], etc.
+        - SolutionIVP: For numeric IVPs, supports sol[y], sol[y.d()], etc.
+        - SolutionBVP: For numeric BVPs, with the same interface
         - SolutionExpr: For symbolic solutions, supports sol.as_expr(y)
 
     Raises:
@@ -94,8 +100,11 @@ def solve(equation, *, ivp=None, bvp=None, tspan=None, backend=None, **kwargs):
 
         Symbolic solution:
         >>> eq = Eq(y.d(2) + y, 0)
-        >>> sol = solve(eq, backend="sympy")
-        >>> expr = sol.as_expr(y)    # Get SymPy expression
+        >>> sol = solve(eq, backend="sympy", ivp={y: 1, y.d(): 0})
+        >>> expr = sol.as_expr(y)    # cos(t)
+
+        Boundary value problem:
+        >>> sol = solve(eq, bvp=[BC(y, t=0, value=0), BC(y, t=1, value=1)], tspan=(0, 1))
 
         Coupled system:
         >>> y, z = var("y"), var("z")
@@ -103,14 +112,11 @@ def solve(equation, *, ivp=None, bvp=None, tspan=None, backend=None, **kwargs):
         >>> eq2 = Eq(z.d() - y, 0)
         >>> sol = solve([eq1, eq2], ivp={y: 1.0, y.d(): 0.0, z: 0.0}, tspan=(0, 5))
     """
-    import sympy as sp
-
-    from .analyze import collect_variables, infer_orders, resolve_orders
-    from .backends.scipy_ivp import ScipyIVPBackend, convert_ivp_to_state_vector
-    from .compile import lambdify_jac, lambdify_rhs
+    from .analyze import infer_orders, resolve_orders
     from .equation import expand_vector_equations
-    from .reduce import build_state_map, isolate_highest_derivatives, make_rhs
-    from .validate import validate_ivp
+
+    if ivp is not None and bvp is not None:
+        raise ValueError("Pass either ivp or bvp, not both")
 
     # Normalize equations to list
     eqs = [equation] if isinstance(equation, Eq) else list(equation)
@@ -118,146 +124,121 @@ def solve(equation, *, ivp=None, bvp=None, tspan=None, backend=None, **kwargs):
     # Expand vector equations to component equations
     eqs = expand_vector_equations(eqs)
 
-    # Step 1: Analyze - infer orders and resolve
-    variables = collect_variables(eqs)
+    # Analyze - infer orders and resolve
     inferred_orders = infer_orders(eqs)
-    orders = resolve_orders(list(variables), inferred_orders)
+    orders = resolve_orders(list(inferred_orders), inferred_orders)
 
-    # Route to appropriate backend
-    if backend is None:
-        backend = "scipy"  # Default to scipy for IVP
+    if backend is None or backend == "scipy_bvp":
+        backend = "scipy"
+
+    if backend == "scipy":
+        return _solve_numeric(eqs, orders, ivp, bvp, tspan, kwargs)
+
+    if backend == "sympy":
+        return _solve_symbolic(eqs, orders, ivp, bvp, tspan, kwargs)
 
     if backend == "auto":
         # Try SciPy first, fall back to SymPy on failure.
-        # Invalid initial conditions are the caller's error, not a reason to
+        # Invalid conditions are the caller's error, not a reason to
         # switch backends, so validate outside the try block.
-        if ivp is not None and tspan is not None:
-            validate_ivp(orders, ivp, tspan[0])
+        if (ivp is not None or bvp is not None) and tspan is not None:
+            _validate_conditions(orders, ivp, bvp, tspan)
+            try:
+                return _solve_numeric(eqs, orders, ivp, bvp, tspan, kwargs)
+            # Any numerical failure triggers the fallback below
+            except Exception:  # noqa: BLE001, S110
+                pass
 
         try:
-            # Check basic requirements for SciPy backend
-            if ivp is None:
-                raise ValueError("SciPy backend requires IVP conditions")
-            if tspan is None:
-                raise ValueError("SciPy backend requires tspan")
+            return _solve_symbolic(eqs, orders, ivp, bvp, tspan, kwargs)
+        except Exception as sympy_error:
+            raise RuntimeError(
+                f"Auto backend failed: Both SciPy and SymPy backends "
+                f"failed to solve the equation. SymPy error: {sympy_error}"
+            ) from sympy_error
 
-            t0 = tspan[0]
+    raise ValueError(f"Unknown backend: {backend}")
 
-            # Step 3: Reduce to first-order system
-            mapping = build_state_map(orders)
-            highest_rules = isolate_highest_derivatives(eqs, orders)
-            f_sym_vec, jac_sym = make_rhs(t.symbol, mapping, highest_rules)
 
-            # Step 4: Convert IVP to state vector
-            x0 = convert_ivp_to_state_vector(ivp, mapping)
+def _validate_conditions(orders, ivp, bvp, tspan):
+    """Validate initial or boundary conditions for a numeric solution."""
+    from .validate import normalize_conditions, validate_bvp, validate_ivp
 
-            # Step 5: Compile to numerical functions
-            n_states = len(x0)
-            state_syms = [sp.Symbol(f"x{i}") for i in range(n_states)]
+    if bvp is not None:
+        validate_bvp(orders, normalize_conditions(bvp=bvp), tspan)
+    else:
+        validate_ivp(orders, ivp, tspan[0])
 
-            f_compiled = lambdify_rhs(f_sym_vec, t.symbol, state_syms)
-            jac_compiled = (
-                lambdify_jac(jac_sym, t.symbol, state_syms)
-                if jac_sym is not None
-                else None
-            )
 
-            # Step 6: Solve using SciPy backend
-            backend_instance = ScipyIVPBackend()
-            solution = backend_instance.solve(
-                f_compiled=f_compiled,
-                jac_compiled=jac_compiled,
-                x0=x0,
-                t0=t0,
-                tspan=tspan,
-                mapping=mapping,
-                options=kwargs,
-            )
+def _solve_numeric(eqs, orders, ivp, bvp, tspan, options):
+    """Reduce to a first-order system and solve it with SciPy."""
+    import sympy as sp
 
-            return solution
+    from .backends.scipy_bvp import ScipyBVPBackend
+    from .backends.scipy_ivp import ScipyIVPBackend, convert_ivp_to_state_vector
+    from .compile import lambdify_jac, lambdify_rhs
+    from .reduce import build_state_map, isolate_highest_derivatives, make_rhs
+    from .validate import normalize_conditions
 
-        except Exception:  # noqa: BLE001 - any numerical failure triggers the fallback
-            # Fall back to SymPy backend
-            try:
-                from .backends.sympy_backend import SymPyBackend
-
-                backend_instance = SymPyBackend()
-                solution = backend_instance.solve(
-                    equations=eqs, t_symbol=t.symbol, **kwargs
-                )
-                return solution
-            except Exception as sympy_error:  # noqa: BLE001
-                # If both fail, raise informative error
-                raise RuntimeError(
-                    f"Auto backend failed: Both SciPy and SymPy backends "
-                    f"failed to solve the equation. SymPy error: {sympy_error}"
-                )
-
-    if backend == "scipy":
-        if ivp is None:
-            raise ValueError("IVP conditions required for scipy backend")
-        if tspan is None:
-            raise ValueError("tspan required for scipy backend")
-
-        # Step 2: Validate IVP
-        t0 = tspan[0]
-        validate_ivp(orders, ivp, t0)
-
-        # Step 3: Reduce to first-order system
-        mapping = build_state_map(orders)
-        highest_rules = isolate_highest_derivatives(eqs, orders)
-        f_sym_vec, jac_sym = make_rhs(t.symbol, mapping, highest_rules)
-
-        # Step 4: Convert IVP to state vector
-        x0 = convert_ivp_to_state_vector(ivp, mapping)
-
-        # Step 5: Compile to numerical functions
-        # Determine state symbols
-        n_states = len(x0)
-        state_syms = [sp.Symbol(f"x{i}") for i in range(n_states)]
-
-        f_compiled = lambdify_rhs(f_sym_vec, t.symbol, state_syms)
-        jac_compiled = (
-            lambdify_jac(jac_sym, t.symbol, state_syms) if jac_sym is not None else None
+    if ivp is None and bvp is None:
+        raise ValueError(
+            "IVP conditions required for scipy backend (or bvp for a boundary "
+            "value problem)"
         )
+    if tspan is None:
+        raise ValueError("tspan required for scipy backend")
 
-        # Step 6: Solve using SciPy backend
-        backend_instance = ScipyIVPBackend()
-        solution = backend_instance.solve(
-            f_compiled=f_compiled,
-            jac_compiled=jac_compiled,
-            x0=x0,
-            t0=t0,
+    _validate_conditions(orders, ivp, bvp, tspan)
+
+    # Reduce to first-order system
+    mapping = build_state_map(orders)
+    highest_rules = isolate_highest_derivatives(eqs, orders)
+    f_sym_vec, jac_sym = make_rhs(t.symbol, mapping, highest_rules)
+    state_syms = [sp.Symbol(f"x{i}") for i in range(f_sym_vec.shape[0])]
+
+    if bvp is not None:
+        return ScipyBVPBackend().solve(
+            f_sym_vec=f_sym_vec,
+            t_symbol=t.symbol,
+            state_syms=state_syms,
+            conditions=normalize_conditions(bvp=bvp),
             tspan=tspan,
             mapping=mapping,
-            options=kwargs,
+            **options,
         )
 
-        return solution
+    # Convert IVP to state vector and compile to numerical functions
+    x0 = convert_ivp_to_state_vector(ivp, mapping)
+    f_compiled = lambdify_rhs(f_sym_vec, t.symbol, state_syms)
+    jac_compiled = (
+        lambdify_jac(jac_sym, t.symbol, state_syms) if jac_sym is not None else None
+    )
 
-    elif backend == "sympy":
-        # SymPy backend for symbolic solutions
-        from .backends.sympy_backend import SymPyBackend
+    return ScipyIVPBackend().solve(
+        f_compiled=f_compiled,
+        jac_compiled=jac_compiled,
+        x0=x0,
+        t0=tspan[0],
+        tspan=tspan,
+        mapping=mapping,
+        options=options,
+    )
 
-        # Create SymPy backend instance
-        backend_instance = SymPyBackend()
-        solution = backend_instance.solve(equations=eqs, t_symbol=t.symbol, **kwargs)
 
-        return solution
+def _solve_symbolic(eqs, orders, ivp, bvp, tspan, options):
+    """Solve with SymPy, applying initial or boundary conditions if given."""
+    from .backends.sympy_backend import SymPyBackend
+    from .validate import normalize_conditions, validate_condition_levels
 
-    elif backend == "scipy_bvp":
-        # Import BVP backend
-        from .backends.scipy_bvp import ScipyBVPBackend
+    conditions = None
+    if ivp is not None or bvp is not None:
+        t0 = tspan[0] if tspan is not None else 0
+        conditions = normalize_conditions(ivp=ivp, bvp=bvp, t0=t0)
+        validate_condition_levels(orders, conditions)
 
-        # Create BVP backend instance
-        backend_instance = ScipyBVPBackend()
-
-        # For now, just raise NotImplementedError as the actual implementation
-        # will come in Milestone 5
-        raise NotImplementedError("BVP backend will be implemented in Milestone 5")
-
-    else:
-        raise ValueError(f"Unknown backend: {backend}")
+    return SymPyBackend().solve(
+        equations=eqs, t_symbol=t.symbol, conditions=conditions, **options
+    )
 
 
 class BC:
@@ -281,10 +262,11 @@ class BC:
 
         BVP problem:
         >>> eq = Eq(y.d(2) + y, 0)
-        >>> sol = solve(eq, bvp=[bc1, bc2], tspan=(0, 1), backend="scipy_bvp")
+        >>> sol = solve(eq, bvp=[bc1, bc2], tspan=(0, 1))
 
-    Note:
-        BVP solving is not yet implemented and will be available in future versions.
+        Vector variables take a sequence of values:
+        >>> u = var("u", shape=2)
+        >>> BC(u, t=0, value=[0, 1])
     """
 
     def __init__(self, variable, *, t=None, value=None):

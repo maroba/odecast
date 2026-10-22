@@ -3,10 +3,11 @@ Analysis functions for ODEs - order inference, validation, etc.
 """
 
 import sympy as sp
+from sympy.core.function import AppliedUndef
 
 from .equation import Eq
 from .errors import OrderMismatchError
-from .symbols import Derivative, Variable
+from .symbols import Derivative, Expression, Variable, as_sympy, lookup_variable, t
 
 
 def collect_variables(eqs: list[Eq]) -> set[Variable]:
@@ -19,72 +20,61 @@ def collect_variables(eqs: list[Eq]) -> set[Variable]:
     Returns:
         Set of Variable objects found in the equations
     """
-    variables = set()
-
-    for eq in eqs:
-        # Convert equation to SymPy and walk the expression tree
-        sympy_eq = eq.sympy()
-
-        # Get all functions in the equation (these correspond to our variables)
-        sympy_eq.atoms(sp.Function)
-
-        # Map back to our Variable objects by walking the original expressions
-        _collect_variables_from_expr(eq.lhs, variables)
-        _collect_variables_from_expr(eq.rhs, variables)
-
-    return variables
-
-
-def _collect_variables_from_expr(expr, variables: set[Variable]):
-    """Helper function to recursively collect variables from an expression."""
-    from .symbols import Expression  # Avoid circular import
-
-    if isinstance(expr, Variable):
-        variables.add(expr)
-    elif isinstance(expr, Derivative):
-        variables.add(expr.variable)
-    elif isinstance(expr, Expression):
-        _collect_variables_from_expr(expr.left, variables)
-        _collect_variables_from_expr(expr.right, variables)
-    # For other types (numbers, SymPy expressions), do nothing
+    return set(infer_orders(eqs))
 
 
 def infer_orders(eqs: list[Eq]) -> dict[Variable, int]:
     """
     Infer the maximum derivative order for each variable from the equations.
 
+    The equations are inspected in their SymPy form, so variables that only
+    occur inside functions such as ``sp.sin(y)`` are found as well.
+
     Args:
         eqs: List of equations to analyze
 
     Returns:
-        Dictionary mapping each variable to its maximum derivative order
+        Dictionary mapping each variable to its maximum derivative order,
+        in order of first appearance
     """
-    orders = {}
-
+    known: dict[str, Variable] = {}
     for eq in eqs:
-        # Analyze both sides of the equation
-        _infer_orders_from_expr(eq.lhs, orders)
-        _infer_orders_from_expr(eq.rhs, orders)
+        _collect_variables_from_expr(eq.lhs, known)
+        _collect_variables_from_expr(eq.rhs, known)
 
+    found: dict[str, int] = {}
+    for eq in eqs:
+        expr = as_sympy(eq.lhs) - as_sympy(eq.rhs)
+        for func in expr.atoms(AppliedUndef):
+            if func.args == (t.symbol,):
+                found.setdefault(func.func.__name__, 0)
+        for deriv in expr.atoms(sp.Derivative):
+            func = deriv.expr
+            if isinstance(func, AppliedUndef) and func.args == (t.symbol,):
+                name = func.func.__name__
+                found[name] = max(found.get(name, 0), deriv.derivative_count)
+
+    # Keep the order in which variables appear in the equations
+    names = [n for n in known if n in found] + [n for n in found if n not in known]
+    orders = {}
+    for name in names:
+        variable = known.get(name) or lookup_variable(name)
+        if variable is None:
+            raise ValueError(f"Unknown function '{name}' in equations")
+        orders[variable] = found[name]
     return orders
 
 
-def _infer_orders_from_expr(expr, orders: dict[Variable, int]):
-    """Helper function to recursively infer orders from an expression."""
-    from .symbols import Expression  # Avoid circular import
-
+def _collect_variables_from_expr(expr, variables: dict[str, Variable]):
+    """Collect Variable objects from an expression tree, keyed by name."""
     if isinstance(expr, Variable):
-        # Variable itself has order 0
-        current_order = orders.get(expr, 0)
-        orders[expr] = max(current_order, 0)
+        variables.setdefault(expr.name, expr)
     elif isinstance(expr, Derivative):
-        # Derivative has the specified order
-        current_order = orders.get(expr.variable, 0)
-        orders[expr.variable] = max(current_order, expr.order)
+        variables.setdefault(expr.variable.name, expr.variable)
     elif isinstance(expr, Expression):
-        _infer_orders_from_expr(expr.left, orders)
-        _infer_orders_from_expr(expr.right, orders)
-    # For other types (numbers, SymPy expressions), do nothing
+        _collect_variables_from_expr(expr.left, variables)
+        _collect_variables_from_expr(expr.right, variables)
+    # SymPy subexpressions are handled through the registry
 
 
 def resolve_orders(

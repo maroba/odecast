@@ -28,8 +28,10 @@ Main features:
 
 * the order of each variable is inferred from the equations;
 * coupled systems of mixed order;
-* vector-valued variables, expanded component-wise;
-* validation of initial conditions before integration;
+* nonlinear terms such as ``y**2`` or ``sp.sin(y)``;
+* vector- and matrix-valued variables, expanded component-wise;
+* initial value problems and two-point boundary value problems;
+* validation of initial and boundary conditions before solving;
 * numerical (SciPy) and symbolic (SymPy) backends.
 
 .. toctree::

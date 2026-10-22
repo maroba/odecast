@@ -2,6 +2,8 @@
 Validation functions for ODEs and initial/boundary conditions
 """
 
+import numpy as np
+
 from .equation import Eq
 from .errors import (
     MissingInitialConditionError,
@@ -11,13 +13,32 @@ from .errors import (
 from .symbols import Derivative, Variable, VectorDerivative
 
 
-def _check_vector_length(name: str, shape: tuple[int, ...], value) -> None:
-    """Raise ValueError if a vector initial condition has the wrong length."""
-    if len(value) != shape[0]:
+def _component_values(name: str, shape: tuple[int, ...], value) -> np.ndarray:
+    """Check a vector/matrix condition against the variable's shape."""
+    if not isinstance(value, (list, tuple, np.ndarray)):
+        raise TypeError(
+            f"Condition for vector variable {name} must be a list, tuple or "
+            f"array, got {type(value).__name__}"
+        )
+    values = np.empty(shape, dtype=object)
+    try:
+        values[...] = value if isinstance(value, np.ndarray) else _nested(value)
+        ok = np.shape(value) == shape
+    except ValueError:
+        ok = False
+    if not ok:
         raise ValueError(
-            f"Initial condition for {name} has {len(value)} components, "
+            f"Initial condition for {name} has shape {np.shape(value)}, "
             f"but the variable has shape {shape}."
         )
+    return values
+
+
+def _nested(value):
+    """Convert nested sequences to a nested list (callables are kept)."""
+    if isinstance(value, (list, tuple)):
+        return [_nested(v) for v in value]
+    return value
 
 
 def normalize_ivp(
@@ -28,7 +49,8 @@ def normalize_ivp(
 
     Args:
         ivp_dict: Dictionary with Variable (level 0), Derivative (level n≥1),
-                 or VectorDerivative keys, with values that can be floats or lists
+                 or VectorDerivative keys. Values for vector and matrix
+                 variables are nested sequences or arrays of matching shape.
 
     Returns:
         Dictionary with (Variable, level) keys for all components
@@ -36,43 +58,115 @@ def normalize_ivp(
     normalized = {}
 
     for key, value in ivp_dict.items():
-        if isinstance(key, Variable):
-            if key.shape is not None:
-                # Vector variable - expand to components
-                if not isinstance(value, (list, tuple)):
-                    raise TypeError(
-                        f"Vector variable {key.name} requires list/tuple initial condition, got {type(value)}"
-                    )
-                _check_vector_length(key.name, key.shape, value)
-
-                for i, comp_value in enumerate(value):
-                    component_var = key[i]  # Get ComponentVariable
-                    normalized[(component_var, 0)] = comp_value
-            else:
-                # Scalar variable - level 0
-                normalized[(key, 0)] = value
-
+        if isinstance(key, Variable) and key.shape is None:
+            normalized[(key, 0)] = value
         elif isinstance(key, Derivative):
-            # Derivative has specified level
             normalized[(key.variable, key.order)] = value
-
-        elif isinstance(key, VectorDerivative):
-            # Vector derivative - expand to component derivatives
-            if not isinstance(value, (list, tuple)):
-                raise TypeError(
-                    f"Vector derivative requires list/tuple initial condition, got {type(value)}"
-                )
-            _check_vector_length(repr(key), key.variable.shape, value)
-
-            for i, comp_value in enumerate(value):
-                component_var = key.variable[i]  # Get ComponentVariable
-                normalized[(component_var, key.order)] = comp_value
+        elif isinstance(key, (Variable, VectorDerivative)):
+            variable, level = (
+                (key, 0) if isinstance(key, Variable) else (key.variable, key.order)
+            )
+            values = _component_values(repr(key), variable.shape, value)
+            for index in np.ndindex(*variable.shape):
+                normalized[(variable[index], level)] = values[index]
         else:
             raise TypeError(
                 f"IVP key must be Variable, Derivative, or VectorDerivative, got {type(key)}"
             )
 
     return normalized
+
+
+def normalize_conditions(
+    ivp: dict | None = None, bvp: list | None = None, t0: float = 0.0
+) -> list[tuple[Variable, int, float, object]]:
+    """
+    Convert initial or boundary conditions to (variable, level, t, value) tuples.
+
+    Args:
+        ivp: Initial conditions as passed to solve; they apply at ``t0``
+        bvp: List of BC objects
+        t0: Initial time for ``ivp``
+
+    Returns:
+        List of (Variable, derivative level, time, value) for scalar components
+    """
+    if ivp is not None:
+        return [
+            (v, level, t0, value) for (v, level), value in normalize_ivp(ivp).items()
+        ]
+
+    conditions = []
+    for bc in bvp or []:
+        if bc.t is None or bc.value is None:
+            raise ValueError(f"Boundary condition {bc} needs both t and value")
+        for (v, level), value in normalize_ivp({bc.variable: bc.value}).items():
+            conditions.append((v, level, bc.t, value))
+    return conditions
+
+
+def validate_condition_levels(
+    orders: dict[Variable, int], conditions: list[tuple[Variable, int, float, object]]
+) -> None:
+    """
+    Check that conditions refer to variables of the system and only to
+    derivatives below each variable's order.
+
+    Raises:
+        ValueError: For a variable that does not occur in the equations
+        OverdeterminedConditionsError: For a condition on the highest derivative
+    """
+    for v, level, t_value, _ in conditions:
+        if v not in orders:
+            raise ValueError(
+                f"Condition on {v.name}, which does not occur in the equations"
+            )
+        if level >= orders[v]:
+            raise OverdeterminedConditionsError(
+                f"Condition on {v.name}^({level}) at t={t_value} is not allowed: "
+                f"{v.name} has order {orders[v]}, so conditions may only involve "
+                f"derivatives up to order {orders[v] - 1}."
+            )
+
+
+def validate_bvp(
+    orders: dict[Variable, int],
+    conditions: list[tuple[Variable, int, float, object]],
+    tspan: tuple[float, float],
+) -> None:
+    """
+    Validate boundary conditions for a two-point boundary value problem.
+
+    Raises:
+        ValueError: If a condition is not at an end point of ``tspan``
+        MissingInitialConditionError: If there are too few conditions
+        OverdeterminedConditionsError: If there are too many or duplicate conditions
+    """
+    validate_condition_levels(orders, conditions)
+
+    a, b = tspan
+    for v, level, t_value, _ in conditions:
+        if not (np.isclose(t_value, a) or np.isclose(t_value, b)):
+            raise ValueError(
+                f"Boundary condition on {v.name}^({level}) at t={t_value} is not at "
+                f"an end point of tspan={tspan}. Only two-point problems are supported."
+            )
+
+    keys = [(v, level, np.isclose(t_value, a)) for v, level, t_value, _ in conditions]
+    if len(set(keys)) != len(keys):
+        raise OverdeterminedConditionsError("Duplicate boundary conditions")
+
+    n_states = sum(orders.values())
+    if len(conditions) < n_states:
+        raise MissingInitialConditionError(
+            f"The system has {n_states} first-order states and needs {n_states} "
+            f"boundary conditions, got {len(conditions)}."
+        )
+    if len(conditions) > n_states:
+        raise OverdeterminedConditionsError(
+            f"The system has {n_states} first-order states and needs {n_states} "
+            f"boundary conditions, got {len(conditions)}."
+        )
 
 
 def validate_ivp(

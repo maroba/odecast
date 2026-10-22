@@ -77,3 +77,44 @@ def test_mixed_vector_scalar_system():
 
     assert sol[x].shape == sol.t.shape
     assert sol[u].shape == (2, len(sol.t))
+
+
+def test_matrix_variable_ivp():
+    import numpy as np
+
+    M = var("M", shape=(2, 2))
+    A0 = np.array([[1.0, 2.0], [3.0, 4.0]])
+    sol = solve(Eq(M.d() + M, 0), ivp={M: A0}, tspan=(0, 1), rtol=1e-10, atol=1e-12)
+
+    assert sol[M].shape == (2, 2, len(sol.t))
+    np.testing.assert_allclose(sol.eval(M, 1.0), A0 * np.exp(-1), atol=1e-8)
+    np.testing.assert_allclose(sol[M[1, 0]], sol[M][1, 0])
+
+
+def test_matrix_initial_condition_shape_checked():
+    import pytest
+
+    M = var("M", shape=(2, 2))
+    with pytest.raises(ValueError, match="has shape"):
+        solve(Eq(M.d() + M, 0), ivp={M: [1, 2, 3, 4]}, tspan=(0, 1))
+
+
+def test_matrix_index_validation():
+    import pytest
+
+    M = var("M", shape=(2, 3))
+    assert M[1, 2] is M[1, 2]
+    assert M[-1, -1] is M[1, 2]
+    with pytest.raises(IndexError):
+        M[0]
+    with pytest.raises(IndexError):
+        M[2, 0]
+
+
+def test_mixed_shapes_in_one_equation_rejected():
+    import pytest
+
+    M = var("M", shape=(2, 2))
+    u = var("u", shape=2)
+    with pytest.raises(ValueError, match="same shape"):
+        solve(Eq(M.d() + u, 0), ivp={M: [[1, 0], [0, 1]]}, tspan=(0, 1))

@@ -73,9 +73,7 @@ The undamped pendulum satisfies
 For small angles :math:`\sin\theta \approx \theta`, which gives the
 harmonic oscillator with period :math:`2\pi\sqrt{L/g}`. At larger angles
 the restoring force is weaker than in the linear approximation and the
-period grows. Since odecast does not yet support transcendental functions of
-the dependent variable, we approximate the sine by its Taylor polynomial
-:math:`\theta - \theta^3/6`, which already captures this effect at
+period grows. The comparison below starts both at
 :math:`\theta_0 = 60^\circ`.
 
 .. plot::
@@ -83,6 +81,7 @@ the dependent variable, we approximate the sine by its Taylor polynomial
 
    import numpy as np
    import matplotlib.pyplot as plt
+   import sympy as sp
    from odecast import var, Eq, solve
 
    g, L = 9.81, 1.0
@@ -90,16 +89,16 @@ the dependent variable, we approximate the sine by its Taylor polynomial
 
    theta = var("theta")
    eq_lin = Eq(theta.d(2) + (g/L)*theta, 0)
-   eq_cubic = Eq(theta.d(2) + (g/L)*(theta - theta*theta*theta/6), 0)
+   eq_full = Eq(theta.d(2) + (g/L)*sp.sin(theta), 0)
 
    ic = {theta: theta0, theta.d(): 0.0}
    sol_lin = solve(eq_lin, ivp=ic, tspan=(0, 10), max_step=0.02)
-   sol_cubic = solve(eq_cubic, ivp=ic, tspan=(0, 10), max_step=0.02)
+   sol_full = solve(eq_full, ivp=ic, tspan=(0, 10), max_step=0.02)
 
    t = np.linspace(0, 10, 1000)
    plt.figure(figsize=(8, 4))
    plt.plot(t, np.degrees(sol_lin.eval(theta, t)), "--", label=r"$\sin\theta \approx \theta$")
-   plt.plot(t, np.degrees(sol_cubic.eval(theta, t)), label=r"$\sin\theta \approx \theta - \theta^3/6$")
+   plt.plot(t, np.degrees(sol_full.eval(theta, t)), label=r"$\sin\theta$")
    plt.xlabel("$t$ [s]")
    plt.ylabel(r"$\theta$ [deg]")
    plt.ylim(-75, 90)
@@ -312,8 +311,80 @@ responds to a unit step :math:`r = 1` as follows.
    overshoot = sol.eval(y, t).max() - r
    print(f"overshoot: {overshoot:.2f}")   # theory: exp(-pi*zeta/sqrt(1-zeta^2)) = 0.73
 
+Boundary value problems
+-----------------------
+
+Deflection of a beam
+~~~~~~~~~~~~~~~~~~~~
+
+The deflection :math:`w(x)` of a beam with bending stiffness :math:`EI`
+under a uniform load :math:`q` satisfies the fourth-order equation
+
+.. math::
+
+   EI\,w^{(4)} = q.
+
+For a beam of length :math:`\ell` that is simply supported at both ends, the
+deflection and the bending moment :math:`EI\,w''` vanish at
+:math:`x = 0` and :math:`x = \ell`. The exact solution is
+
+.. math::
+
+   w(x) = \frac{q\,x}{24\,EI}\left(\ell^3 - 2\ell x^2 + x^3\right),
+
+with maximum :math:`5q\ell^4/(384\,EI)` at the centre. Here the independent
+variable is a position rather than a time; odecast still calls it
+:math:`t`.
+
+.. plot::
+   :include-source:
+
+   import numpy as np
+   import matplotlib.pyplot as plt
+   from odecast import var, Eq, solve, BC
+
+   EI, q, ell = 1.0, 1.0, 1.0
+
+   w = var("w")
+   eq = Eq(EI*w.d(4), q)
+   bcs = [
+       BC(w, t=0, value=0), BC(w.d(2), t=0, value=0),
+       BC(w, t=ell, value=0), BC(w.d(2), t=ell, value=0),
+   ]
+   sol = solve(eq, bvp=bcs, tspan=(0, ell))
+
+   x = np.linspace(0, ell, 200)
+   exact = q*x*(ell**3 - 2*ell*x**2 + x**3) / (24*EI)
+
+   plt.figure(figsize=(8, 3.5))
+   plt.plot(x, -sol.eval(w, x), label="odecast")
+   plt.plot(x, -exact, "k:", label="exact")
+   plt.xlabel("$x$")
+   plt.ylabel("$-w(x)$")
+   plt.legend()
+   plt.tight_layout()
+
+   print(f"max deflection: {sol.eval(w, ell/2):.6f}")   # 5/384 = 0.013021
+
 Symbolic solutions
 ------------------
+
+Initial conditions
+~~~~~~~~~~~~~~~~~~
+
+With conditions, the SymPy backend determines the integration constants:
+
+.. code-block:: python
+
+   import sympy as sp
+   from odecast import var, Eq, solve, t
+
+   # Driven oscillator at resonance: y'' + y = cos(t), y(0) = y'(0) = 0
+   y = var("y")
+   sol = solve(Eq(y.d(2) + y, sp.cos(t)), backend="sympy", ivp={y: 0, y.d(): 0})
+   sol.as_expr(y)   # t*sin(t)/2
+
+The amplitude grows linearly in time.
 
 General solution of a linear equation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

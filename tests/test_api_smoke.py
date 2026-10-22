@@ -56,8 +56,8 @@ def test_solve_placeholder():
 
     assert isinstance(expr, sp.Expr)
 
-    # BVP backend should raise NotImplementedError (Milestone 5)
-    with pytest.raises(NotImplementedError, match="BVP backend"):
+    # BVP backend requires boundary conditions
+    with pytest.raises(ValueError, match="bvp for a boundary value problem"):
         solve(eq, backend="scipy_bvp")
 
     # SciPy backend should require IVP and tspan

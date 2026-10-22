@@ -24,6 +24,7 @@ class SolutionIVP:
         f_compiled: Callable | None = None,
         jac_compiled: Callable | None = None,
         x0: np.ndarray | None = None,
+        interpolant: Callable | None = None,
     ):
         """
         Initialize IVP solution.
@@ -36,6 +37,8 @@ class SolutionIVP:
             f_compiled: Compiled RHS function f(t, x)
             jac_compiled: Compiled Jacobian function (optional)
             x0: Initial state vector
+            interpolant: Optional callable returning the state vector at
+                given times; used by ``eval`` instead of linear interpolation
         """
         self.t = t
         self.y = y
@@ -44,83 +47,46 @@ class SolutionIVP:
         self._f_compiled = f_compiled
         self._jac_compiled = jac_compiled
         self._x0 = x0
+        self._interpolant = interpolant
 
     def __getitem__(self, target: Variable | Derivative) -> np.ndarray:
         """
         Access solution values for a specific variable or derivative.
 
         Args:
-            target: Variable or Derivative to get values for
+            target: Variable, Derivative, or vector/matrix variable or derivative
 
         Returns:
-            Array of solution values at all time points
+            Array of solution values at all time points. For a vector or
+            matrix target the array has shape ``(*shape, len(t))``.
         """
-        if isinstance(target, Variable):
-            # Check if it's a vector variable
-            if target.shape is not None:
-                # Vector variable - return 2D array with component values
-                n_components = (
-                    target.shape[0] if isinstance(target.shape, tuple) else target.shape
-                )
-                component_arrays = []
+        return self._select(target, self.y)
 
-                for i in range(n_components):
-                    component_var = target[i]
-                    if (component_var, 0) in self.mapping:
-                        state_index = self.mapping[(component_var, 0)]
-                        component_arrays.append(self.y[state_index, :])
-                    else:
-                        raise KeyError(
-                            f"Component {component_var.name} not found in solution"
-                        )
+    def _select(self, target, states: np.ndarray) -> np.ndarray:
+        """Pick the rows of a state array that belong to ``target``."""
+        from .symbols import VectorDerivative
 
-                return np.vstack(component_arrays)
-            else:
-                # Scalar variable - variable itself is the 0th derivative
-                if (target, 0) in self.mapping:
-                    state_index = self.mapping[(target, 0)]
-                    return self.y[state_index, :]
-                else:
-                    raise KeyError(f"Variable {target.name} not found in solution")
-
-        elif isinstance(target, Derivative):
-            # Derivative of specified order
-            if (target.variable, target.order) in self.mapping:
-                state_index = self.mapping[(target.variable, target.order)]
-                return self.y[state_index, :]
-            else:
-                raise KeyError(
-                    f"Derivative {target.variable.name}^({target.order}) not found in solution"
-                )
+        if isinstance(target, (Derivative, VectorDerivative)):
+            variable, level = target.variable, target.order
+        elif isinstance(target, Variable):
+            variable, level = target, 0
         else:
-            # Check if it's a VectorDerivative
-            from .symbols import VectorDerivative
+            raise TypeError(
+                f"Target must be Variable, Derivative, or VectorDerivative, got {type(target)}"
+            )
 
-            if isinstance(target, VectorDerivative):
-                # Vector derivative - return 2D array with component derivatives
-                vector_var = target.variable
-                n_components = (
-                    vector_var.shape[0]
-                    if isinstance(vector_var.shape, tuple)
-                    else vector_var.shape
-                )
-                component_arrays = []
+        if variable.shape is None:
+            return states[self._state_index(variable, level)]
+        rows = [states[self._state_index(c, level)] for c in variable.components()]
+        return np.stack(rows).reshape(*variable.shape, *states.shape[1:])
 
-                for i in range(n_components):
-                    component_var = vector_var[i]
-                    if (component_var, target.order) in self.mapping:
-                        state_index = self.mapping[(component_var, target.order)]
-                        component_arrays.append(self.y[state_index, :])
-                    else:
-                        raise KeyError(
-                            f"Derivative {component_var.name}^({target.order}) not found in solution"
-                        )
-
-                return np.vstack(component_arrays)
-            else:
-                raise TypeError(
-                    f"Target must be Variable, Derivative, or VectorDerivative, got {type(target)}"
-                )
+    def _state_index(self, variable: Variable, level: int) -> int:
+        if (variable, level) not in self.mapping:
+            what = (
+                variable.name if level == 0 else f"Derivative {variable.name}^({level})"
+            )
+            raise KeyError(f"{what} not found in solution")
+        return self.mapping[(variable, level)]
 
     def eval(self, target, tpoints: float | np.ndarray) -> float | np.ndarray:
         """
@@ -131,26 +97,21 @@ class SolutionIVP:
             tpoints: Time point(s) to evaluate at
 
         Returns:
-            Interpolated solution value(s)
+            Interpolated solution value(s). For vector and matrix targets the
+            component axes come first.
         """
-        # Get the full solution array for this target
+        if self._interpolant is not None:
+            values = self._select(target, self._interpolant(np.atleast_1d(tpoints)))
+            return values[..., 0][()] if np.isscalar(tpoints) else values
+
         y_values = self[target]
-
-        # Handle vector case (2D array)
-        if y_values.ndim == 2:
-            # Vector result - interpolate each component
-            result = np.zeros((y_values.shape[0], np.atleast_1d(tpoints).shape[0]))
-            for i in range(y_values.shape[0]):
-                result[i, :] = np.interp(tpoints, self.t, y_values[i, :])
-
-            # Return scalar if single time point requested
-            if np.isscalar(tpoints):
-                result = result.squeeze(axis=1)
-
-            return result
-        else:
-            # Scalar result - standard interpolation
+        if y_values.ndim == 1:
             return np.interp(tpoints, self.t, y_values)
+
+        # Vector/matrix result - interpolate each component
+        flat = y_values.reshape(-1, y_values.shape[-1])
+        result = np.array([np.interp(tpoints, self.t, row) for row in flat])
+        return result.reshape(*y_values.shape[:-1], *np.shape(tpoints))
 
     def as_first_order(
         self,
@@ -174,29 +135,28 @@ class SolutionIVP:
         return (self._f_compiled, self._jac_compiled, self._x0, self.t0, self.mapping)
 
 
-class Solution:
+class SolutionBVP(SolutionIVP):
     """
-    Base container for ODE solution data and methods.
+    Solution of a boundary value problem.
 
-    This is a placeholder for future symbolic solutions.
+    Supports the same access methods as SolutionIVP. ``eval`` uses the
+    cubic interpolant returned by ``scipy.integrate.solve_bvp``.
     """
 
-    def __init__(self, t_values=None, y_values=None):
-        self.t = t_values if t_values is not None else np.array([])
-        self._y_values = y_values if y_values is not None else {}
-
-    def __getitem__(self, variable):
-        """Access solution values for a specific variable."""
-        raise NotImplementedError(
-            "Solution indexing will be implemented in later playbooks"
+    def __init__(
+        self,
+        t: np.ndarray,
+        y: np.ndarray,
+        mapping: Any,
+        interpolant: Callable,
+        f_compiled: Callable | None = None,
+    ):
+        super().__init__(
+            t=t,
+            y=y,
+            mapping=mapping,
+            t0=t[0],
+            f_compiled=f_compiled,
+            x0=y[:, 0],
+            interpolant=interpolant,
         )
-
-    def as_first_order(self):
-        """Return first-order system representation."""
-        raise NotImplementedError(
-            "as_first_order will be implemented in later playbooks"
-        )
-
-    def as_expr(self, variable):
-        """Return symbolic expression for a variable."""
-        raise NotImplementedError("as_expr will be implemented in later playbooks")
