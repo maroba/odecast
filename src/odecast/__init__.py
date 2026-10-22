@@ -10,5 +10,5 @@ from .printing import latex
 from .stability import equilibria
 from .symbols import t
 
-__version__ = "0.2.0"
+__version__ = "0.3.0"
 __all__ = ["BC", "Eq", "Event", "equilibria", "fit", "latex", "solve", "t", "var"]
