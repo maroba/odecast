@@ -12,6 +12,7 @@ from .periodic import periodic_orbit
 from .portrait import phase_portrait
 from .printing import latex
 from .stability import equilibria
+from .stochastic import solve_sde
 from .symbols import t
 
 __version__ = "0.3.0"
@@ -27,6 +28,7 @@ __all__ = [
     "periodic_orbit",
     "phase_portrait",
     "solve",
+    "solve_sde",
     "t",
     "var",
 ]
