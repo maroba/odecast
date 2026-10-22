@@ -26,9 +26,53 @@ Analysis
 
 .. autoclass:: odecast.stability.Equilibrium
 
+.. autofunction:: odecast.linearize
+
+.. autoclass:: odecast.linearize.LinearSystem
+   :members:
+
+.. autofunction:: odecast.phase_portrait
+
+.. autofunction:: odecast.continuation
+
+.. autoclass:: odecast.continuation.Branch
+   :members:
+
+.. autoclass:: odecast.continuation.Bifurcation
+
+.. autofunction:: odecast.periodic_orbit
+
+.. autoclass:: odecast.periodic.PeriodicOrbit
+
 .. autofunction:: odecast.fit
 
 .. autoclass:: odecast.fitting.FitResult
+
+Delay and stochastic equations
+------------------------------
+
+.. autofunction:: odecast.solve_sde
+
+.. autoclass:: odecast.stochastic.SDESolution
+   :members:
+
+Partial differential equations
+------------------------------
+
+.. autofunction:: odecast.pde.solve_pde
+
+.. autoclass:: odecast.pde.Grid
+
+.. autofunction:: odecast.pde.field
+
+.. autoclass:: odecast.pde.Dirichlet
+
+.. autoclass:: odecast.pde.Neumann
+
+.. autoclass:: odecast.pde.Periodic
+
+.. autoclass:: odecast.pde.PDESolution
+   :members:
 
 Solutions
 ---------

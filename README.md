@@ -22,7 +22,8 @@ pip install odecast
 
 This installs NumPy, SciPy and SymPy. Python 3.10 or later is required.
 Plotting and `to_pandas()` additionally need Matplotlib and pandas
-(`pip install "odecast[examples]"`).
+(`pip install "odecast[examples]"`), partial differential equations need
+findiff (`pip install "odecast[pde]"`).
 
 ## Example
 
@@ -71,9 +72,10 @@ for coupled systems of mixed order, which is the case odecast is designed for.
   written `A @ u`.
 - **Parameters.** SymPy symbols in the equations take values from
   `params=`. The system is compiled once and reused for further values.
-- **Initial and boundary value problems.** Two-point boundary value problems
-  are solved with `scipy.integrate.solve_bvp`. Events, such as a body
-  reaching the ground, are located during integration.
+- **Initial and boundary value problems.** Events are located during
+  integration and can reset the state (impacts, switching, dosing).
+  Two-point boundary value problems may have unknown parameters, e.g.
+  eigenvalues.
 - **Differential-algebraic equations.** Variables without derivatives are
   algebraic. Constraints such as `Eq(x**2 + y**2, L**2)` are handled by index
   reduction with stabilization; algebraic equations without closed-form
@@ -81,8 +83,17 @@ for coupled systems of mixed order, which is the case odecast is designed for.
 - **Stiff problems.** Implicit solvers receive the exact Jacobian.
 - **Symbolic solutions.** The SymPy backend returns closed-form solutions,
   with initial or boundary conditions applied.
-- **Analysis.** Equilibria and their stability; fitting parameters to
-  measured data.
+- **Sensitivities.** Derivatives of the solution with respect to
+  parameters, computed exactly alongside the solution.
+- **Analysis.** Equilibria and their stability, linearization and transfer
+  functions, phase portraits, continuation of equilibria with detection of
+  bifurcations, periodic orbits with Floquet multipliers, and fitting
+  parameters to measured data.
+- **Delay and stochastic equations.** `y.delay(tau)` for delayed values;
+  `solve_sde()` for equations with noise (Euler-Maruyama, Milstein).
+- **Partial differential equations.** Time-dependent PDEs on grids in one
+  to three dimensions, with the method of lines and finite differences from
+  findiff.
 - **Validation.** Missing, superfluous or inconsistent conditions are
   reported before solving, with a message naming the offending condition.
 
@@ -211,6 +222,66 @@ result = fit(Eq(y.d(2) + c * y.d() + k * y, 0), {y: (t_data, y_data)},
 result.params, result.stderr
 ```
 
+### Analysis
+
+```python
+from odecast import equilibria, linearize, continuation, periodic_orbit, phase_portrait
+
+x, y = var("x"), var("y")
+equilibria([Eq(x.d(), x - x * y), Eq(y.d(), x * y - y)])
+# [Equilibrium(x=0, y=0, saddle), Equilibrium(x=1, y=1, center)]
+
+F = sp.Symbol("F")
+linearize(Eq(2 * x.d(2) + 0.5 * x.d() + 8 * x, F), around={x: 0},
+          inputs=[F], outputs=[x]).transfer_function()
+# Matrix([[0.5/(s**2 + 0.25*s + 4.0)]])
+
+r = sp.Symbol("r")
+continuation(Eq(x.d(), r + x - x**3 / 3), r, start={x: -2.5, r: -3},
+             p_range=(-3, 3)).bifurcations
+# [Bifurcation(fold at param=0.666667, x=-1), Bifurcation(fold at param=-0.666667, x=1)]
+
+v = var("v")
+periodic_orbit(Eq(v.d(2) - (1 - v**2) * v.d() + v, 0), ivp={v: 2, v.d(): 0},
+               period=6.5, transient=20)
+# PeriodicOrbit(period=6.66329, stable)
+```
+
+`phase_portrait()` draws direction field, nullclines, equilibria and
+trajectories of planar systems; `fit()` estimates parameters from data,
+with exact derivatives from `solve(..., sensitivities=[...])`.
+
+### Delay and stochastic equations
+
+```python
+from odecast import solve_sde
+
+y = var("y")
+solve(Eq(y.d(), 1.8 * y * (1 - y.delay(1))), ivp={y: 0.5}, tspan=(0, 50))
+
+sol = solve_sde(Eq(y.d(), 0.1 * y), noise={y: 0.3 * y}, ivp={y: 1.0},
+                tspan=(0, 1), dt=1e-3, paths=1000, method="milstein")
+sol.mean(y), sol.std(y)
+```
+
+### Partial differential equations
+
+With `pip install "odecast[pde]"`, time-dependent PDEs are solved with the
+method of lines, using finite differences from
+[findiff](https://github.com/maroba/findiff):
+
+```python
+from odecast.pde import Grid, field, solve_pde, Neumann
+
+u = field("u", Grid(x=np.linspace(0, 100, 501)))
+sol = solve_pde(
+    Eq(u.d(), u.dx(2) + u * (1 - u)),          # Fisher-KPP
+    ic={u: lambda x: np.where(x < 5, 1.0, 0.0)},
+    bc={u: {"x": (Neumann(0), Neumann(0))}},
+    tspan=(0, 40),
+)
+```
+
 ### Output
 
 `sol.plot()` plots the solution with Matplotlib, `sol.to_pandas()` returns
@@ -231,8 +302,7 @@ solve(eq, ivp=ic, tspan=(0, 10), method="LSODA", rtol=1e-9, t_eval=t_points)
 odecast is at an early stage (alpha). In particular:
 
 - Boundary value problems must be two-point problems: all conditions lie at
-  the end points of `tspan`. Problems with unknown parameters, such as
-  eigenvalue problems, are not supported.
+  the end points of `tspan`.
 - Functions must be applied to components of vector variables
   (`sp.sin(u[0])`), not to the vector as a whole.
 - Matrix products require one constant operand: `A @ u` works, a product of
@@ -244,6 +314,10 @@ odecast is at an early stage (alpha). In particular:
   supported. Boundary value problems, the SymPy backend and `equilibria()`
   support only algebraic equations that are linear in the algebraic
   variables and determine them directly (index 1).
+- Delay equations must have constant delays and may not delay the highest
+  derivative (neutral equations).
+- The analysis functions find equilibria with `sympy.solve`; for periodic
+  nonlinearities such as `sin` only representatives are returned.
 
 ## Examples
 

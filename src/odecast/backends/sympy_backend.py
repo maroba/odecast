@@ -143,6 +143,12 @@ class SymPyBackend:
         def sympy_eq(eq):
             return substitute_params(eq.sympy(), params)
 
+        from ..delay import find_delays
+
+        if any(find_delays(eq.sympy()) for eq in equations):
+            raise BackendError(
+                "The SymPy backend does not support delay differential equations"
+            )
         orders = infer_orders(equations)
         if len(equations) != len(orders):
             raise BackendError(

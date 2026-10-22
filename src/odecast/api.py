@@ -59,6 +59,7 @@ def solve(
     backend=None,
     params=None,
     events=None,
+    sensitivities=None,
     **kwargs,
 ):
     """
@@ -145,10 +146,14 @@ def solve(
         backend = "scipy"
 
     if backend == "scipy":
-        return _solve_numeric(eqs, orders, ivp, bvp, tspan, params, events, kwargs)
+        return _solve_numeric(
+            eqs, orders, ivp, bvp, tspan, params, events, sensitivities, kwargs
+        )
 
     if backend == "sympy":
-        return _solve_symbolic(eqs, orders, ivp, bvp, tspan, params, events, kwargs)
+        return _solve_symbolic(
+            eqs, orders, ivp, bvp, tspan, params, events, sensitivities, kwargs
+        )
 
     if backend == "auto":
         # Try SciPy first, fall back to SymPy on failure.
@@ -158,14 +163,16 @@ def solve(
             _validate_conditions(orders, *_bind_conditions(ivp, bvp, params), tspan)
             try:
                 return _solve_numeric(
-                    eqs, orders, ivp, bvp, tspan, params, events, kwargs
+                    eqs, orders, ivp, bvp, tspan, params, events, sensitivities, kwargs
                 )
             # Any numerical failure triggers the fallback below
             except Exception:  # noqa: BLE001, S110
                 pass
 
         try:
-            return _solve_symbolic(eqs, orders, ivp, bvp, tspan, params, events, kwargs)
+            return _solve_symbolic(
+                eqs, orders, ivp, bvp, tspan, params, events, sensitivities, kwargs
+            )
         except Exception as sympy_error:
             raise RuntimeError(
                 f"Auto backend failed: Both SciPy and SymPy backends "
@@ -175,12 +182,12 @@ def solve(
     raise ValueError(f"Unknown backend: {backend}")
 
 
-def _validate_conditions(orders, ivp, bvp, tspan):
+def _validate_conditions(orders, ivp, bvp, tspan, n_unknowns=0):
     """Validate initial or boundary conditions for a numeric solution."""
     from .validate import normalize_conditions, validate_bvp, validate_ivp
 
     if bvp is not None:
-        validate_bvp(orders, normalize_conditions(bvp=bvp), tspan)
+        validate_bvp(orders, normalize_conditions(bvp=bvp), tspan, n_unknowns)
     else:
         validate_ivp(orders, ivp, tspan[0])
 
@@ -245,7 +252,54 @@ def _attach_algebraic(sol, system, orders, params, z_guess):
     return sol
 
 
-def _solve_numeric(eqs, orders, ivp, bvp, tspan, params, events, options):
+def _sensitivity_names(sensitivities) -> list[str]:
+    if sensitivities is None:
+        return []
+    if not isinstance(sensitivities, (list, tuple)):
+        sensitivities = [sensitivities]
+    return [getattr(s, "name", s) for s in sensitivities]
+
+
+def _initial_sensitivities(ivp, mapping, names, params) -> np.ndarray:
+    """dx0/dp for initial values that depend on parameters."""
+    from .validate import normalize_ivp
+
+    S0 = np.zeros((len(mapping), len(names)))
+    for (v, level), value in normalize_ivp(ivp).items():
+        if (v, level) not in mapping or not isinstance(value, sp.Basic):
+            continue
+        for j, name in enumerate(names):
+            symbol = next((s for s in value.free_symbols if s.name == name), None)
+            if symbol is not None:
+                derivative = substitute_params(sp.diff(value, symbol), params)
+                S0[mapping[(v, level)], j] = float(derivative)
+    return S0
+
+
+def _free_symbols(value) -> set:
+    """Free symbols in (nested) condition values."""
+    if isinstance(value, dict):
+        return set().union(*(_free_symbols(v) for v in value.values()))
+    if isinstance(value, (list, tuple, np.ndarray)):
+        return set().union(*(_free_symbols(v) for v in value)) if len(value) else set()
+    return set(value.free_symbols) if isinstance(value, sp.Basic) else set()
+
+
+def _on_states(event, n):
+    """An event function that only sees the first n entries of the state."""
+
+    def restricted(t, y):
+        return event(t, y[:n])
+
+    for attribute in ("terminal", "direction", "reset", "stops"):
+        if hasattr(event, attribute):
+            setattr(restricted, attribute, getattr(event, attribute))
+    return restricted
+
+
+def _solve_numeric(
+    eqs, orders, ivp, bvp, tspan, params, events, sensitivities, options
+):
     """Reduce to a first-order system and solve it with SciPy."""
     from .backends.scipy_bvp import ScipyBVPBackend
     from .backends.scipy_ivp import ScipyIVPBackend, convert_ivp_to_state_vector
@@ -262,8 +316,14 @@ def _solve_numeric(eqs, orders, ivp, bvp, tspan, params, events, options):
     if tspan is None:
         raise ValueError("tspan required for scipy backend")
 
+    options = dict(options)
+    unknowns = options.pop("unknowns", None) or {}
+    if unknowns and bvp is None:
+        raise ValueError("unknowns are only supported for boundary value problems")
+
+    ivp_unbound = ivp
     ivp, bvp = _bind_conditions(ivp, bvp, params)
-    _validate_conditions(orders, ivp, bvp, tspan)
+    _validate_conditions(orders, ivp, bvp, tspan, len(unknowns))
 
     system = compile_system(eqs, orders)
     mapping = build_state_map(orders)
@@ -273,23 +333,56 @@ def _solve_numeric(eqs, orders, ivp, bvp, tspan, params, events, options):
     if bvp is not None:
         if events is not None:
             raise ValueError("Events are only supported for initial value problems")
+        if sensitivities is not None:
+            raise ValueError(
+                "Sensitivities are only supported for initial value problems"
+            )
         if system.invariants:
             raise ValueError(
                 "Boundary value problems are only supported for algebraic equations "
                 "that determine the algebraic variables directly (index 1)"
             )
+        from .delay import reject_delays
+
+        reject_delays(system.f_sym, "A boundary value problem")
         params = _dae_params(system, params, options)
+        names = [getattr(s, "name", s) for s in unknowns]
         sol = ScipyBVPBackend().solve(
-            fun=system.rhs_vectorized(params),
+            fun=(
+                system.rhs_vectorized_free(params, names)
+                if names
+                else system.rhs_vectorized(params)
+            ),
             n_states=len(system.state_syms),
             conditions=normalize_conditions(bvp=bvp),
             tspan=tspan,
             mapping=mapping,
+            p0=[float(v) for v in unknowns.values()] if names else None,
             **options,
         )
+        if names:
+            sol.unknowns = dict(zip(unknowns, (float(v) for v in sol.p), strict=True))
+            params = {**(params or {}), **sol.unknowns}
         return _attach_algebraic(sol, system, orders, params, z_guess)
 
     x0 = convert_ivp_to_state_vector(ivp, mapping)
+
+    from .delay import find_delays, solve_dde
+
+    history = options.pop("history", None)
+    if find_delays(system.f_sym):
+        if system.is_dae:
+            raise ValueError(
+                "Delays are not supported together with algebraic equations"
+            )
+        if events is not None or sensitivities is not None:
+            raise ValueError(
+                "Events and sensitivities are not supported for delay equations"
+            )
+        return solve_dde(system, mapping, x0, tspan, params, history, options)
+    if history is not None:
+        raise ValueError("history is only used for delay differential equations")
+
     params = _dae_params(system, params, options, tspan[0], x0, z_guess)
     system.check_consistency(tspan[0], x0, params)
     if system.is_dae:
@@ -310,26 +403,58 @@ def _solve_numeric(eqs, orders, ivp, bvp, tspan, params, events, options):
     events = compile_events(
         events, mapping, system.state_syms, t.symbol, params, algebraic
     )
+
+    f_compiled = system.rhs(params, z_guess)
+    jac_compiled = system.jac(params, z_guess) if implicit else None
+    names = _sensitivity_names(sensitivities)
+    if names:
+        known = {s.name for s in system.param_syms} | {
+            s.name for s in _free_symbols(ivp_unbound)
+        }
+        unknown = [name for name in names if name not in known]
+        if unknown:
+            raise ValueError(
+                f"Sensitivity parameters {', '.join(unknown)} do not occur in the "
+                "equations or initial values"
+            )
+        if any(getattr(e, "reset", None) is not None for e in events or []):
+            raise ValueError(
+                "Sensitivities are not supported together with event resets"
+            )
+        n = len(x0)
+        f_compiled = system.sensitivity_rhs(params, names)
+        jac_compiled = None
+        x0 = np.concatenate(
+            [x0, _initial_sensitivities(ivp_unbound, mapping, names, params).T.ravel()]
+        )
+        events = [_on_states(e, n) for e in events] if events else events
+
     if events is not None:
         options = {**options, "events": events}
 
     sol = ScipyIVPBackend().solve(
-        f_compiled=system.rhs(params, z_guess),
-        jac_compiled=system.jac(params, z_guess) if implicit else None,
+        f_compiled=f_compiled,
+        jac_compiled=jac_compiled,
         x0=x0,
         t0=tspan[0],
         tspan=tspan,
         mapping=mapping,
         options=options,
+        after_reset=lambda t, x: system.check_consistency(t, x, params),
     )
+    sol._sensitivity_names = names
     return _attach_algebraic(sol, system, orders, params, z_guess)
 
 
-def _solve_symbolic(eqs, orders, ivp, bvp, tspan, params, events, options):
+def _solve_symbolic(
+    eqs, orders, ivp, bvp, tspan, params, events, sensitivities, options
+):
     """Solve with SymPy, applying initial or boundary conditions if given."""
     from .backends.sympy_backend import SymPyBackend
     from .validate import normalize_conditions, validate_condition_levels
 
+    if sensitivities is not None:
+        raise ValueError("Sensitivities are only supported by the scipy backend")
     if events is not None:
         raise ValueError("Events are only supported by the scipy backend")
 

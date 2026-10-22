@@ -71,6 +71,9 @@ def equilibria(equation, params: dict | None = None, *, tol: float = 1e-10):
     orders = resolve_orders(list(inferred), inferred)
     system = compile_system(eqs, orders)
     mapping = build_state_map(orders)
+    from .delay import reject_delays
+
+    reject_delays(system.f_sym, "equilibria()")
     if system.is_dae and (system.invariants or not system.algebraic_exprs):
         raise ValueError(
             "Equilibria of differential-algebraic systems are only supported if "

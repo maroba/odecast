@@ -55,6 +55,16 @@ _UFUNC_FUNCTIONS = {
 }
 
 
+# Delayed values y^(level)(t - tau) are SymPy functions with these names
+DELAY_PREFIX = "__delay__"
+_delayed: dict[str, tuple["Variable", int]] = {}
+
+
+def delayed_target(func_name: str) -> "tuple[Variable, int] | None":
+    """(variable, derivative level) behind the name of a delayed function."""
+    return _delayed.get(func_name)
+
+
 def lookup_variable(name: str) -> "Variable | None":
     """Return the most recently created variable with the given name."""
     return _registry.get(name)
@@ -331,6 +341,21 @@ class Variable(_ScalarOps):
             return _VectorOps._sympy_(self)
         return sp.Function(self.name)(t.symbol)
 
+    def delay(self, tau):
+        """
+        The value of this variable at the earlier time t - tau.
+
+        Args:
+            tau: Constant delay, a number or an expression in parameters
+
+        Returns:
+            Delayed expression; for vector and matrix variables, one per
+            component
+        """
+        if self.shape is not None:
+            return _delayed_components(self, tau)
+        return Delayed(self, tau)
+
     def __repr__(self):
         return self.name
 
@@ -493,6 +518,10 @@ class VectorDerivative(_VectorOps):
         """Vector derivatives have no scalar SymPy form."""
         return self._sympy_()
 
+    def delay(self, tau):
+        """The derivative at the earlier time t - tau, component-wise."""
+        return _delayed_components(self, tau)
+
 
 class VectorExpression(_VectorOps):
     """
@@ -637,6 +666,10 @@ class Derivative(_ScalarOps):
         func = sp.Function(self.variable.name)(t.symbol)
         return sp.Derivative(func, t.symbol, self.order)
 
+    def delay(self, tau):
+        """The value of this derivative at the earlier time t - tau."""
+        return Delayed(self, tau)
+
     def __hash__(self):
         """Hash by variable identity and order."""
         return hash((id(self.variable), self.order))
@@ -648,6 +681,39 @@ class Derivative(_ScalarOps):
             and self.variable is other.variable
             and self.order == other.order
         )
+
+
+class Delayed(_ScalarOps):
+    """
+    The value of a variable or derivative at the earlier time t - tau.
+
+    Created with ``y.delay(tau)`` or ``y.d().delay(tau)``.
+    """
+
+    def __init__(self, target, tau):
+        self.target = target
+        self.tau = tau
+
+    def __repr__(self):
+        return f"{self.target!r}(t - {self.tau})"
+
+    def sympy(self) -> sp.Expr:
+        variable, level = (
+            (self.target.variable, self.target.order)
+            if isinstance(self.target, Derivative)
+            else (self.target, 0)
+        )
+        name = f"{DELAY_PREFIX}{variable.name}__{level}"
+        _delayed[name] = (variable, level)
+        return sp.Function(name)(t.symbol - as_sympy(self.tau))
+
+
+def _delayed_components(target, tau) -> "VectorComponents":
+    variable = target.variable if isinstance(target, VectorDerivative) else target
+    out = np.empty(variable.shape, dtype=object)
+    for index in np.ndindex(*variable.shape):
+        out[index] = target[index[0] if len(index) == 1 else index].delay(tau)
+    return VectorComponents(out)
 
 
 # The global independent variable instance

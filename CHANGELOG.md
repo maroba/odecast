@@ -5,6 +5,46 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- Event resets: `Event(..., reset={y.d(): -0.8 * y.d()})` changes the state
+  at an event and continues the integration (impacts, switching, dosing).
+- Sensitivities: `solve(..., sensitivities=[k])` computes derivatives of the
+  solution with respect to parameters, including parameters in initial
+  values; `sol.sensitivity(y, k, t)` returns them. `fit()` uses them for
+  exact derivatives of the residuals.
+- Boundary value problems with unknown parameters, e.g. eigenvalue problems:
+  `solve(..., bvp=..., unknowns={lam: 3.8})`; results in `sol.unknowns`.
+- `periodic_orbit()` computes limit cycles, their period, and Floquet
+  multipliers.
+- `linearize()` gives state-space models (A, B, C, D) and transfer
+  functions around an operating point; `to_scipy()` converts them to
+  `scipy.signal.StateSpace`.
+- `phase_portrait()` draws direction field, nullclines, equilibria and
+  trajectories of planar systems.
+- `continuation()` follows branches of equilibria with pseudo-arclength
+  continuation and detects folds, Hopf bifurcations and branch points.
+- Delay differential equations with constant delays: `y.delay(tau)` and
+  `y.d().delay(tau)`, solved with the method of steps; `history=` gives the
+  values before the initial time.
+- `solve_sde()` simulates stochastic differential equations (Euler-Maruyama,
+  Milstein) for ensembles of paths, with mean, standard deviation, quantiles
+  and plots.
+- `odecast.pde`: time-dependent partial differential equations on grids in
+  one to three dimensions with Dirichlet, Neumann and periodic boundaries,
+  solved with the method of lines and finite differences from findiff (new
+  `pde` extra).
+
+### Changed
+
+- `fit()` no longer aborts when the integration fails for trial parameters
+  during the optimization; such steps are rejected.
+- Documentation: new pages on analysis, delay and stochastic equations, and
+  partial differential equations; equilibria and fitting moved to the
+  analysis page.
+
 ## [0.3.0] - 2026-10-22
 
 ### Added
@@ -138,6 +178,7 @@ Initial release.
 - Validation of initial conditions.
 - Backends: SciPy (numerical IVP), SymPy (symbolic), and auto selection.
 
+[Unreleased]: https://github.com/maroba/odecast/compare/v0.3.0...HEAD
 [0.3.0]: https://github.com/maroba/odecast/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/maroba/odecast/compare/v0.1.1...v0.2.0
 [0.1.1]: https://github.com/maroba/odecast/compare/v0.1.0...v0.1.1

@@ -3,7 +3,10 @@ import pytest
 import sympy as sp
 
 from odecast import BC, Eq, solve, var
-from odecast.errors import MissingInitialConditionError, OverdeterminedConditionsError
+from odecast.errors import (
+    MissingInitialConditionError,
+    OverdeterminedConditionsError,
+)
 from odecast.solution import SolutionBVP
 
 
@@ -110,3 +113,73 @@ def test_ivp_and_bvp_together_rejected():
     y = var("y")
     with pytest.raises(ValueError, match="either ivp or bvp"):
         solve(Eq(y.d() + y, 0), ivp={y: 1}, bvp=[BC(y, t=0, value=1)], tspan=(0, 1))
+
+
+class TestUnknownParameters:
+    @pytest.mark.parametrize("n", [1, 2, 3])
+    def test_sturm_liouville_eigenvalues(self, n):
+        # y'' + lam y = 0, y(0) = y(pi) = 0: lam = n^2, y = sin(n t) / n
+        y = var("y")
+        lam = sp.Symbol("lam")
+        bcs = [BC(y, t=0, value=0), BC(y, t=np.pi, value=0), BC(y.d(), t=0, value=1)]
+        sol = solve(
+            Eq(y.d(2) + lam * y, 0),
+            bvp=bcs,
+            tspan=(0, np.pi),
+            unknowns={lam: n**2 - 0.3},
+            guess={y: lambda t: np.sin(n * t) / n},
+            tol=1e-8,
+            max_nodes=20000,
+        )
+        assert sol.unknowns[lam] == pytest.approx(n**2, rel=1e-6)
+        tt = np.linspace(0, np.pi, 9)
+        np.testing.assert_allclose(sol.eval(y, tt), np.sin(n * tt) / n, atol=1e-6)
+
+    @pytest.mark.parametrize("n", [0, 1, 2])
+    def test_quantum_harmonic_oscillator(self, n):
+        # psi'' = (x^2 - 2E) psi: E = n + 1/2
+        from odecast import t
+
+        psi = var("psi")
+        E = sp.Symbol("E")
+        L = 6
+        bcs = [
+            BC(psi, t=-L, value=0),
+            BC(psi, t=L, value=0),
+            BC(psi.d(), t=-L, value=1e-6),
+        ]
+        hermite = np.polynomial.hermite.hermval
+        sol = solve(
+            Eq(psi.d(2), (t**2 - 2 * E) * psi),
+            bvp=bcs,
+            tspan=(-L, L),
+            unknowns={E: n + 0.4},
+            mesh=200,
+            tol=1e-6,
+            guess={psi: lambda x: hermite(x, [0] * n + [1]) * np.exp(-(x**2) / 2)},
+        )
+        assert sol.unknowns[E] == pytest.approx(n + 0.5, abs=1e-4)
+
+    def test_unknowns_need_extra_conditions(self):
+        y = var("y")
+        lam = sp.Symbol("lam")
+        with pytest.raises(MissingInitialConditionError, match="1 unknown parameter"):
+            solve(
+                Eq(y.d(2) + lam * y, 0),
+                bvp=[BC(y, t=0, value=0), BC(y, t=1, value=0)],
+                tspan=(0, 1),
+                unknowns={lam: 1},
+            )
+
+    def test_unknown_must_occur_in_equations(self):
+        y = var("y")
+        bcs = [BC(y, t=0, value=0), BC(y, t=1, value=0), BC(y.d(), t=0, value=1)]
+        with pytest.raises(ValueError, match="do not occur"):
+            solve(Eq(y.d(2) + y, 0), bvp=bcs, tspan=(0, 1), unknowns={"q": 1})
+
+    def test_only_for_boundary_value_problems(self):
+        y = var("y")
+        with pytest.raises(ValueError, match="only supported for boundary value"):
+            solve(
+                Eq(y.d(2) + y, 0), ivp={y: 0, y.d(): 1}, tspan=(0, 1), unknowns={"q": 1}
+            )

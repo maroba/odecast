@@ -350,6 +350,18 @@ class NumericDAE(CompiledSystem):
 
         return jac_function
 
+    def rhs_vectorized_free(self, params, names):
+        raise ValueError(
+            "Unknown parameters are not supported when algebraic variables are "
+            "computed numerically"
+        )
+
+    def sensitivity_rhs(self, params, names):
+        raise ValueError(
+            "Sensitivities are not available when algebraic variables are "
+            "computed numerically"
+        )
+
     def algebraic_functions(
         self, params: dict | None = None, z_guess: dict | None = None
     ) -> dict[str, Callable]:

@@ -27,6 +27,7 @@ class ScipyBVPBackend:
         mapping: dict,
         guess: dict | None = None,
         mesh: int | np.ndarray = 50,
+        p0: list[float] | None = None,
         **options,
     ) -> SolutionBVP:
         """
@@ -43,6 +44,8 @@ class ScipyBVPBackend:
                 numbers, arrays matching the mesh, or callables of t.
                 Unspecified states start at zero.
             mesh: Number of initial mesh nodes, or the mesh itself
+            p0: Starting values of unknown parameters; ``fun`` then takes
+                them as a third argument
             **options: Passed to scipy.integrate.solve_bvp (tol, max_nodes,
                 bc_tol, verbose)
 
@@ -60,7 +63,7 @@ class ScipyBVPBackend:
             at_start = bool(np.isclose(t_value, a))
             residuals.append((mapping[(v, level)], at_start, float(value)))
 
-        def bc(ya, yb):
+        def bc(ya, yb, *p):
             return np.array(
                 [
                     (ya if at_start else yb)[i] - value
@@ -76,14 +79,26 @@ class ScipyBVPBackend:
                 )
             y0[mapping[(v, level)]] = value(x) if callable(value) else value
 
+        if p0 is not None:
+            options["p"] = np.asarray(p0, dtype=float)
         sol = solve_bvp(fun, bc, x, y0, **options)
         if not sol.success:
             raise RuntimeError(f"SciPy solve_bvp failed: {sol.message}")
 
-        return SolutionBVP(
+        solution = SolutionBVP(
             t=sol.x,
             y=sol.y,
             mapping=mapping,
             interpolant=sol.sol,
-            f_compiled=lambda t, x: fun(np.atleast_1d(t), np.asarray(x)[:, None])[:, 0],
+            f_compiled=(
+                (
+                    lambda t, x: fun(np.atleast_1d(t), np.asarray(x)[:, None], sol.p)[
+                        :, 0
+                    ]
+                )
+                if p0 is not None
+                else (lambda t, x: fun(np.atleast_1d(t), np.asarray(x)[:, None])[:, 0])
+            ),
         )
+        solution.p = sol.p
+        return solution

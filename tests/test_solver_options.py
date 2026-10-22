@@ -143,3 +143,89 @@ class TestParameters:
         assert compile_system([Eq(y2.d(2) + k * y2, 0)], {y2: 2}) is compile_system(
             eqs, orders
         )
+
+
+class TestSensitivities:
+    def test_exponential_decay(self):
+        # y' = -k y, y(0) = y0: dy/dk = -t y0 exp(-k t), dy/dy0 = exp(-k t)
+        y = var("y")
+        k, y0 = sp.symbols("k y0")
+        sol = solve(
+            Eq(y.d(), -k * y),
+            ivp={y: y0},
+            tspan=(0, 2),
+            params={k: 0.7, y0: 2.0},
+            sensitivities=[k, y0],
+            **TOL,
+        )
+        tt = np.array([0.5, 1.0, 2.0])
+        np.testing.assert_allclose(
+            sol.sensitivity(y, k, tt), -tt * 2 * np.exp(-0.7 * tt), atol=1e-9
+        )
+        np.testing.assert_allclose(
+            sol.sensitivity(y, "y0", tt), np.exp(-0.7 * tt), atol=1e-9
+        )
+        assert sol.sensitivity(y, k).shape == sol.t.shape
+        assert isinstance(sol.sensitivity(y, k, 1.0), float)
+
+    def test_oscillator_frequency(self):
+        # y = cos(w t): dy/dw = -t sin(w t)
+        y = var("y")
+        w = sp.Symbol("w")
+        sol = solve(
+            Eq(y.d(2) + w**2 * y, 0),
+            ivp={y: 1, y.d(): 0},
+            tspan=(0, 5),
+            params={w: 1.3},
+            sensitivities=w,
+            **TOL,
+        )
+        tt = np.linspace(0, 5, 6)
+        np.testing.assert_allclose(
+            sol.sensitivity(y, w, tt), -tt * np.sin(1.3 * tt), atol=1e-8
+        )
+        np.testing.assert_allclose(
+            sol.sensitivity(y.d(), w, tt),
+            -np.sin(1.3 * tt) - 1.3 * tt * np.cos(1.3 * tt),
+            atol=1e-8,
+        )
+
+    def test_vector_variable(self):
+        u = var("u", shape=2)
+        k = sp.Symbol("k")
+        sol = solve(
+            Eq(u.d(), -k * u),
+            ivp={u: [1, 2]},
+            tspan=(0, 1),
+            params={k: 1},
+            sensitivities=[k],
+            **TOL,
+        )
+        np.testing.assert_allclose(
+            sol.sensitivity(u, k, 1.0), -np.exp(-1) * np.array([1, 2]), atol=1e-9
+        )
+
+    def test_unknown_parameter(self):
+        y = var("y")
+        k = sp.Symbol("k")
+        with pytest.raises(ValueError, match="do not occur"):
+            solve(
+                Eq(y.d(), -k * y),
+                ivp={y: 1},
+                tspan=(0, 1),
+                params={k: 1},
+                sensitivities=["q"],
+            )
+
+    def test_not_requested(self):
+        y = var("y")
+        k = sp.Symbol("k")
+        sol = solve(
+            Eq(y.d(), -k * y),
+            ivp={y: 1},
+            tspan=(0, 1),
+            params={k: 1},
+            sensitivities=[k],
+        )
+        with pytest.raises(KeyError, match="No sensitivity"):
+            sol.sensitivity(y, "z")

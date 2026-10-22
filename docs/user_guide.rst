@@ -180,6 +180,28 @@ assumptions helps SymPy simplify the result:
    sol = solve(Eq(y.d(2) + k*y, 0), backend="sympy", ivp={y: 1, y.d(): 0})
    sol.as_expr(y)   # cos(sqrt(k)*t)
 
+Sensitivities
+-------------
+
+The derivatives of the solution with respect to parameters show how
+sensitive it is to them. They are computed together with the solution, from
+the exact Jacobians:
+
+.. code-block:: python
+
+   k = sp.Symbol("k")
+   sol = solve(Eq(y.d(2) + k*y, 0), ivp={y: 1, y.d(): 0}, tspan=(0, 10),
+               params={k: 4.0}, sensitivities=[k])
+
+   sol.sensitivity(y, k)            # dy/dk at sol.t
+   sol.sensitivity(y, k, t=5.0)     # dy/dk at t = 5
+
+Parameters that appear in the initial values are taken into account, e.g.
+``ivp={y: y0, ...}`` with ``sensitivities=[y0]``. Sensitivities are
+available for initial value problems without event resets, and not for
+algebraic variables. :func:`~odecast.fit` uses them for exact derivatives of
+the residuals.
+
 Boundary value problems
 -----------------------
 
@@ -228,6 +250,30 @@ determines which one is found. The Bratu problem
    lower = solve(eq, bvp=bcs, tspan=(0, 1))   # y(0.5) = 0.14
    upper = solve(eq, bvp=bcs, tspan=(0, 1),
                  guess={y: lambda t: 12*t*(1 - t)})   # y(0.5) = 4.09
+
+Unknown parameters
+~~~~~~~~~~~~~~~~~~
+
+Parameters can be determined together with the solution by passing them as
+``unknowns`` with a starting value. Each unknown requires one boundary
+condition in addition to one per first-order state. This covers eigenvalue
+problems:
+
+.. code-block:: python
+
+   # y'' + lam y = 0, y(0) = y(pi) = 0; y'(0) = 1 fixes the amplitude
+   lam = sp.Symbol("lam")
+   sol = solve(
+       Eq(y.d(2) + lam*y, 0),
+       bvp=[BC(y, t=0, value=0), BC(y, t=np.pi, value=0), BC(y.d(), t=0, value=1)],
+       tspan=(0, np.pi),
+       unknowns={lam: 3.8},
+       guess={y: lambda t: np.sin(2*t) / 2},
+   )
+   sol.unknowns   # {lam: 4.000...}
+
+The starting values of the unknowns and the guess for the solution select
+which eigenvalue is found.
 
 Differential-algebraic equations
 --------------------------------
@@ -356,7 +402,34 @@ occurrence; ``direction`` restricts events to crossings from negative to
 positive (1) or from positive to negative (-1). Conditions may involve
 variables, their derivatives below the highest order, :math:`t` and
 parameters. Plain functions ``g(t, x)`` of the state vector, as accepted by
-:func:`scipy.integrate.solve_ivp`, are passed through unchanged.
+:func:`scipy.integrate.solve_ivp`, are passed through unchanged. An event is
+not triggered at the very start of the integration.
+
+Resets
+~~~~~~
+
+An event with ``reset`` changes the state when it occurs and then continues
+the integration; this describes impacts, switching and dosing. The new
+values are expressions in the values just before the event:
+
+.. code-block:: python
+
+   # A ball that loses 20% of its speed at every bounce
+   bounce = Event(Eq(y, 0), direction=-1, reset={y.d(): -0.8*y.d()})
+   sol = solve(Eq(y.d(2), -9.81), ivp={y: 1, y.d(): 0}, tspan=(0, 3),
+               events=bounce)
+   sol.t_events[0]   # times of the bounces
+
+   # A dose at t = 1, 2, 3, ... (the zeros of sin(pi t))
+   c = var("c")
+   dose = Event(Eq(sp.sin(sp.pi*t), 0), reset={c: c + 1})
+   sol = solve(Eq(c.d(), -0.5*c), ivp={c: 1}, tspan=(0, 10), events=dose)
+
+The solution, including ``sol.eval``, is discontinuous at the events. Only
+states (variables and derivatives below the highest order) can be reset.
+If events accumulate, as for a bouncing ball coming to rest, the integration
+stops with an error after many resets; shorten ``tspan`` or add a terminal
+event.
 
 Backends
 --------
@@ -455,68 +528,6 @@ In Jupyter, equations and symbolic solutions are displayed as formulas.
 
    latex(Eq(y.d(2) + 0.3*y.d() + y, sp.sin(t)))
    # y + 0.3 y' + y'' = \sin{\left(t \right)}
-
-Equilibria and stability
-------------------------
-
-:func:`~odecast.equilibria` finds the points where all derivatives of an
-autonomous system vanish and classifies them by the eigenvalues of the
-Jacobian:
-
-.. code-block:: python
-
-   from odecast import equilibria
-
-   x, y = var("x"), var("y")
-   equilibria([Eq(x.d(), x - x*y), Eq(y.d(), x*y - y)])
-   # [Equilibrium(x=0, y=0, saddle), Equilibrium(x=1, y=1, center)]
-
-   theta = var("theta")
-   equilibria(Eq(theta.d(2) + 0.3*theta.d() + sp.sin(theta), 0))
-   # [Equilibrium(theta=0.0, stable focus), Equilibrium(theta=3.14159..., saddle)]
-
-Each result has the attributes ``point`` (values of the variables),
-``jacobian``, ``eigenvalues`` and ``stability``. The classification is
-``"stable"`` if all eigenvalues have negative real part, ``"unstable"`` if
-one has positive real part, and ``"marginal"`` otherwise, in which case the
-linearization does not decide stability. Two-dimensional systems are
-further classified as node, focus, saddle or center.
-
-The equilibria are found with :func:`sympy.solve`. For periodic
-nonlinearities such as ``sin`` it returns representatives only (here
-:math:`0` and :math:`\pi`). Parameters may be given values with ``params``;
-otherwise the Jacobian and eigenvalues stay symbolic and the stability is
-``"unknown"``.
-
-Fitting parameters to data
---------------------------
-
-:func:`~odecast.fit` determines parameters of an initial value problem from
-measurements by nonlinear least squares:
-
-.. code-block:: python
-
-   from odecast import fit
-
-   y = var("y")
-   c, k, y0 = sp.symbols("c k y0")
-   eq = Eq(y.d(2) + c*y.d() + k*y, 0)
-
-   result = fit(
-       eq,
-       {y: (t_data, y_data)},          # measurements of y
-       guess={c: 1.0, k: 2.0, y0: 1.0},
-       ivp={y: y0, y.d(): 0},           # the initial value is fitted too
-   )
-   result.params     # {c: 0.40..., k: 3.00..., y0: 1.50...}
-   result.stderr     # standard errors
-   result.solution   # solution with the fitted parameters
-
-Measurements of several variables or derivatives may be given, each on its
-own time grid. ``params`` fixes parameters that are not fitted, ``bounds``
-restricts the fitted ones, and ``sigma`` weights the residuals by the
-measurement uncertainties. The standard errors are computed from the
-Jacobian of the residuals, as in :func:`scipy.optimize.curve_fit`.
 
 Errors
 ------

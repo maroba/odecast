@@ -31,11 +31,16 @@ Main features:
 * nonlinear terms such as ``y**2`` or ``sp.sin(y)``;
 * vector- and matrix-valued variables and matrix products;
 * parameters, with compiled systems reused across parameter values;
-* initial value problems with events, and two-point boundary value problems;
+* initial value problems with events and resets, and boundary value
+  problems with unknown parameters;
 * differential-algebraic equations, including index reduction;
 * validation of initial and boundary conditions before solving;
 * numerical (SciPy) and symbolic (SymPy) backends;
-* equilibria and their stability, and fitting parameters to data.
+* sensitivities with respect to parameters;
+* equilibria, linearization, phase portraits, bifurcations, periodic
+  orbits, and fitting parameters to data;
+* delay and stochastic differential equations;
+* partial differential equations with the method of lines.
 
 .. toctree::
    :maxdepth: 2
@@ -44,6 +49,9 @@ Main features:
    installation
    quickstart
    user_guide
+   analysis
+   delay_stochastic
+   pde
    examples
    api_reference
    contributing

@@ -136,6 +136,11 @@ def lambdify_jac(
     return jac_function
 
 
+def _symbol_named(symbols, name: str) -> sp.Symbol:
+    """The symbol with the given name, or a new one (whose derivatives vanish)."""
+    return next((s for s in symbols if s.name == name), sp.Symbol(name))
+
+
 class CompiledSystem:
     """
     First-order system compiled to numerical functions.
@@ -171,7 +176,7 @@ class CompiledSystem:
         free -= {t_symbol, *self.state_syms, *exclude}
         self.param_syms = tuple(sorted(free, key=lambda s: s.name))
         self._args = [t_symbol, *self.state_syms, *self.param_syms]
-        self._f = sp.lambdify(self._args, list(f_sym_vec), modules="numpy", cse=True)
+        self._f_compiled = None
         self._jac_sym = None
         self._jac = None
 
@@ -179,6 +184,14 @@ class CompiledSystem:
         self.algebraic_exprs: dict[str, sp.Expr] = {}
         self.invariants: list[tuple[sp.Expr, str]] = []
         self.constraints: list[sp.Expr] = []
+
+    def _f(self) -> Callable:
+        """f(t, *x, *p), compiled on first use."""
+        if self._f_compiled is None:
+            self._f_compiled = sp.lambdify(
+                self._args, list(self.f_sym), modules="numpy", cse=True
+            )
+        return self._f_compiled
 
     @property
     def is_dae(self) -> bool:
@@ -205,7 +218,7 @@ class CompiledSystem:
     def rhs(self, params: dict | None = None, z_guess: dict | None = None) -> Callable:
         """f(t, x) for scipy.integrate.solve_ivp."""
         p = self.param_values(params)
-        f = self._f
+        f = self._f()
 
         def rhs_function(t, x):
             return np.array(f(t, *x, *p), dtype=float)
@@ -217,12 +230,37 @@ class CompiledSystem:
     ) -> Callable:
         """f(t, X) for arrays of time points, as scipy.integrate.solve_bvp requires."""
         p = self.param_values(params)
-        f = self._f
+        f = self._f()
 
         def rhs_function(t, x):
             t = np.asarray(t)
             return np.array(
                 [np.broadcast_to(v, t.shape) for v in f(t, *x, *p)], dtype=float
+            )
+
+        return rhs_function
+
+    def rhs_vectorized_free(self, params: dict | None, names: list[str]) -> Callable:
+        """
+        f(t, X, p) for solve_bvp, where p holds the values of the parameters
+        ``names``, which are determined together with the solution.
+        """
+        missing = [n for n in names if n not in {s.name for s in self.param_syms}]
+        if missing:
+            raise ValueError(
+                f"Unknown parameters {', '.join(missing)} do not occur in the equations"
+            )
+        base = self.param_values({**(params or {}), **dict.fromkeys(names, 0.0)})
+        positions = [[s.name for s in self.param_syms].index(n) for n in names]
+        f = self._f()
+
+        def rhs_function(t, x, p):
+            values = list(base)
+            for i, v in zip(positions, p, strict=True):
+                values[i] = v
+            t = np.asarray(t)
+            return np.array(
+                [np.broadcast_to(v, t.shape) for v in f(t, *x, *values)], dtype=float
             )
 
         return rhs_function
@@ -240,6 +278,44 @@ class CompiledSystem:
             return np.array(jac(t, *x, *p), dtype=float)
 
         return jac_function
+
+    def sensitivity_rhs(self, params: dict | None, names: list[str]) -> Callable:
+        """
+        Right-hand side of the system augmented by its sensitivities.
+
+        The state is (x, S) with S = dx/dp for the parameters ``names``,
+        stored column by column after x. S obeys S' = J S + df/dp.
+        """
+        if not hasattr(self, "_sensitivity_cache"):
+            self._sensitivity_cache = {}
+        key = tuple(names)
+        if key not in self._sensitivity_cache:
+            symbols = [_symbol_named(self.param_syms, name) for name in names]
+            fp = (
+                self.f_sym.jacobian(symbols)
+                if symbols
+                else sp.zeros(self.f_sym.shape[0], 0)
+            )
+            self._sensitivity_cache[key] = (
+                sp.lambdify(
+                    self._args, self.jac_sym.tolist(), modules="numpy", cse=True
+                ),
+                sp.lambdify(self._args, fp.tolist(), modules="numpy", cse=True),
+            )
+        jac, fp = self._sensitivity_cache[key]
+        p = self.param_values(params)
+        f = self._f()
+        n, m = len(self.state_syms), len(names)
+
+        def rhs_function(t, y):
+            x = y[:n]
+            S = y[n:].reshape(m, n).T
+            dS = np.asarray(jac(t, *x, *p), dtype=float).reshape(n, n) @ S + np.asarray(
+                fp(t, *x, *p), dtype=float
+            ).reshape(n, m)
+            return np.concatenate([np.asarray(f(t, *x, *p), dtype=float), dS.T.ravel()])
+
+        return rhs_function
 
     def _vectorized(self, exprs) -> Callable:
         """Compile expressions in (t, states, params) for arrays of time points."""

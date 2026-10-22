@@ -8,7 +8,7 @@ import sympy as sp
 from sympy.core.function import AppliedUndef
 from sympy.printing.latex import LatexPrinter
 
-from .symbols import t
+from .symbols import delayed_target, t
 
 _COMPONENT = re.compile(r"^(.+)\[([0-9, ]+)\]$")
 
@@ -30,6 +30,16 @@ class _Printer(LatexPrinter):
     """Prints y(t) as y and its derivatives as y', y'', y''', y^{(4)}."""
 
     def _print_Function(self, expr, exp=None):
+        target = (
+            delayed_target(expr.func.__name__)
+            if isinstance(expr, AppliedUndef)
+            else None
+        )
+        if target is not None:
+            variable, level = target
+            name = _name(variable.name) + "'" * level
+            arg = self._print(expr.args[0])
+            return f"{name}({arg})" if exp is None else f"{name}({arg})^{{{exp}}}"
         if _is_unknown(expr):
             name = _name(expr.func.__name__)
             return name if exp is None else f"{name}^{{{exp}}}"

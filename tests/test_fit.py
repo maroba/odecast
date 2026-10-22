@@ -64,3 +64,45 @@ def test_fit_two_series_bounds_and_fixed_parameter():
 
     assert result.params[a] == pytest.approx(1.0, rel=1e-4)
     assert result.params[b] == pytest.approx(0.1, rel=1e-4)
+
+
+def test_jacobian_from_sensitivities_matches_finite_differences():
+
+    x, z = var("x"), var("z")
+    a, b, c, d = sp.symbols("a b c d")
+    eqs = [Eq(x.d(), a * x - b * x * z), Eq(z.d(), -c * z + d * x * z)]
+    true = {a: 1.0, b: 0.1, c: 1.5, d: 0.075}
+    tt = np.linspace(0, 15, 60)
+    ref = solve(eqs, ivp={x: 10, z: 5}, tspan=(0, 15), params=true, rtol=1e-10)
+    data = {x: (tt, ref.eval(x, tt)), z: (tt, ref.eval(z, tt))}
+    guess = {a: 0.9, b: 0.11, c: 1.4, d: 0.07}
+
+    result = fit(eqs, data, guess=guess, ivp={x: 10, z: 5}, tspan=(0, 15))
+    for s, value in true.items():
+        assert result.params[s] == pytest.approx(value, rel=1e-6)
+    # Exact derivatives need fewer evaluations than finite differences
+    assert result.result.nfev < 15
+
+
+def test_fit_survives_failing_trial_parameters():
+    # From this start the optimizer tries parameters for which the
+    # integration fails; such steps are rejected instead of aborting.
+    x, z = var("x"), var("z")
+    a, b, c, d = sp.symbols("a b c d")
+    eqs = [Eq(x.d(), a * x - b * x * z), Eq(z.d(), -c * z + d * x * z)]
+    ref = solve(
+        eqs,
+        ivp={x: 10, z: 5},
+        tspan=(0, 15),
+        params={a: 1.0, b: 0.1, c: 1.5, d: 0.075},
+        rtol=1e-10,
+    )
+    tt = np.linspace(0, 15, 60)
+    result = fit(
+        eqs,
+        {x: (tt, ref.eval(x, tt)), z: (tt, ref.eval(z, tt))},
+        guess={a: 0.8, b: 0.12, c: 1.3, d: 0.06},
+        ivp={x: 10, z: 5},
+        tspan=(0, 15),
+    )
+    assert result.success
