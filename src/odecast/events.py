@@ -53,12 +53,15 @@ class Event:
         return as_sympy(c)
 
 
-def compile_events(events, mapping, state_syms, t_symbol, params: dict) -> list:
+def compile_events(
+    events, mapping, state_syms, t_symbol, params: dict, algebraic: dict | None = None
+) -> list:
     """
     Convert events to functions g(t, x) for scipy.integrate.solve_ivp.
 
     Plain callables are passed through unchanged. Eq objects and expressions
-    are wrapped in a non-terminal Event.
+    are wrapped in a non-terminal Event. ``algebraic`` maps algebraic
+    variables z(t) of a DAE to their expressions in the states.
     """
     from .reduce import _substitute_derivatives_with_states
 
@@ -75,12 +78,14 @@ def compile_events(events, mapping, state_syms, t_symbol, params: dict) -> list:
         if not isinstance(event, Event):
             event = Event(event)
 
-        expr = _substitute_derivatives_with_states(event.expr(), mapping, state_syms)
+        expr = event.expr().xreplace(algebraic or {})
+        expr = _substitute_derivatives_with_states(expr, mapping, state_syms)
         expr = substitute_params(expr, params)
         if expr.atoms(AppliedUndef, sp.Derivative):
             raise ValueError(
-                f"Event {event.condition!r} may only involve variables and "
-                "derivatives below their highest order"
+                f"Event {event.condition!r} may only involve variables, "
+                "derivatives below their highest order, and algebraic variables "
+                "that can be eliminated symbolically"
             )
         unknown = expr.free_symbols - {t_symbol} - set(state_syms)
         if unknown:

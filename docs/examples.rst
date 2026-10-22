@@ -366,6 +366,133 @@ variable is a position rather than a time; odecast still calls it
 
    print(f"max deflection: {sol.eval(w, ell/2):.6f}")   # 5/384 = 0.013021
 
+Differential-algebraic equations
+--------------------------------
+
+Pendulum in Cartesian coordinates
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A pendulum of length :math:`L = 1` described by the position
+:math:`(x, y)` of the bob and the string tension :math:`\lambda` (per unit
+mass and length):
+
+.. math::
+
+   \ddot x = -\lambda x, \qquad \ddot y = -\lambda y - g, \qquad
+   x^2 + y^2 = L^2.
+
+The constraint does not contain :math:`\lambda`; odecast differentiates it
+twice (index 3). The result is compared with the pendulum in polar form,
+:math:`\ddot\theta + g\sin\theta = 0`, for which the tension is
+:math:`\lambda = g\cos\theta + \dot\theta^2`.
+
+.. plot::
+   :include-source:
+
+   import numpy as np
+   import matplotlib.pyplot as plt
+   import sympy as sp
+   from odecast import var, Eq, solve
+
+   g, theta0 = 9.81, np.pi / 3
+
+   x, y, lam = var("x"), var("y"), var("lam")
+   eqs = [Eq(x.d(2), -lam*x), Eq(y.d(2), -lam*y - g), Eq(x**2 + y**2, 1)]
+   ic = {x: np.sin(theta0), x.d(): 0.0, y: -np.cos(theta0), y.d(): 0.0}
+   sol = solve(eqs, ivp=ic, tspan=(0, 10), rtol=1e-8, atol=1e-10)
+
+   theta = var("theta")
+   polar = solve(Eq(theta.d(2) + g*sp.sin(theta), 0),
+                 ivp={theta: theta0, theta.d(): 0.0}, tspan=(0, 10),
+                 rtol=1e-8, atol=1e-10)
+
+   t = np.linspace(0, 10, 1000)
+   tension = g*np.cos(polar.eval(theta, t)) + polar.eval(theta.d(), t)**2
+
+   fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(11, 4))
+   ax1.plot(t, sol.eval(lam, t), label="Cartesian (DAE)")
+   ax1.plot(t, tension, "k:", label="polar")
+   ax1.set_xlabel("$t$")
+   ax1.set_title(r"Tension $\lambda$")
+   ax1.set_ylim(3, 24)
+   ax1.legend(loc="upper center", ncol=2)
+
+   ax2.semilogy(t, np.abs(sol.constraint_residuals(t)[0]) + 1e-17)
+   ax2.set_xlabel("$t$")
+   ax2.set_title(r"Constraint violation $|x^2 + y^2 - 1|$")
+   plt.tight_layout()
+
+The constraint violation stays at the level of the solver tolerance.
+
+Tank draining through a pipe
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A tank with cross-section :math:`A_t` drains through a pipe of length
+:math:`\ell` and diameter :math:`D`. The water level :math:`h` falls as
+
+.. math::
+
+   A_t \dot h = -A_p v,
+
+where the outflow velocity :math:`v` follows from the energy balance with
+pipe friction,
+
+.. math::
+
+   g h = \left(1 + K + f\frac{\ell}{D}\right)\frac{v^2}{2},
+
+and the friction factor :math:`f` from the Colebrook equation for turbulent
+flow,
+
+.. math::
+
+   \frac{1}{\sqrt f} = -2\log_{10}\left(\frac{\varepsilon}{3.7 D}
+   + \frac{2.51}{\mathrm{Re}\sqrt f}\right),
+   \qquad \mathrm{Re} = \frac{vD}{\nu}.
+
+The algebraic equations for :math:`v` and :math:`f` have no closed-form
+solution, so odecast solves them numerically at every step. The starting
+guess for the first step is taken from ``ivp``. The integration stops when
+the level reaches 0.5 m.
+
+.. plot::
+   :include-source:
+
+   import numpy as np
+   import matplotlib.pyplot as plt
+   import sympy as sp
+   from odecast import var, Eq, Event, solve
+
+   g = 9.81
+   A_t, D, ell = 1.0, 0.05, 20.0      # m^2, m, m
+   eps, nu, K = 1e-4, 1e-6, 0.5       # roughness (m), viscosity (m^2/s), inlet loss
+   A_p = np.pi * D**2 / 4
+
+   h, v, f = var("h"), var("v"), var("f")
+   Re = v * D / nu
+   eqs = [
+       Eq(A_t * h.d(), -A_p * v),
+       Eq(g * h, (1 + K + f * ell / D) * v**2 / 2),
+       Eq(1 / sp.sqrt(f), -2 * sp.log(eps / (3.7 * D) + 2.51 / (Re * sp.sqrt(f)), 10)),
+   ]
+   sol = solve(eqs, ivp={h: 2.0, v: 1.0, f: 0.02}, tspan=(0, 2000),
+               events=Event(Eq(h, 0.5), terminal=True))
+
+   t = np.linspace(0, sol.t[-1], 300)
+   fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(11, 4))
+   ax1.plot(t, sol.eval(h, t))
+   ax1.set_xlabel("$t$ [s]")
+   ax1.set_title("Water level $h$ [m]")
+   ax2.plot(t, sol.eval(f, t))
+   ax2.set_xlabel("$t$ [s]")
+   ax2.set_title("Friction factor $f$")
+   plt.tight_layout()
+
+   print(f"level 0.5 m reached after {sol.t_events[0][0]:.0f} s")
+
+As the flow slows down, the Reynolds number falls and the friction factor
+rises.
+
 Analysis
 --------
 

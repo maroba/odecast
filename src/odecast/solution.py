@@ -54,6 +54,9 @@ class SolutionIVP:
         self._interpolant = interpolant
         self.t_events = t_events
         self._y_events = y_events
+        # Algebraic variables of a DAE: functions of (t, states)
+        self._algebraic: dict[Variable, Callable] = {}
+        self._constraints: Callable | None = None
 
     def __getitem__(self, target: Variable | Derivative) -> np.ndarray:
         """
@@ -66,9 +69,9 @@ class SolutionIVP:
             Array of solution values at all time points. For a vector or
             matrix target the array has shape ``(*shape, len(t))``.
         """
-        return self._select(target, self.y)
+        return self._select(target, self.y, self.t)
 
-    def _select(self, target, states: np.ndarray) -> np.ndarray:
+    def _select(self, target, states: np.ndarray, times: np.ndarray) -> np.ndarray:
         """Pick the rows of a state array that belong to ``target``."""
         from .symbols import VectorDerivative
 
@@ -82,9 +85,19 @@ class SolutionIVP:
             )
 
         if variable.shape is None:
-            return states[self._state_index(variable, level)]
-        rows = [states[self._state_index(c, level)] for c in variable.components()]
+            return self._row(variable, level, states, times)
+        rows = [self._row(c, level, states, times) for c in variable.components()]
         return np.stack(rows).reshape(*variable.shape, *states.shape[1:])
+
+    def _row(self, variable, level, states, times) -> np.ndarray:
+        if variable in self._algebraic:
+            if level != 0:
+                raise KeyError(
+                    f"{variable.name} is an algebraic variable; its derivatives are "
+                    "not part of the solution"
+                )
+            return self._algebraic[variable](times, states)
+        return states[self._state_index(variable, level)]
 
     def _state_index(self, variable: Variable, level: int) -> int:
         if (variable, level) not in self.mapping:
@@ -107,7 +120,8 @@ class SolutionIVP:
             component axes come first.
         """
         if self._interpolant is not None:
-            values = self._select(target, self._interpolant(np.atleast_1d(tpoints)))
+            times = np.atleast_1d(np.asarray(tpoints, dtype=float))
+            values = self._select(target, self._interpolant(times), times)
             return values[..., 0][()] if np.isscalar(tpoints) else values
 
         y_values = self[target]
@@ -132,11 +146,35 @@ class SolutionIVP:
         """
         if self._y_events is None:
             raise ValueError("No events were passed to solve")
-        return self._select(target, np.asarray(self._y_events[index]).T)
+        return self._select(
+            target,
+            np.asarray(self._y_events[index]).T,
+            np.asarray(self.t_events[index]),
+        )
 
     def variables(self) -> list[Variable]:
         """The scalar variables (and vector components) of the system."""
-        return [v for (v, level) in self.mapping if level == 0]
+        return [v for (v, level) in self.mapping if level == 0] + list(self._algebraic)
+
+    def constraint_residuals(self, t: np.ndarray | None = None) -> np.ndarray:
+        """
+        Residuals of the algebraic equations of a differential-algebraic system.
+
+        For constraints that odecast had to differentiate (higher index), the
+        numerical solution drifts slowly away from the constraint; the
+        residuals show how far.
+
+        Args:
+            t: Time points; the solver's time points if omitted
+
+        Returns:
+            Array of shape (number of algebraic equations, number of time points)
+        """
+        if self._constraints is None:
+            raise ValueError("The system has no algebraic equations")
+        times = self.t if t is None else np.atleast_1d(np.asarray(t, dtype=float))
+        states = self.y if t is None else self._interpolant(times)
+        return self._constraints(times, states)
 
     def _columns(self, targets, tpoints) -> list[tuple[str, np.ndarray]]:
         """Labels and values for plotting and tabulating."""

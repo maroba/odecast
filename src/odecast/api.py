@@ -209,6 +209,42 @@ def _bind_conditions(ivp, bvp, params):
     return ivp, bvp
 
 
+def _dae_params(system, params, options, t0=None, x0=None, z_guess=None):
+    """Add the Baumgarte rate to the parameters if the system needs it."""
+    from .dae import BAUMGARTE, default_baumgarte
+
+    rate = options.pop("baumgarte", None)
+    if BAUMGARTE not in system.param_syms:
+        return params
+    if rate is None:
+        rate = default_baumgarte(system, params, t0, x0, z_guess)
+    return {**(params or {}), BAUMGARTE: rate}
+
+
+def _algebraic_guesses(ivp, orders) -> dict:
+    """Values given for algebraic variables, used as starting guesses."""
+    from .validate import normalize_ivp
+
+    if ivp is None:
+        return {}
+    return {
+        v.name: value
+        for (v, level), value in normalize_ivp(ivp).items()
+        if orders.get(v) == 0 and level == 0
+    }
+
+
+def _attach_algebraic(sol, system, orders, params, z_guess):
+    """Let the solution compute the algebraic variables of a DAE."""
+    if not system.is_dae:
+        return sol
+    by_name = {v.name: v for v in orders}
+    functions = system.algebraic_functions(params, z_guess)
+    sol._algebraic = {by_name[name]: f for name, f in functions.items()}
+    sol._constraints = system.constraint_function(params, z_guess)
+    return sol
+
+
 def _solve_numeric(eqs, orders, ivp, bvp, tspan, params, events, options):
     """Reduce to a first-order system and solve it with SciPy."""
     from .backends.scipy_bvp import ScipyBVPBackend
@@ -231,11 +267,19 @@ def _solve_numeric(eqs, orders, ivp, bvp, tspan, params, events, options):
 
     system = compile_system(eqs, orders)
     mapping = build_state_map(orders)
+    options = dict(options)
+    z_guess = _algebraic_guesses(ivp, orders)
 
     if bvp is not None:
         if events is not None:
             raise ValueError("Events are only supported for initial value problems")
-        return ScipyBVPBackend().solve(
+        if system.invariants:
+            raise ValueError(
+                "Boundary value problems are only supported for algebraic equations "
+                "that determine the algebraic variables directly (index 1)"
+            )
+        params = _dae_params(system, params, options)
+        sol = ScipyBVPBackend().solve(
             fun=system.rhs_vectorized(params),
             n_states=len(system.state_syms),
             conditions=normalize_conditions(bvp=bvp),
@@ -243,22 +287,42 @@ def _solve_numeric(eqs, orders, ivp, bvp, tspan, params, events, options):
             mapping=mapping,
             **options,
         )
+        return _attach_algebraic(sol, system, orders, params, z_guess)
+
+    x0 = convert_ivp_to_state_vector(ivp, mapping)
+    params = _dae_params(system, params, options, tspan[0], x0, z_guess)
+    system.check_consistency(tspan[0], x0, params)
+    if system.is_dae:
+        # Solve the algebraic equations at the initial point first: a failure
+        # is reported clearly, and the result is the best starting guess.
+        z_guess = {
+            name: float(f(tspan[0], x0[:, None])[0])
+            for name, f in system.algebraic_functions(params, z_guess).items()
+        }
 
     method = options.get("method", "RK45")
     implicit = not isinstance(method, str) or method in ("Radau", "BDF", "LSODA")
-    events = compile_events(events, mapping, system.state_syms, t.symbol, params)
+    algebraic = {
+        v.sympy(): system.algebraic_exprs[v.name]
+        for v in orders
+        if v.name in system.algebraic_exprs
+    }
+    events = compile_events(
+        events, mapping, system.state_syms, t.symbol, params, algebraic
+    )
     if events is not None:
         options = {**options, "events": events}
 
-    return ScipyIVPBackend().solve(
-        f_compiled=system.rhs(params),
-        jac_compiled=system.jac(params) if implicit else None,
-        x0=convert_ivp_to_state_vector(ivp, mapping),
+    sol = ScipyIVPBackend().solve(
+        f_compiled=system.rhs(params, z_guess),
+        jac_compiled=system.jac(params, z_guess) if implicit else None,
+        x0=x0,
         t0=tspan[0],
         tspan=tspan,
         mapping=mapping,
         options=options,
     )
+    return _attach_algebraic(sol, system, orders, params, z_guess)
 
 
 def _solve_symbolic(eqs, orders, ivp, bvp, tspan, params, events, options):

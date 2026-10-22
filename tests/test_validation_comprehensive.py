@@ -128,14 +128,10 @@ class TestValidateIVP:
         # Should not raise any exception
         validate_ivp(orders, ivp, 0.0)
 
-    def test_zero_order_with_extra_condition(self):
-        """Test zero-order variable with unnecessary condition."""
+    def test_zero_order_value_is_a_guess(self):
+        """A value for an algebraic (zero-order) variable is a starting guess."""
         y = var("y")
-        orders = {y: 0}
-        ivp = {y: 1.0}  # Extra condition for zero-order variable
-
-        with pytest.raises(OverdeterminedConditionsError):
-            validate_ivp(orders, ivp, 0.0)
+        validate_ivp({y: 0}, {y: 1.0}, 0.0)  # no error
 
     def test_first_order_system(self):
         """Test first-order system validation."""

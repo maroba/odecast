@@ -71,6 +71,12 @@ def equilibria(equation, params: dict | None = None, *, tol: float = 1e-10):
     orders = resolve_orders(list(inferred), inferred)
     system = compile_system(eqs, orders)
     mapping = build_state_map(orders)
+    if system.is_dae and (system.invariants or not system.algebraic_exprs):
+        raise ValueError(
+            "Equilibria of differential-algebraic systems are only supported if "
+            "the algebraic equations are linear in the algebraic variables and "
+            "determine them directly (index 1)"
+        )
 
     f = substitute_params(system.f_sym, params)
     if t.symbol in f.free_symbols:
@@ -97,6 +103,10 @@ def equilibria(equation, params: dict | None = None, *, tol: float = 1e-10):
         point = {
             v: values[states[i]] for (v, level), i in mapping.items() if level == 0
         }
+        for v in orders:
+            if v.name in system.algebraic_exprs:
+                expr = substitute_params(system.algebraic_exprs[v.name], params)
+                point[v] = expr.subs(sol).subs(names)
         jacobian = substitute_params(system.jac_sym, params).subs(sol).subs(names)
         result.append(_classify(point, jacobian, tol))
     return result

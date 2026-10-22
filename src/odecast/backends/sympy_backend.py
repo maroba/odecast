@@ -8,7 +8,7 @@ from sympy.core.function import AppliedUndef
 
 from ..analyze import collect_variables, infer_orders
 from ..equation import Eq
-from ..errors import BackendError
+from ..errors import BackendError, NonSolvableFormError
 from ..symbols import Derivative, Variable, VectorDerivative, substitute_params
 
 
@@ -143,15 +143,21 @@ class SymPyBackend:
         def sympy_eq(eq):
             return substitute_params(eq.sympy(), params)
 
-        variables = list(infer_orders(equations))
-        funcs = {v: sp.Function(v.name)(t_symbol) for v in variables}
-
-        if len(equations) != len(variables):
+        orders = infer_orders(equations)
+        if len(equations) != len(orders):
             raise BackendError(
                 f"SymPy backend needs one equation per variable, got "
                 f"{len(equations)} equation(s) for variables "
-                f"{[v.name for v in variables]}"
+                f"{[v.name for v in orders]}"
             )
+
+        by_name = {v.name: v for v in orders}
+        algebraic = {}
+        if any(order == 0 for order in orders.values()):
+            equations, algebraic = _eliminate_algebraic(equations, orders)
+            conditions = [c for c in conditions if c[0] not in algebraic]
+        variables = [v for v, order in orders.items() if order > 0]
+        funcs = {v: sp.Function(v.name)(t_symbol) for v in variables}
 
         def ics_for(vs):
             ics = {}
@@ -192,7 +198,9 @@ class SymPyBackend:
                 )
             return {v: by_name[v.name] for v in vs}
 
-        groups = [(eq, list(collect_variables([eq]))) for eq in equations]
+        groups = [
+            (eq, [by_name[v.name] for v in collect_variables([eq])]) for eq in equations
+        ]
         decoupled = all(len(vs) == 1 for _, vs in groups) and len(
             {vs[0] for _, vs in groups}
         ) == len(groups)
@@ -204,4 +212,50 @@ class SymPyBackend:
         else:
             solutions.update(dsolve(equations, variables))
 
+        # Algebraic variables follow from the solution of the differential ones
+        known = {funcs[v]: expr for v, expr in solutions.items()}
+        for v, expr in algebraic.items():
+            solutions[v] = substitute_params(expr, params).subs(known).doit()
+
         return SolutionExpr(solutions, t_symbol)
+
+
+def _eliminate_algebraic(equations: list[Eq], orders: dict) -> tuple[list[Eq], dict]:
+    """
+    Eliminate algebraic variables (index 1, linear) from a system.
+
+    Returns:
+        The remaining differential equations, and the algebraic variables as
+        expressions in the differential variables and their derivatives
+    """
+    from ..compile import compile_system
+    from ..reduce import build_state_map
+    from ..symbols import as_sympy
+
+    try:
+        system = compile_system(equations, orders)
+    except NonSolvableFormError as e:
+        raise BackendError(str(e)) from e
+    if system.invariants or not system.algebraic_exprs:
+        raise BackendError(
+            "The SymPy backend supports algebraic equations only if they are "
+            "linear in the algebraic variables and determine them directly (index 1)"
+        )
+    mapping = build_state_map(orders)
+    back = {
+        system.state_syms[i]: v.d(level).sympy() if level else v.sympy()
+        for (v, level), i in mapping.items()
+    }
+    algebraic = {
+        v: system.algebraic_exprs[v.name].xreplace(back)
+        for v, order in orders.items()
+        if order == 0
+    }
+    z_subs = {v.sympy(): expr for v, expr in algebraic.items()}
+
+    remaining = []
+    for eq in equations:
+        residual = (as_sympy(eq.lhs) - as_sympy(eq.rhs)).xreplace(z_subs)
+        if sp.simplify(residual) != 0:  # algebraic equations are now satisfied
+            remaining.append(Eq(residual, 0))
+    return remaining, algebraic

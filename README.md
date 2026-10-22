@@ -74,6 +74,10 @@ for coupled systems of mixed order, which is the case odecast is designed for.
 - **Initial and boundary value problems.** Two-point boundary value problems
   are solved with `scipy.integrate.solve_bvp`. Events, such as a body
   reaching the ground, are located during integration.
+- **Differential-algebraic equations.** Variables without derivatives are
+  algebraic. Constraints such as `Eq(x**2 + y**2, L**2)` are handled by index
+  reduction with stabilization; algebraic equations without closed-form
+  solution are solved numerically.
 - **Stiff problems.** Implicit solvers receive the exact Jacobian.
 - **Symbolic solutions.** The SymPy backend returns closed-form solutions,
   with initial or boundary conditions applied.
@@ -160,6 +164,23 @@ for kv in [1.0, 2.0, 4.0]:
     sol = solve(Eq(u.d(), A @ u), ivp={u: [1, 0]}, tspan=(0, 10), params={k: kv})
 ```
 
+### Differential-algebraic equations
+
+A pendulum in Cartesian coordinates, with the string tension `lam` as an
+algebraic variable:
+
+```python
+x, y, lam = var("x"), var("y"), var("lam")
+eqs = [
+    Eq(x.d(2), -lam * x),
+    Eq(y.d(2), -lam * y - 9.81),
+    Eq(x**2 + y**2, 1),
+]
+sol = solve(eqs, ivp={x: 0.6, x.d(): 0, y: -0.8, y.d(): 0}, tspan=(0, 10))
+sol[lam]                      # tension
+sol.constraint_residuals()    # remaining violation of x**2 + y**2 = 1
+```
+
 ### Events
 
 ```python
@@ -218,6 +239,11 @@ odecast is at an early stage (alpha). In particular:
   two variables such as `M @ u` does not.
 - The SymPy backend can solve what `sympy.dsolve` can solve: single
   equations and linear systems, but generally not nonlinear coupled systems.
+- Differential-algebraic systems are reduced by differentiating constraints
+  one at a time; structures that need the Pantelides algorithm are not
+  supported. Boundary value problems, the SymPy backend and `equilibria()`
+  support only algebraic equations that are linear in the algebraic
+  variables and determine them directly (index 1).
 
 ## Examples
 

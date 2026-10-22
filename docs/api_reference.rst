@@ -87,6 +87,12 @@ Validation
    :undoc-members:
    :show-inheritance:
 
+Differential-algebraic equations
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. automodule:: odecast.dae
+   :members: compile_dae, NumericDAE
+
 Backends
 ~~~~~~~~
 

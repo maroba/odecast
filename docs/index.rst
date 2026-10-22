@@ -32,6 +32,7 @@ Main features:
 * vector- and matrix-valued variables and matrix products;
 * parameters, with compiled systems reused across parameter values;
 * initial value problems with events, and two-point boundary value problems;
+* differential-algebraic equations, including index reduction;
 * validation of initial and boundary conditions before solving;
 * numerical (SciPy) and symbolic (SymPy) backends;
 * equilibria and their stability, and fitting parameters to data.

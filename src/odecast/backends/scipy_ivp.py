@@ -54,7 +54,9 @@ class ScipyIVPBackend:
         sol = solve_ivp(fun=f_compiled, t_span=tspan, y0=x0, **options)
 
         if not sol.success:
-            raise RuntimeError(f"SciPy solve_ivp failed: {sol.message}")
+            reason = getattr(f_compiled, "failure", None)
+            detail = f" Last problem: {reason}" if reason else ""
+            raise RuntimeError(f"SciPy solve_ivp failed: {sol.message}{detail}")
 
         return SolutionIVP(
             t=sol.t,

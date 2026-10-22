@@ -229,6 +229,107 @@ determines which one is found. The Bratu problem
    upper = solve(eq, bvp=bcs, tspan=(0, 1),
                  guess={y: lambda t: 12*t*(1 - t)})   # y(0.5) = 4.09
 
+Differential-algebraic equations
+--------------------------------
+
+A variable that occurs without derivatives is *algebraic*. It is determined
+by the equations that contain no highest derivative, the *algebraic
+equations*. No special syntax is needed:
+
+.. code-block:: python
+
+   # Fast equilibrium A <=> B (B = K A) followed by a slow reaction B -> C.
+   # T = A + B is the total amount of A and B.
+   T, C, A, B = var("T"), var("C"), var("A"), var("B")
+   k, K = 0.5, 3.0
+   eqs = [
+       Eq(T.d(), -k*B),
+       Eq(C.d(), k*B),
+       Eq(B, K*A),        # algebraic
+       Eq(A + B, T),      # algebraic
+   ]
+   sol = solve(eqs, ivp={T: 1.0, C: 0.0}, tspan=(0, 10))
+   sol[B]                 # algebraic variables are part of the solution
+
+Initial conditions are only needed for the differential variables. The
+number of algebraic equations must equal the number of algebraic variables.
+
+odecast reduces the system to ordinary differential equations in three
+ways, depending on its structure.
+
+Algebraic variables determined directly (index 1)
+   If the algebraic equations can be solved for the algebraic variables and
+   are *linear* in them, as above, the algebraic variables are eliminated
+   symbolically. The result is an ordinary system; everything else (events,
+   parameters, the SymPy backend, equilibria, fitting) works as usual.
+
+Constraints on the states (higher index)
+   An algebraic equation may not contain any algebraic variable at all. The
+   classic example is a pendulum of length :math:`L` in Cartesian
+   coordinates, where the string tension :math:`\lambda` (per unit mass and
+   length) keeps the bob on the circle:
+
+   .. code-block:: python
+
+      x, y, lam = var("x"), var("y"), var("lam")
+      eqs = [
+          Eq(x.d(2), -lam*x),
+          Eq(y.d(2), -lam*y - 9.81),
+          Eq(x**2 + y**2, 1),    # constraint without lam
+      ]
+      sol = solve(eqs, ivp={x: 0.6, x.d(): 0, y: -0.8, y.d(): 0}, tspan=(0, 10))
+
+   Such a constraint is differentiated with respect to :math:`t` until an
+   algebraic variable appears: here twice, after which :math:`\lambda`
+   follows from the equations of motion. The *index* of the system is the
+   number of differentiations plus one; the pendulum has index 3.
+
+   The initial values must satisfy the constraint and the derivatives that
+   were taken, i.e. the bob starts on the circle with a tangential velocity.
+   odecast checks this and reports inconsistent initial values.
+
+   Numerically, only the differentiated constraint is enforced, so the
+   solution would slowly drift away from the original one. odecast damps
+   this drift with Baumgarte stabilization: the :math:`k`-th derivative
+   :math:`c^{(k)} = 0` of a constraint :math:`c` is replaced by
+   :math:`(d/dt + \alpha)^k c = 0`. The rate :math:`\alpha` is chosen as five
+   times the largest absolute eigenvalue of the Jacobian at the initial
+   point, so that violations decay faster than the dynamics evolve.
+   ``solve(..., baumgarte=alpha)`` sets it explicitly; ``baumgarte=0``
+   disables the stabilization. The remaining violation is available as
+   ``sol.constraint_residuals()``; it is of the order of the solver
+   tolerance.
+
+Algebraic equations without closed-form solution
+   If the (possibly differentiated) algebraic equations are not linear in
+   the algebraic variables, they are solved numerically with Newton's method
+   each time the right-hand side is evaluated, starting from the previous
+   solution. Values given for algebraic variables in ``ivp`` are used as the
+   starting guess at the initial time. Where an equation has several
+   solutions, the guess selects one:
+
+   .. code-block:: python
+
+      y, z = var("y"), var("z")
+      eqs = [Eq(y.d(), -z), Eq(z**2, y)]
+
+      solve(eqs, ivp={y: 1.0, z: 0.5}, tspan=(0, 1))    # follows z = +sqrt(y)
+      solve(eqs, ivp={y: 1.0, z: -0.5}, tspan=(0, 1))   # follows z = -sqrt(y)
+
+   For implicit solvers, the Jacobian is computed from the implicit function
+   theorem. If the algebraic equations have no solution at some point, the
+   integration stops with an error that names the time.
+
+Limitations:
+
+* Only constraints that can be differentiated one at a time are reduced.
+  Systems whose algebraic equations remain singular after this (which would
+  require the Pantelides algorithm) are rejected with an error.
+* Boundary value problems, the SymPy backend and :func:`~odecast.equilibria`
+  support only the first case (index 1, linear).
+* Events may involve algebraic variables only if they are eliminated
+  symbolically.
+
 Events
 ------
 

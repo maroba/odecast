@@ -23,6 +23,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   their stability from the eigenvalues of the Jacobian.
 - `fit()` estimates parameters of initial value problems from measurements
   by nonlinear least squares, with standard errors.
+- Differential-algebraic equations. A variable without derivatives is
+  algebraic and determined by the equations without highest derivatives.
+  - Algebraic equations that are linear in the algebraic variables are
+    eliminated symbolically (index 1).
+  - Constraints without algebraic variables (higher index, e.g. a pendulum
+    in Cartesian coordinates) are differentiated until the algebraic
+    variables are determined. Initial values are checked for consistency,
+    and drift is damped by Baumgarte stabilization (`baumgarte=` option).
+    `sol.constraint_residuals()` shows the remaining violation.
+  - Other algebraic equations are solved numerically with Newton's method at
+    each evaluation; values for algebraic variables in `ivp` are starting
+    guesses.
 - `sol.plot()` and `sol.to_pandas()` for numerical solutions.
 - LaTeX rendering of equations and symbolic solutions in Jupyter, and
   `odecast.latex()`.
@@ -36,6 +48,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Jacobian, computed symbolically.
 - The `examples` and `dev` extras include pandas; `dev` also includes
   Matplotlib.
+- A value for a variable that has no derivatives is no longer rejected as an
+  extra initial condition; it is the starting guess for that algebraic
+  variable.
 
 ### Fixed
 
@@ -44,6 +59,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `scipy.integrate.solve_ivp`, e.g. `t_eval` and `first_step`.
 - Multiplying a SymPy expression by a vector variable (`k * u`) raised an
   error.
+- A variable without derivatives led to an obscure `NameError` inside the
+  compiled right-hand side.
 
 ## [0.2.0] - 2026-10-22
 
