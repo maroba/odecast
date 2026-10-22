@@ -2,14 +2,15 @@
 Unit tests for Playbook 5 functionality - compilation and SciPy backend
 """
 
-import pytest
 import numpy as np
+import pytest
 import sympy as sp
-from odecast import var, Eq, solve, t
-from odecast.compile import lambdify_rhs
+
+from odecast import Eq, solve, t, var
 from odecast.backends.scipy_ivp import convert_ivp_to_state_vector
-from odecast.solution import SolutionIVP
+from odecast.compile import lambdify_rhs
 from odecast.errors import MissingInitialConditionError
+from odecast.solution import SolutionIVP
 
 
 class TestCompilation:
@@ -175,7 +176,7 @@ class TestIntegratedWorkflow:
         eq = Eq(y.d(2) + y, 0)
         sol = solve(eq, ivp={y: 1.0, y.d(): 0.0}, tspan=(0.0, 1.0), backend="scipy")
 
-        f, jac, x0, t0, mapping = sol.as_first_order()
+        f, _jac, x0, t0, mapping = sol.as_first_order()
 
         # Check types and shapes
         assert callable(f)

@@ -3,7 +3,8 @@ Unit tests for the analyze module.
 """
 
 import pytest
-from odecast import var, Eq
+
+from odecast import Eq, var
 from odecast.analyze import collect_variables, infer_orders, resolve_orders
 from odecast.errors import OrderMismatchError
 

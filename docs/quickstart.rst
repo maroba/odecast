@@ -1,138 +1,94 @@
-Quick Start Guide
-=================
+Quickstart
+==========
 
-This guide provides a quick introduction to Odecast's basic functionality.
+Solving an equation with odecast involves three steps: declaring the unknown
+functions, writing the equations, and calling :func:`odecast.solve`.
 
-Basic Concepts
---------------
+Variables
+---------
 
-Odecast operates on three main concepts:
-
-1. **Variables**: Mathematical variables and their derivatives
-2. **Equations**: Mathematical relationships between variables
-3. **Solutions**: Numerical or symbolic results
-
-Creating Variables
-------------------
-
-Variables are created using the ``var`` function:
+:func:`odecast.var` declares an unknown function of the independent
+variable :math:`t`. Derivatives are written with ``.d()``:
 
 .. code-block:: python
 
    from odecast import var
 
-   # Scalar variable
    y = var("y")
+   y.d()     # y'
+   y.d(2)    # y''
 
-   # Vector variable
-   u = var("u", shape=2)  # 2D vector
-   v = var("v", shape=3)  # 3D vector
+Vector-valued unknowns are declared with ``shape``; see :doc:`user_guide`.
 
-Derivatives are accessed using the ``.d()`` method:
+Equations
+---------
 
-.. code-block:: python
-
-   y_prime = y.d()      # First derivative: y'
-   y_double_prime = y.d(2)  # Second derivative: y''
-
-   # For vector variables
-   u_dot = u.d()        # Vector of first derivatives
-   u_ddot = u.d(2)      # Vector of second derivatives
-
-Writing Equations
------------------
-
-Equations are created using the ``Eq`` function:
+:class:`odecast.Eq` takes a left-hand and a right-hand side:
 
 .. code-block:: python
 
    from odecast import Eq
 
-   # Simple harmonic oscillator: y'' + y = 0
-   eq1 = Eq(y.d(2) + y, 0)
+   Eq(y.d(2) + y, 0)               # y'' + y = 0
+   Eq(y.d(2) + 0.1*y.d() + y, 0)   # y'' + 0.1 y' + y = 0
 
-   # Damped oscillator: y'' + 0.1*y' + y = 0
-   eq2 = Eq(y.d(2) + 0.1*y.d() + y, 0)
+Terms that depend explicitly on :math:`t` are written with SymPy functions
+of ``t.symbol``:
 
-   # Non-homogeneous: y'' + y = sin(t)
-   from odecast import t
+.. code-block:: python
+
    import sympy as sp
-   eq3 = Eq(y.d(2) + y, sp.sin(t))
+   from odecast import t
 
-Solving ODEs
-------------
+   Eq(y.d(2) + y, sp.sin(t.symbol))   # y'' + y = sin(t)
 
-Use the ``solve`` function to solve differential equations:
+Solving
+-------
+
+An initial value problem needs a value for each variable and each of its
+derivatives below the highest order that occurs, here :math:`y(0)` and
+:math:`y'(0)`:
 
 .. code-block:: python
 
    from odecast import solve
 
-   # Define the problem
-   y = var("y")
-   equation = Eq(y.d(2) + 0.3*y.d() + y, 0)
+   eq = Eq(y.d(2) + 0.3*y.d() + y, 0)
+   sol = solve(eq, ivp={y: 1.0, y.d(): 0.0}, tspan=(0, 10))
 
-   # Solve with initial conditions
-   solution = solve(
-       equation,
-       ivp={y: 1.0, y.d(): 0.0},  # Initial conditions
-       tspan=(0, 10),              # Time span
-       backend="scipy"             # Solver backend
-   )
+The initial conditions are taken at ``tspan[0]``. By default the equation is
+integrated with :func:`scipy.integrate.solve_ivp`.
 
-Accessing Results
------------------
-
-Solution objects provide easy access to results:
+Results
+-------
 
 .. code-block:: python
 
-   # Time points
-   times = solution.t
+   sol.t                # time points chosen by the integrator
+   sol[y]               # y at those points
+   sol[y.d()]           # y' at those points
+   sol.eval(y, 5.0)     # y(5), interpolated
+   sol.eval(y, [1, 2])  # y at several points
 
-   # Variable values
-   y_values = solution[y]
-   y_prime_values = solution[y.d()]
-
-   # Evaluate at specific times
-   y_at_5 = solution.eval(y, 5.0)
-   y_prime_at_5 = solution.eval(y.d(), 5.0)
-
-Complete Example
-----------------
-
-Here's a complete example solving a damped harmonic oscillator:
+Full example
+------------
 
 .. code-block:: python
 
-   import numpy as np
    import matplotlib.pyplot as plt
+   import numpy as np
    from odecast import var, Eq, solve
 
-   # Define the system: y'' + 0.3*y' + y = 0
    y = var("y")
-   equation = Eq(y.d(2) + 0.3*y.d() + y, 0)
+   eq = Eq(y.d(2) + 0.3*y.d() + y, 0)
+   sol = solve(eq, ivp={y: 1.0, y.d(): 0.0}, tspan=(0, 10))
 
-   # Set initial conditions: y(0) = 1, y'(0) = 0
-   initial_conditions = {y: 1.0, y.d(): 0.0}
-
-   # Solve over time interval [0, 10]
-   solution = solve(equation, ivp=initial_conditions, tspan=(0, 10))
-
-   # Plot results
-   plt.figure(figsize=(10, 6))
-   plt.plot(solution.t, solution[y], label='Position')
-   plt.plot(solution.t, solution[y.d()], label='Velocity')
-   plt.xlabel('Time')
-   plt.ylabel('Value')
-   plt.title('Damped Harmonic Oscillator')
+   t = np.linspace(0, 10, 500)
+   plt.plot(t, sol.eval(y, t), label="y")
+   plt.plot(t, sol.eval(y.d(), t), label="y'")
+   plt.xlabel("t")
    plt.legend()
-   plt.grid(True)
    plt.show()
 
-Next Steps
-----------
-
-* Learn about :doc:`user_guide` for more advanced features
-* Explore :doc:`examples` for real-world applications
-* Check the :doc:`api_reference` for detailed function documentation
+Where to go next: the :doc:`user_guide` covers systems, vector variables and
+backends; :doc:`examples` contains worked problems from several fields.

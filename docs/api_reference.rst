@@ -1,53 +1,41 @@
 API Reference
 =============
 
-This section provides detailed documentation for all Odecast functions and classes.
-
-Core Functions
---------------
-
-.. automodule:: odecast.api
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-Variables and Equations
------------------------
+Public interface
+----------------
 
 .. autofunction:: odecast.var
 
-.. autofunction:: odecast.Eq
+.. autoclass:: odecast.Eq
 
 .. autodata:: odecast.t
-
-Solving Functions
------------------
+   :annotation:
 
 .. autofunction:: odecast.solve
 
-Solution Classes
-----------------
+.. autoclass:: odecast.BC
 
-.. autoclass:: odecast.solution.Solution
+Solutions
+---------
+
+.. autoclass:: odecast.solution.SolutionIVP
    :members:
-   :undoc-members:
-   :show-inheritance:
 
-Validation and Errors
----------------------
+Exceptions
+----------
 
 .. automodule:: odecast.errors
    :members:
    :undoc-members:
    :show-inheritance:
 
-Internal Modules
-----------------
+Internals
+---------
 
-The following modules are primarily for internal use but may be useful for 
-advanced users or contributors.
+The modules below implement the reduction to a first-order system. They are
+not part of the stable interface but are documented for contributors.
 
-Equation Analysis
+Equation analysis
 ~~~~~~~~~~~~~~~~~
 
 .. automodule:: odecast.analyze
@@ -63,7 +51,7 @@ Compilation
    :undoc-members:
    :show-inheritance:
 
-Order Reduction
+Order reduction
 ~~~~~~~~~~~~~~~
 
 .. automodule:: odecast.reduce
@@ -79,8 +67,8 @@ Validation
    :undoc-members:
    :show-inheritance:
 
-Backend Implementations
-~~~~~~~~~~~~~~~~~~~~~~~
+Backends
+~~~~~~~~
 
 .. automodule:: odecast.backends.scipy_ivp
    :members:

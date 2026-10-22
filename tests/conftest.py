@@ -16,7 +16,7 @@ def sample_variable():
 @pytest.fixture
 def sample_equation():
     """Create a sample equation for testing."""
-    from odecast import var, Eq
+    from odecast import Eq, var
 
     y = var("y")
     return Eq(y.d(2) + y, 0)

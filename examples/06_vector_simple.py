@@ -12,7 +12,7 @@ Mathematical model:
 This represents a 2D harmonic oscillator where u = [x, y].
 """
 
-from odecast import var, Eq, solve
+from odecast import Eq, solve, var
 
 
 def main():
@@ -92,18 +92,6 @@ def main():
         pos = sol.eval(u, t_eval)  # Returns [x, y] at time t_eval
         vel = sol.eval(u.d(), t_eval)  # Returns [vx, vy] at time t_eval
         print(f"t={t_eval}: position={pos}, velocity={vel}")
-
-    print()
-    print("Key features demonstrated:")
-    print("  ✓ Vector variable creation with var('u', shape=2)")
-    print("  ✓ Vector equation notation: u.d(2) + u = 0")
-    print("  ✓ Vector initial conditions: {u: [...], u.d(): [...]}")
-    print("  ✓ Vector solution access: sol[u] returns 2×N array")
-    print("  ✓ Component access: sol[u[0]], sol[u[1]] return 1D arrays")
-    print("  ✓ Vector derivative access: sol[u.d()] returns 2×N array")
-    print("  ✓ Evaluation at specific times with sol.eval()")
-
-    print("\nExample completed successfully!")
 
 
 if __name__ == "__main__":

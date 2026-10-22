@@ -3,13 +3,14 @@ Comprehensive tests for Playbook 6 - Validation and precise errors
 """
 
 import pytest
-from odecast import var, Eq, solve
-from odecast.validate import normalize_ivp, validate_ivp
+
+from odecast import Eq, solve, var
 from odecast.errors import (
     MissingInitialConditionError,
-    OverdeterminedConditionsError,
     OrderMismatchError,
+    OverdeterminedConditionsError,
 )
+from odecast.validate import normalize_ivp, validate_ivp
 
 
 class TestNormalizeIVP:

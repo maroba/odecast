@@ -6,16 +6,16 @@ This script demonstrates all the key vector variable features in odecast.
 Run this to see a comprehensive showcase of vector functionality.
 """
 
-from odecast import var, Eq, solve
+from odecast import Eq, solve, var
 
 
 def demo_vector_features():
     """Demonstrate all vector variable features."""
-    print("🚀 Odecast Vector/Matrix Variables Demo")
+    print("Odecast Vector/Matrix Variables Demo")
     print("=" * 50)
 
     # Feature 1: Vector Variable Creation
-    print("\n1️⃣ Vector Variable Creation")
+    print("\n1. Vector Variable Creation")
     print("-" * 30)
 
     u = var("u", shape=2)
@@ -25,7 +25,7 @@ def demo_vector_features():
     print(f"3D vector: {v} with components {v[0]}, {v[1]}, {v[2]}")
 
     # Feature 2: Vector Derivatives
-    print("\n2️⃣ Vector Derivatives")
+    print("\n2. Vector Derivatives")
     print("-" * 20)
 
     u_dot = u.d()
@@ -36,7 +36,7 @@ def demo_vector_features():
     print(f"Component access:  {u_dot.variable[0]}, {u_dot.variable[1]}")
 
     # Feature 3: Vector Equations
-    print("\n3️⃣ Vector Equations & Auto-Expansion")
+    print("\n3. Vector Equations & Auto-Expansion")
     print("-" * 35)
 
     eq = Eq(u.d(2) + 2 * u.d() + u, 0)
@@ -50,7 +50,7 @@ def demo_vector_features():
         print(f"  Component {i}: {comp_eq}")
 
     # Feature 4: Vector IVP Solving
-    print("\n4️⃣ Vector IVP Solving")
+    print("\n4. Vector IVP Solving")
     print("-" * 22)
 
     # Simple harmonic oscillator: u'' + u = 0
@@ -62,10 +62,10 @@ def demo_vector_features():
     print(f"IVP: {ivp}")
 
     sol = solve(eq_simple, ivp=ivp, tspan=(0, 2), backend="scipy")
-    print(f"✓ Solved! Got {len(sol.t)} time points")
+    print(f"Solved! Got {len(sol.t)} time points")
 
     # Feature 5: Vector Solution Access
-    print("\n5️⃣ Vector Solution Access")
+    print("\n5. Vector Solution Access")
     print("-" * 26)
 
     # Vector access
@@ -83,7 +83,7 @@ def demo_vector_features():
     print(f"Velocity sol[u.d()] shape: {u_vel.shape}")
 
     # Feature 6: Vector Evaluation
-    print("\n6️⃣ Vector Evaluation at Specific Times")
+    print("\n6. Vector Evaluation at Specific Times")
     print("-" * 40)
 
     eval_times = [0.0, 0.5, 1.0, 1.5, 2.0]
@@ -93,7 +93,7 @@ def demo_vector_features():
         print(f"t={t_val}: pos={pos}, vel={vel}")
 
     # Feature 7: Mixed Vector/Scalar Systems
-    print("\n7️⃣ Mixed Vector/Scalar Systems")
+    print("\n7. Mixed Vector/Scalar Systems")
     print("-" * 33)
 
     x = var("x")  # Scalar
@@ -119,7 +119,7 @@ def demo_vector_features():
     print(f"Mixed IVP: {mixed_ivp}")
 
     mixed_sol = solve(mixed_eqs, ivp=mixed_ivp, tspan=(0, 1), backend="scipy")
-    print(f"✓ Mixed system solved! {len(mixed_sol.t)} points")
+    print(f"Mixed system solved! {len(mixed_sol.t)} points")
 
     # Show final values
     x_final = mixed_sol.eval(x, 1.0)
@@ -127,7 +127,7 @@ def demo_vector_features():
     print(f"Final values: x(1)={x_final:.4f}, w(1)={w_final}")
 
     # Feature 8: SymPy Backend with Vectors
-    print("\n8️⃣ SymPy Backend with Vector Equations")
+    print("\n8. SymPy Backend with Vector Equations")
     print("-" * 38)
 
     try:
@@ -141,32 +141,13 @@ def demo_vector_features():
         u0_expr = sym_sol.as_expr(u[0])
         u1_expr = sym_sol.as_expr(u[1])
 
-        print("✓ Symbolic solution:")
+        print("Symbolic solution:")
         print(f"  u[0](t) = {u0_expr}")
         print(f"  u[1](t) = {u1_expr}")
 
     except Exception as e:
         print(f"Symbolic solving failed: {e}")
         print("(This is expected for some complex cases)")
-
-    print("\n🎉 Vector Features Demo Complete!")
-    print("\nKey achievements:")
-    achievements = [
-        "✅ Vector variable creation and component access",
-        "✅ Vector derivatives and automatic equation expansion",
-        "✅ Vector initial value problems with flexible IVP syntax",
-        "✅ Comprehensive solution access (vector, component, derivative)",
-        "✅ Solution evaluation at arbitrary time points",
-        "✅ Mixed vector/scalar systems with automatic validation",
-        "✅ Both SciPy (numeric) and SymPy (symbolic) backend support",
-        "✅ Robust error handling and user-friendly interfaces",
-    ]
-
-    for achievement in achievements:
-        print(f"  {achievement}")
-
-    print("\n📊 Total tests passed: All vector functionality working!")
-    print("🚀 Ready for production use!")
 
 
 if __name__ == "__main__":

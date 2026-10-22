@@ -2,9 +2,12 @@
 Solution objects for storing and accessing ODE solutions
 """
 
+from collections.abc import Callable
+from typing import Any
+
 import numpy as np
-from typing import Dict, Any, Callable, Optional, Union, Tuple
-from .symbols import Variable, Derivative
+
+from .symbols import Derivative, Variable
 
 
 class SolutionIVP:
@@ -18,9 +21,9 @@ class SolutionIVP:
         y: np.ndarray,
         mapping: Any,  # StateMapping from reduce.py
         t0: float,
-        f_compiled: Optional[Callable] = None,
-        jac_compiled: Optional[Callable] = None,
-        x0: Optional[np.ndarray] = None,
+        f_compiled: Callable | None = None,
+        jac_compiled: Callable | None = None,
+        x0: np.ndarray | None = None,
     ):
         """
         Initialize IVP solution.
@@ -42,7 +45,7 @@ class SolutionIVP:
         self._jac_compiled = jac_compiled
         self._x0 = x0
 
-    def __getitem__(self, target: Union[Variable, Derivative]) -> np.ndarray:
+    def __getitem__(self, target: Variable | Derivative) -> np.ndarray:
         """
         Access solution values for a specific variable or derivative.
 
@@ -119,9 +122,7 @@ class SolutionIVP:
                     f"Target must be Variable, Derivative, or VectorDerivative, got {type(target)}"
                 )
 
-    def eval(
-        self, target, tpoints: Union[float, np.ndarray]
-    ) -> Union[float, np.ndarray]:
+    def eval(self, target, tpoints: float | np.ndarray) -> float | np.ndarray:
         """
         Evaluate solution at specific time points using interpolation.
 
@@ -153,7 +154,7 @@ class SolutionIVP:
 
     def as_first_order(
         self,
-    ) -> Tuple[Callable, Optional[Callable], np.ndarray, float, Dict]:
+    ) -> tuple[Callable, Callable | None, np.ndarray, float, dict]:
         """
         Return first-order system representation.
 

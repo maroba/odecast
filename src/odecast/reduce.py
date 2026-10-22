@@ -2,11 +2,11 @@
 Reduction of higher-order ODEs to first-order systems
 """
 
-from typing import Dict, List, Optional, Union
 import sympy as sp
-from .symbols import Variable, t
+
 from .equation import Eq
 from .errors import NonSolvableFormError
+from .symbols import Variable, t
 
 
 class StateMapping(dict):
@@ -43,7 +43,7 @@ class VariableIndexer:
         """Iterate over all derivative levels for this variable."""
         # Find all levels for this variable
         levels = []
-        for key in self.mapping.keys():
+        for key in self.mapping:
             if isinstance(key, tuple) and len(key) == 2 and key[0] is self.variable:
                 levels.append(key[1])
 
@@ -54,14 +54,14 @@ class VariableIndexer:
     def __len__(self):
         """Return number of derivative levels for this variable."""
         count = 0
-        for key in self.mapping.keys():
+        for key in self.mapping:
             if isinstance(key, tuple) and len(key) == 2 and key[0] is self.variable:
                 count += 1
         return count
 
 
 def build_state_map(
-    orders: Dict[Variable, int],
+    orders: dict[Variable, int],
 ) -> StateMapping:
     """
     Build a state mapping for converting higher-order ODEs to first-order systems.
@@ -88,8 +88,8 @@ def build_state_map(
 
 
 def isolate_highest_derivatives(
-    eqs: List[Eq], orders: Dict[Variable, int]
-) -> Dict[Variable, sp.Expr]:
+    eqs: list[Eq], orders: dict[Variable, int]
+) -> dict[Variable, sp.Expr]:
     """
     Isolate the highest derivatives in the equations.
 
@@ -152,7 +152,7 @@ def isolate_highest_derivatives(
 
             highest_rules[var] = solution
 
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001 - any SymPy failure means not solvable
             raise NonSolvableFormError(
                 f"Failed to isolate highest derivative {var.name}^({order}) "
                 f"from equation: {found_equation}. Error: {e}"
@@ -163,10 +163,10 @@ def isolate_highest_derivatives(
 
 def make_rhs(
     t_symbol: sp.Symbol,
-    mapping: Dict[Union[Variable, tuple], Union[List[int], int]],
-    highest_rules: Dict[Variable, sp.Expr],
-    params: Optional[Dict[str, float]] = None,
-) -> tuple[sp.Matrix, Optional[sp.Matrix]]:
+    mapping: dict[Variable | tuple, list[int] | int],
+    highest_rules: dict[Variable, sp.Expr],
+    params: dict[str, float] | None = None,
+) -> tuple[sp.Matrix, sp.Matrix | None]:
     """
     Build the right-hand side vector field f(t, x) for the first-order system.
 
@@ -186,9 +186,8 @@ def make_rhs(
     for key, value in mapping.items():
         if isinstance(key, tuple):  # (var, level) keys
             max_index = max(max_index, value)
-        elif isinstance(key, Variable):  # var keys with lists
-            if isinstance(value, list):
-                max_index = max(max_index, max(value) if value else -1)
+        elif isinstance(key, Variable) and isinstance(value, list):
+            max_index = max(max_index, max(value) if value else -1)
 
     n_states = max_index + 1
 
@@ -256,8 +255,8 @@ def make_rhs(
 
 def _substitute_derivatives_with_states(
     expr: sp.Expr,
-    mapping: Dict[Union[Variable, tuple], Union[List[int], int]],
-    state_symbols: List[sp.Symbol],
+    mapping: dict[Variable | tuple, list[int] | int],
+    state_symbols: list[sp.Symbol],
 ) -> sp.Expr:
     """
     Helper function to substitute derivatives with state variables in a SymPy expression.
@@ -305,9 +304,9 @@ def _substitute_derivatives_with_states(
     for deriv, func_name, deriv_order in derivatives_with_order:
         # Find the corresponding Variable by name
         corresponding_var = None
-        for key in mapping.keys():
+        for key in mapping:
             if isinstance(key, tuple) and len(key) == 2:
-                var, order = key
+                var, _order = key
                 if isinstance(var, Variable) and var.name == func_name:
                     corresponding_var = var
                     break
@@ -327,9 +326,9 @@ def _substitute_derivatives_with_states(
         if len(func.args) == 1 and func.args[0] == t.symbol:
             # Find corresponding variable
             corresponding_var = None
-            for key in mapping.keys():
+            for key in mapping:
                 if isinstance(key, tuple) and len(key) == 2:
-                    var, order = key
+                    var, _order = key
                     if isinstance(var, Variable) and var.name == func_name:
                         corresponding_var = var
                         break

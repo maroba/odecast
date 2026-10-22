@@ -2,14 +2,14 @@
 Analysis functions for ODEs - order inference, validation, etc.
 """
 
-from typing import Set, List, Dict
 import sympy as sp
-from .symbols import Variable, Derivative
+
 from .equation import Eq
 from .errors import OrderMismatchError
+from .symbols import Derivative, Variable
 
 
-def collect_variables(eqs: List[Eq]) -> Set[Variable]:
+def collect_variables(eqs: list[Eq]) -> set[Variable]:
     """
     Collect all variables used in the given equations.
 
@@ -35,7 +35,7 @@ def collect_variables(eqs: List[Eq]) -> Set[Variable]:
     return variables
 
 
-def _collect_variables_from_expr(expr, variables: Set[Variable]):
+def _collect_variables_from_expr(expr, variables: set[Variable]):
     """Helper function to recursively collect variables from an expression."""
     from .symbols import Expression  # Avoid circular import
 
@@ -49,7 +49,7 @@ def _collect_variables_from_expr(expr, variables: Set[Variable]):
     # For other types (numbers, SymPy expressions), do nothing
 
 
-def infer_orders(eqs: List[Eq]) -> Dict[Variable, int]:
+def infer_orders(eqs: list[Eq]) -> dict[Variable, int]:
     """
     Infer the maximum derivative order for each variable from the equations.
 
@@ -69,7 +69,7 @@ def infer_orders(eqs: List[Eq]) -> Dict[Variable, int]:
     return orders
 
 
-def _infer_orders_from_expr(expr, orders: Dict[Variable, int]):
+def _infer_orders_from_expr(expr, orders: dict[Variable, int]):
     """Helper function to recursively infer orders from an expression."""
     from .symbols import Expression  # Avoid circular import
 
@@ -88,8 +88,8 @@ def _infer_orders_from_expr(expr, orders: Dict[Variable, int]):
 
 
 def resolve_orders(
-    variables: List[Variable], inferred: Dict[Variable, int]
-) -> Dict[Variable, int]:
+    variables: list[Variable], inferred: dict[Variable, int]
+) -> dict[Variable, int]:
     """
     Resolve final orders by checking intent_order against inferred orders.
 

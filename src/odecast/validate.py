@@ -2,19 +2,27 @@
 Validation functions for ODEs and initial/boundary conditions
 """
 
-from typing import Dict, Union, Tuple, List
-from .symbols import Variable, Derivative, VectorDerivative
 from .equation import Eq
 from .errors import (
     MissingInitialConditionError,
-    OverdeterminedConditionsError,
     OrderMismatchError,
+    OverdeterminedConditionsError,
 )
+from .symbols import Derivative, Variable, VectorDerivative
+
+
+def _check_vector_length(name: str, shape: tuple[int, ...], value) -> None:
+    """Raise ValueError if a vector initial condition has the wrong length."""
+    if len(value) != shape[0]:
+        raise ValueError(
+            f"Initial condition for {name} has {len(value)} components, "
+            f"but the variable has shape {shape}."
+        )
 
 
 def normalize_ivp(
-    ivp_dict: Dict[Union[Variable, Derivative], float],
-) -> Dict[Tuple[Variable, int], float]:
+    ivp_dict: dict[Variable | Derivative, float],
+) -> dict[tuple[Variable, int], float]:
     """
     Normalize IVP dictionary to use (Variable, level) keys.
 
@@ -32,9 +40,10 @@ def normalize_ivp(
             if key.shape is not None:
                 # Vector variable - expand to components
                 if not isinstance(value, (list, tuple)):
-                    raise ValueError(
+                    raise TypeError(
                         f"Vector variable {key.name} requires list/tuple initial condition, got {type(value)}"
                     )
+                _check_vector_length(key.name, key.shape, value)
 
                 for i, comp_value in enumerate(value):
                     component_var = key[i]  # Get ComponentVariable
@@ -50,9 +59,10 @@ def normalize_ivp(
         elif isinstance(key, VectorDerivative):
             # Vector derivative - expand to component derivatives
             if not isinstance(value, (list, tuple)):
-                raise ValueError(
+                raise TypeError(
                     f"Vector derivative requires list/tuple initial condition, got {type(value)}"
                 )
+            _check_vector_length(repr(key), key.variable.shape, value)
 
             for i, comp_value in enumerate(value):
                 component_var = key.variable[i]  # Get ComponentVariable
@@ -66,8 +76,8 @@ def normalize_ivp(
 
 
 def validate_ivp(
-    orders: Dict[Variable, int],
-    ivp: Dict[Union[Variable, Derivative], float],
+    orders: dict[Variable, int],
+    ivp: dict[Variable | Derivative, float],
     t0: float,
 ) -> None:
     """
@@ -123,7 +133,7 @@ def validate_ivp(
             from .symbols import VectorDerivative
 
             has_vector_derivative = any(
-                isinstance(key, VectorDerivative) for key in ivp.keys()
+                isinstance(key, VectorDerivative) for key in ivp
             )
 
             if has_vector_derivative:
@@ -147,8 +157,8 @@ def validate_ivp(
 
 
 def validate_variable_orders(
-    equations: List[Eq],
-    declared_orders: Dict[Variable, int],
+    equations: list[Eq],
+    declared_orders: dict[Variable, int],
 ) -> None:
     """
     Validate that declared variable orders match equation requirements.

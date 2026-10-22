@@ -1,5 +1,6 @@
 import sympy as sp
-from odecast import t, var, Eq, solve
+
+from odecast import Eq, solve, t, var
 
 
 def test_symbolic_solution_matches_form():

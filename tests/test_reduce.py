@@ -4,10 +4,11 @@ Unit tests for the reduce module - Playbook 4 functionality
 
 import pytest
 import sympy as sp
-from odecast import var, Eq, t
-from odecast.reduce import build_state_map, isolate_highest_derivatives, make_rhs
+
+from odecast import Eq, t, var
 from odecast.analyze import collect_variables, infer_orders, resolve_orders
 from odecast.errors import NonSolvableFormError
+from odecast.reduce import build_state_map, isolate_highest_derivatives, make_rhs
 
 
 class TestBuildStateMap:
@@ -169,7 +170,7 @@ class TestMakeRhs:
         y_func = sp.Function(y.name)(t.symbol)
         highest_rules = {y: -y_func}
 
-        f_vector, jac = make_rhs(t.symbol, mapping, highest_rules)
+        f_vector, _jac = make_rhs(t.symbol, mapping, highest_rules)
 
         # Should get [x1, -x0] where x0=y, x1=y'
         assert f_vector.shape == (2, 1)
@@ -192,7 +193,7 @@ class TestMakeRhs:
         y_prime = sp.Derivative(y_func, t.symbol)
         highest_rules = {y: -0.3 * y_prime - y_func}
 
-        f_vector, jac = make_rhs(t.symbol, mapping, highest_rules)
+        f_vector, _jac = make_rhs(t.symbol, mapping, highest_rules)
 
         # Should get [x1, -0.3*x1 - x0]
         assert f_vector.shape == (2, 1)
@@ -237,7 +238,7 @@ class TestIntegration:
         assert highest_rules[y] == expected_rule
 
         # Step 4: Build RHS
-        f_vector, jac = make_rhs(t.symbol, mapping, highest_rules)
+        f_vector, _jac = make_rhs(t.symbol, mapping, highest_rules)
 
         # Should get the correct first-order system
         assert f_vector.shape == (2, 1)

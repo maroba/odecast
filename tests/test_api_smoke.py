@@ -7,7 +7,7 @@ import pytest
 
 def test_package_imports():
     """Test that the main package imports without errors."""
-    from odecast import t, var, Eq, solve, BC
+    from odecast import BC, Eq, solve, t, var
 
     # Basic sanity checks
     assert t is not None
@@ -32,7 +32,7 @@ def test_basic_variable_creation():
 
 def test_basic_equation_creation():
     """Test that equations can be created."""
-    from odecast import var, Eq
+    from odecast import Eq, var
 
     y = var("y")
     eq = Eq(y.d(2) + y, 0)
@@ -42,7 +42,7 @@ def test_basic_equation_creation():
 
 def test_solve_placeholder():
     """Test that solve raises appropriate errors for unimplemented backends."""
-    from odecast import var, Eq, solve
+    from odecast import Eq, solve, var
 
     y = var("y")
     eq = Eq(y.d(2) + y, 0)

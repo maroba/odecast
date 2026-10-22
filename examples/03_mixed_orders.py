@@ -13,11 +13,12 @@ This represents a coupled oscillator system where one variable affects the other
 """
 
 import matplotlib.pyplot as plt
-from odecast import var, Eq, solve
+
+from odecast import Eq, solve, var
 
 
 def main():
-    print("🎯 Coupled Mixed-Order System Example")
+    print("Coupled Mixed-Order System Example")
     print("=" * 45)
 
     # Define the dependent variables
@@ -55,7 +56,7 @@ def main():
     print(f"\nTime span: {time_span}")
 
     # Solve using the SciPy numeric backend
-    print("\n🔄 Solving coupled system...")
+    print("\nSolving coupled system...")
     sol = solve(equations, ivp=initial_conditions, tspan=time_span, backend="scipy")
 
     # Extract solution data
@@ -64,14 +65,14 @@ def main():
     xprime_vals = sol[x.d()]  # Velocity x'
     y_vals = sol[y]  # Variable y
 
-    print(f"✅ Solution computed with {len(t_vals)} time points")
+    print(f"Solution computed with {len(t_vals)} time points")
     print(f"   Final values at t = {t_vals[-1]:.1f}:")
     print(f"     x({t_vals[-1]:.1f}) = {x_vals[-1]:.6f}")
     print(f"     x'({t_vals[-1]:.1f}) = {xprime_vals[-1]:.6f}")
     print(f"     y({t_vals[-1]:.1f}) = {y_vals[-1]:.6f}")
 
     # Create comprehensive plots
-    fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(12, 10))
+    _fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(12, 10))
 
     # Plot x position vs time
     ax1.plot(t_vals, x_vals, "b-", linewidth=2, label="x(t)")
@@ -122,7 +123,7 @@ def main():
     plt.show()
 
     # Demonstrate solution evaluation
-    print("\n📊 Solution evaluation at specific times:")
+    print("\nSolution evaluation at specific times:")
     eval_times = [0, 3, 6, 9, 12, 15]
     print("   Time   x(t)      x'(t)     y(t)")
     print("   " + "-" * 35)
@@ -133,16 +134,16 @@ def main():
         print(f"   {t_eval:4.0f}   {x_eval:8.4f}  {xprime_eval:8.4f}  {y_eval:8.4f}")
 
     # Show system properties
-    print("\n🔧 System Analysis:")
+    print("\nSystem Analysis:")
     print("This coupled system demonstrates:")
-    print("  • Mixed orders: x is 2nd order, y is 1st order")
-    print("  • Coupling: x affects y through the +0.3*x term")
-    print("  • Coupling: y affects x through the -0.5*y term")
-    print("  • Damping: x has damping (0.1*x' term), y has decay (2*y term)")
+    print("  - Mixed orders: x is 2nd order, y is 1st order")
+    print("  - Coupling: x affects y through the +0.3*x term")
+    print("  - Coupling: y affects x through the -0.5*y term")
+    print("  - Damping: x has damping (0.1*x' term), y has decay (2*y term)")
 
     # Inspect the first-order system
-    print("\n🔍 First-order system inspection:")
-    f, jac, x0, t0, mapping = sol.as_first_order()
+    print("\nFirst-order system inspection:")
+    _f, _jac, x0, _t0, mapping = sol.as_first_order()
     print(f"  State vector dimension: {len(x0)}")
     print("  State mapping:")
     print(f"    x    -> index {mapping[(x, 0)]}")

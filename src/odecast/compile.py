@@ -2,16 +2,17 @@
 Compilation of symbolic expressions to numerical functions
 """
 
-from typing import List, Callable, Optional
-import sympy as sp
+from collections.abc import Callable
+
 import numpy as np
+import sympy as sp
 
 
 def lambdify_rhs(
     f_sym_vec: sp.Matrix,
     t_symbol: sp.Symbol,
-    state_syms: List[sp.Symbol],
-    param_names: Optional[List[str]] = None,
+    state_syms: list[sp.Symbol],
+    param_names: list[str] | None = None,
 ) -> Callable:
     """
     Compile symbolic RHS vector to a numerical function.
@@ -70,11 +71,11 @@ def lambdify_rhs(
 
 
 def lambdify_jac(
-    jac_sym: Optional[sp.Matrix],
+    jac_sym: sp.Matrix | None,
     t_symbol: sp.Symbol,
-    state_syms: List[sp.Symbol],
-    param_names: Optional[List[str]] = None,
-) -> Optional[Callable]:
+    state_syms: list[sp.Symbol],
+    param_names: list[str] | None = None,
+) -> Callable | None:
     """
     Compile symbolic Jacobian matrix to a numerical function.
 

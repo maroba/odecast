@@ -2,7 +2,8 @@
 Symbolic variables and the distinguished independent variable t
 """
 
-from typing import Optional, Union, Tuple
+from typing import Union
+
 import sympy as sp
 
 
@@ -31,9 +32,7 @@ class Expression:
                 return expr
             elif isinstance(expr, Variable):
                 return sp.Function(expr.name)(t.symbol)
-            elif isinstance(expr, Derivative):
-                return expr.sympy()
-            elif isinstance(expr, Expression):
+            elif isinstance(expr, (Derivative, Expression)):
                 return expr.sympy()
             else:
                 return sp.sympify(expr)
@@ -106,8 +105,8 @@ class Variable:
     def __init__(
         self,
         name: str,
-        order: Optional[int] = None,
-        shape: Optional[Union[int, Tuple[int, ...]]] = None,
+        order: int | None = None,
+        shape: int | tuple[int, ...] | None = None,
     ):
         self.name = name
         self.intent_order = order  # Use intent_order as specified in Playbook 2
@@ -123,7 +122,7 @@ class Variable:
             self.shape = tuple(shape)  # Matrix/tensor variable
 
     @property
-    def order(self) -> Optional[int]:
+    def order(self) -> int | None:
         """Backward compatibility property."""
         return self.intent_order
 
@@ -210,7 +209,7 @@ class ComponentVariable(Variable):
     Behaves like a scalar variable for most purposes.
     """
 
-    def __init__(self, parent: Variable, index: Union[int, Tuple[int, ...]]):
+    def __init__(self, parent: Variable, index: int | tuple[int, ...]):
         self.parent = parent
         self.index = index
 
@@ -337,9 +336,11 @@ class VectorExpression:
 
     def _get_component(self, expr, index):
         """Get component of an expression."""
-        if isinstance(expr, Variable) and expr.shape is not None:
-            return expr[index]
-        elif isinstance(expr, VectorDerivative):
+        if (
+            isinstance(expr, Variable)
+            and expr.shape is not None
+            or isinstance(expr, VectorDerivative)
+        ):
             return expr[index]
         elif isinstance(expr, VectorExpression):
             return expr._get_component_recursive(index)
@@ -430,7 +431,7 @@ class Derivative:
 t = IndependentVariable("t")
 
 
-def var(name: str, order: Optional[int] = None) -> Variable:
+def var(name: str, order: int | None = None) -> Variable:
     """
     Create a new dependent variable.
 
@@ -462,9 +463,7 @@ def as_sympy(expr) -> sp.Expr:
         return expr.sympy()
     elif isinstance(expr, Variable):
         return sp.Function(expr.name)(t.symbol)
-    elif isinstance(expr, Derivative):
-        return expr.sympy()
-    elif isinstance(expr, Expression):
+    elif isinstance(expr, (Derivative, Expression)):
         return expr.sympy()
     elif isinstance(expr, (VectorExpression, VectorDerivative)):
         # Vector operations need special handling

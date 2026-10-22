@@ -14,11 +14,12 @@ This represents a mass-spring-damper system with:
 """
 
 import matplotlib.pyplot as plt
-from odecast import var, Eq, solve
+
+from odecast import Eq, solve, var
 
 
 def main():
-    print("🎯 Damped Harmonic Oscillator Example")
+    print("Damped Harmonic Oscillator Example")
     print("=" * 50)
 
     # Define the dependent variable
@@ -39,7 +40,7 @@ def main():
     print(f"Time span: {time_span}")
 
     # Solve using the SciPy numeric backend
-    print("\n🔄 Solving...")
+    print("\nSolving...")
     sol = solve(eq, ivp=initial_conditions, tspan=time_span, backend="scipy")
 
     # Extract solution data
@@ -47,12 +48,12 @@ def main():
     y_vals = sol[y]  # Position
     yprime_vals = sol[y.d()]  # Velocity
 
-    print(f"✅ Solution computed with {len(t_vals)} time points")
+    print(f"Solution computed with {len(t_vals)} time points")
     print(f"   Final position: y({t_vals[-1]:.1f}) = {y_vals[-1]:.6f}")
     print(f"   Final velocity: y'({t_vals[-1]:.1f}) = {yprime_vals[-1]:.6f}")
 
     # Create plots
-    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 8))
+    _fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 8))
 
     # Plot position vs time
     ax1.plot(t_vals, y_vals, "b-", linewidth=2, label="Position y(t)")
@@ -87,7 +88,7 @@ def main():
     plt.show()
 
     # Demonstrate solution evaluation at specific times
-    print("\n📊 Solution evaluation at specific times:")
+    print("\nSolution evaluation at specific times:")
     eval_times = [0, 5, 10, 15, 20]
     for t_eval in eval_times:
         y_eval = sol.eval(y, t_eval)

@@ -2,12 +2,14 @@
 SciPy-based backend for solving initial value problems
 """
 
-from typing import Dict, Tuple, Callable, Optional, Any, Union
+from collections.abc import Callable
+from typing import Any
+
 import numpy as np
 from scipy.integrate import solve_ivp
 
-from ..symbols import Variable, Derivative
 from ..solution import SolutionIVP
+from ..symbols import Derivative, Variable
 
 
 class ScipyIVPBackend:
@@ -18,12 +20,12 @@ class ScipyIVPBackend:
     def solve(
         self,
         f_compiled: Callable,
-        jac_compiled: Optional[Callable],
+        jac_compiled: Callable | None,
         x0: np.ndarray,
         t0: float,
-        tspan: Tuple[float, float],
-        mapping: Dict[Union[Variable, Tuple[Variable, int]], Union[list, int]],
-        options: Optional[Dict[str, Any]] = None,
+        tspan: tuple[float, float],
+        mapping: dict[Variable | tuple[Variable, int], list | int],
+        options: dict[str, Any] | None = None,
     ) -> SolutionIVP:
         """
         Solve the IVP using SciPy's solve_ivp.
@@ -80,8 +82,8 @@ class ScipyIVPBackend:
 
 
 def convert_ivp_to_state_vector(
-    ivp_dict: Dict[Union[Variable, Derivative], float],
-    mapping: Dict[Union[Variable, Tuple[Variable, int]], Union[list, int]],
+    ivp_dict: dict[Variable | Derivative, float],
+    mapping: dict[Variable | tuple[Variable, int], list | int],
 ) -> np.ndarray:
     """
     Convert IVP dictionary to initial state vector.
@@ -104,9 +106,8 @@ def convert_ivp_to_state_vector(
     for key, value in mapping.items():
         if isinstance(key, tuple):  # (var, level) keys
             max_index = max(max_index, value)
-        elif isinstance(key, Variable):  # var keys with lists
-            if isinstance(value, list) and value:
-                max_index = max(max_index, max(value))
+        elif isinstance(key, Variable) and isinstance(value, list) and value:
+            max_index = max(max_index, max(value))
 
     n_states = max_index + 1
     x0 = np.zeros(n_states)

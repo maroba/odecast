@@ -2,7 +2,8 @@
 SciPy-based backend for solving boundary value problems
 """
 
-from typing import Any, List, Dict
+from typing import Any
+
 from ..api import BC
 
 
@@ -15,7 +16,7 @@ class ScipyBVPBackend:
     """
 
     def solve(
-        self, system: Any, bvp: List[BC], tspan: tuple, options: Dict = None
+        self, system: Any, bvp: list[BC], tspan: tuple, options: dict | None = None
     ) -> Any:
         """
         Solve a boundary value problem.

@@ -2,12 +2,12 @@
 Equation objects for representing ODEs
 """
 
-from typing import List
 import sympy as sp
-from .symbols import as_sympy, VectorExpression, VectorDerivative, Variable
+
+from .symbols import Variable, VectorDerivative, VectorExpression, as_sympy
 
 
-def expand_vector_equations(equations: List["Eq"]) -> List["Eq"]:
+def expand_vector_equations(equations: list["Eq"]) -> list["Eq"]:
     """
     Expand vector equations to component equations.
 
@@ -48,7 +48,7 @@ def _contains_vector_ops(expr) -> bool:
     return False
 
 
-def _expand_vector_equation(eq: "Eq") -> List["Eq"]:
+def _expand_vector_equation(eq: "Eq") -> list["Eq"]:
     """
     Expand a single vector equation to component equations.
 
@@ -63,7 +63,7 @@ def _expand_vector_equation(eq: "Eq") -> List["Eq"]:
 
     # For now, assume all vector variables have the same shape
     # This is a simplification for Playbook 11
-    shape = list(vector_vars)[0].shape
+    shape = next(iter(vector_vars)).shape
     component_eqs = []
 
     for i in range(shape[0]):  # Handle 1D vectors for now

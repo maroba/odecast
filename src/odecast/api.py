@@ -2,14 +2,11 @@
 Main APIs for odecast
 """
 
-from typing import Optional
-from .symbols import t, Variable
 from .equation import Eq
+from .symbols import Variable, t
 
 
-def var(
-    name: str, order: Optional[int] = None, shape: Optional[tuple] = None
-) -> Variable:
+def var(name: str, order: int | None = None, shape: tuple | None = None) -> Variable:
     """
     Create a dependent variable for use in differential equations.
 
@@ -70,7 +67,7 @@ def solve(equation, *, ivp=None, bvp=None, tspan=None, backend=None, **kwargs):
         backend: Solution backend to use:
                  - "scipy": Numeric integration using SciPy (default)
                  - "sympy": Symbolic solution using SymPy
-                 - "auto": Try SymPy first, fall back to SciPy if needed
+                 - "auto": Try SciPy first, fall back to SymPy if needed
                  - "scipy_bvp": BVP solver (not yet implemented)
         **kwargs: Additional backend-specific options:
                   For scipy: method, rtol, atol, max_step, etc.
@@ -106,13 +103,14 @@ def solve(equation, *, ivp=None, bvp=None, tspan=None, backend=None, **kwargs):
         >>> eq2 = Eq(z.d() - y, 0)
         >>> sol = solve([eq1, eq2], ivp={y: 1.0, y.d(): 0.0, z: 0.0}, tspan=(0, 5))
     """
-    from .analyze import collect_variables, infer_orders, resolve_orders
-    from .validate import validate_ivp
-    from .reduce import build_state_map, isolate_highest_derivatives, make_rhs
-    from .compile import lambdify_rhs, lambdify_jac
-    from .backends.scipy_ivp import ScipyIVPBackend, convert_ivp_to_state_vector
-    from .equation import expand_vector_equations
     import sympy as sp
+
+    from .analyze import collect_variables, infer_orders, resolve_orders
+    from .backends.scipy_ivp import ScipyIVPBackend, convert_ivp_to_state_vector
+    from .compile import lambdify_jac, lambdify_rhs
+    from .equation import expand_vector_equations
+    from .reduce import build_state_map, isolate_highest_derivatives, make_rhs
+    from .validate import validate_ivp
 
     # Normalize equations to list
     eqs = [equation] if isinstance(equation, Eq) else list(equation)
@@ -130,7 +128,12 @@ def solve(equation, *, ivp=None, bvp=None, tspan=None, backend=None, **kwargs):
         backend = "scipy"  # Default to scipy for IVP
 
     if backend == "auto":
-        # Try SciPy first, fall back to SymPy on failure
+        # Try SciPy first, fall back to SymPy on failure.
+        # Invalid initial conditions are the caller's error, not a reason to
+        # switch backends, so validate outside the try block.
+        if ivp is not None and tspan is not None:
+            validate_ivp(orders, ivp, tspan[0])
+
         try:
             # Check basic requirements for SciPy backend
             if ivp is None:
@@ -138,9 +141,7 @@ def solve(equation, *, ivp=None, bvp=None, tspan=None, backend=None, **kwargs):
             if tspan is None:
                 raise ValueError("SciPy backend requires tspan")
 
-            # Try SciPy backend
             t0 = tspan[0]
-            validate_ivp(orders, ivp, t0)
 
             # Step 3: Reduce to first-order system
             mapping = build_state_map(orders)
@@ -175,7 +176,7 @@ def solve(equation, *, ivp=None, bvp=None, tspan=None, backend=None, **kwargs):
 
             return solution
 
-        except Exception:
+        except Exception:  # noqa: BLE001 - any numerical failure triggers the fallback
             # Fall back to SymPy backend
             try:
                 from .backends.sympy_backend import SymPyBackend
@@ -185,7 +186,7 @@ def solve(equation, *, ivp=None, bvp=None, tspan=None, backend=None, **kwargs):
                     equations=eqs, t_symbol=t.symbol, **kwargs
                 )
                 return solution
-            except Exception as sympy_error:
+            except Exception as sympy_error:  # noqa: BLE001
                 # If both fail, raise informative error
                 raise RuntimeError(
                     f"Auto backend failed: Both SciPy and SymPy backends "

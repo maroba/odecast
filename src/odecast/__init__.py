@@ -2,9 +2,9 @@
 Odecast: A DSL for ordinary differential equations
 """
 
-from .symbols import t
-from .api import var, solve, BC
+from .api import BC, solve, var
 from .equation import Eq
+from .symbols import t
 
-__version__ = "0.1.0"
-__all__ = ["t", "var", "Eq", "solve", "BC"]
+__version__ = "0.1.1"
+__all__ = ["BC", "Eq", "solve", "t", "var"]

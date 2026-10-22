@@ -1,5 +1,6 @@
 import numpy as np
-from odecast import var, Eq, solve
+
+from odecast import Eq, solve, var
 
 
 def test_second_order_ivp_numeric():
@@ -20,7 +21,7 @@ def test_as_first_order_contract():
     y = var("y")
     eq = Eq(y.d(2) + y, 0)
     sol = solve(eq, ivp={y: 1.0, y.d(): 0.0}, tspan=(0.0, 1.0), backend="scipy")
-    f, jac, x0, t0, mapping = sol.as_first_order()
+    f, _jac, x0, _t0, mapping = sol.as_first_order()
     assert callable(f)
     assert isinstance(x0, np.ndarray)
     assert isinstance(mapping, dict)

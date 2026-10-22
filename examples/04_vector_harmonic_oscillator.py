@@ -15,9 +15,10 @@ This expands to the component equations:
     y'' + ω²y = 0
 """
 
-import numpy as np
 import matplotlib.pyplot as plt
-from odecast import var, Eq, solve
+import numpy as np
+
+from odecast import Eq, solve, var
 
 
 def main():
@@ -91,7 +92,7 @@ def main():
     print()
 
     # Create visualization
-    fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(12, 10))
+    _fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(12, 10))
 
     # Phase space plot (trajectory)
     ax1.plot(x_vals, y_vals, "b-", linewidth=2, label="Trajectory")
@@ -148,7 +149,6 @@ def main():
     except Exception as e:
         print(f"Symbolic solution failed: {e}")
 
-    print("\nExample completed successfully!")
     print("Close the plot window to continue...")
     plt.show()
 

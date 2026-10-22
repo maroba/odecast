@@ -24,7 +24,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -e ".[math,dev]"
+          pip install -e ".[dev]"
 
       - name: Run tests with pytest
         run: |
@@ -52,7 +52,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install ruff black
+          pip install ruff==0.17.1 black==26.10.1
 
       - name: Run ruff
         run: ruff check .

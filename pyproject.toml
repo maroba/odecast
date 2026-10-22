@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "odecast"
-version = "0.1.1"
+dynamic = ["version"]
 description = "A Python library for solving higher-order ordinary differential equations (ODEs) without manual reduction."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -19,15 +19,25 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
 ]
-dependencies = []
+dependencies = ["numpy", "scipy", "sympy"]
 
 [project.optional-dependencies]
-math = ["sympy", "scipy", "numpy", "matplotlib"]
-dev = ["pytest", "pytest-cov"]
+# Kept for backwards compatibility; numpy, scipy and sympy are now core dependencies.
+math = ["matplotlib"]
+examples = ["matplotlib"]
+dev = ["pytest", "pytest-cov", "ruff==0.17.1", "black==26.10.1"]
 
 [project.urls]
 Homepage = "https://github.com/maroba/odecast"
 Repository = "https://github.com/maroba/odecast"
+
+[tool.ruff.lint.per-file-ignores]
+# Example scripts are numbered for reading order and catch broad exceptions
+# so that a failing optional step does not abort the demonstration.
+"examples/*.py" = ["N999", "BLE001"]
+
+[tool.hatch.version]
+path = "src/odecast/__init__.py"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/odecast"]

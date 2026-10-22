@@ -12,11 +12,12 @@ rather than numerical approximations.
 """
 
 import sympy as sp
-from odecast import t, var, Eq, solve
+
+from odecast import Eq, solve, t, var
 
 
 def main():
-    print("🎯 Symbolic Solution Example")
+    print("Symbolic Solution Example")
     print("=" * 40)
 
     # Define the dependent variable
@@ -28,15 +29,15 @@ def main():
     print("This is the simple harmonic oscillator equation.")
 
     # Solve symbolically using SymPy backend
-    print("\n🔄 Solving symbolically...")
+    print("\nSolving symbolically...")
     sol = solve(eq, backend="sympy")
 
     # Get the symbolic expression
     expr = sol.as_expr(y)
-    print(f"✅ Symbolic solution: y(t) = {expr}")
+    print(f"Symbolic solution: y(t) = {expr}")
 
     # Verify the solution by substituting back into the ODE
-    print("\n🔍 Verification:")
+    print("\nVerification:")
     t_sym = t.symbol  # Get the SymPy symbol for t
 
     # Compute derivatives
@@ -54,18 +55,18 @@ def main():
     print(f"y''(t) + y(t) = {lhs} = {simplified}")
 
     if simplified == 0:
-        print("✅ Verification successful: the solution satisfies the ODE!")
+        print("The solution satisfies the ODE.")
     else:
-        print("❌ Verification failed!")
+        print("The solution does NOT satisfy the ODE.")
 
     # Show general form with constants
-    print("\n📝 General solution form:")
+    print("\nGeneral solution form:")
     print("The solution contains arbitrary constants C1 and C2,")
     print("which would be determined by initial or boundary conditions.")
     print("General form: y(t) = C1*cos(t) + C2*sin(t)")
 
     # Demonstrate symbolic manipulation
-    print("\n🔧 Symbolic manipulation examples:")
+    print("\nSymbolic manipulation examples:")
 
     # Extract coefficients if possible
     try:
@@ -85,10 +86,10 @@ def main():
     print("If y(t) = A*cos(t) + B*sin(t), then:")
     print("y'(t) = -A*sin(t) + B*cos(t)")
     print("y''(t) = -A*cos(t) - B*sin(t) = -y(t)")
-    print("Therefore: y''(t) + y(t) = 0 ✓")
+    print("Therefore: y''(t) + y(t) = 0 ")
 
     # Demonstrate evaluation at specific points
-    print("\n📊 Symbolic evaluation:")
+    print("\nSymbolic evaluation:")
     eval_points = [0, sp.pi / 4, sp.pi / 2, sp.pi]
     for t_val in eval_points:
         y_val = expr.subs(t_sym, t_val)

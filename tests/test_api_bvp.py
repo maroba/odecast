@@ -1,5 +1,6 @@
 import pytest
-from odecast import var, Eq, solve, BC
+
+from odecast import BC, Eq, solve, var
 
 
 @pytest.mark.xfail(reason="BVP arrives in Milestone 5")

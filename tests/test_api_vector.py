@@ -1,4 +1,4 @@
-from odecast import var, Eq, solve
+from odecast import Eq, solve, var
 
 
 def test_vector_variable_creation():

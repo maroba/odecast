@@ -1,30 +1,22 @@
 Installation
 ============
 
-Requirements
-------------
-
-Odecast requires Python 3.10 or later and depends on the following packages:
-
-* NumPy (>= 1.20)
-* SciPy (>= 1.7)
-* SymPy (>= 1.10)
-
-Installing from PyPI
----------------------
-
-The recommended way to install Odecast is using pip:
+odecast requires Python 3.10 or later.
 
 .. code-block:: bash
 
    pip install odecast
 
-This will automatically install all required dependencies.
+This also installs the required dependencies NumPy, SciPy and SymPy. The
+example scripts and the plotting code in :doc:`examples` additionally use
+Matplotlib, which is available as an extra:
 
-Installing from Source
-----------------------
+.. code-block:: bash
 
-To install the latest development version from GitHub:
+   pip install "odecast[examples]"
+
+From source
+-----------
 
 .. code-block:: bash
 
@@ -32,32 +24,23 @@ To install the latest development version from GitHub:
    cd odecast
    pip install -e .
 
-Development Installation
-------------------------
-
-For development work, install with additional dependencies:
+For development, use the ``dev`` extra, which adds pytest, pytest-cov, Ruff
+and Black:
 
 .. code-block:: bash
 
-   git clone https://github.com/maroba/odecast.git
-   cd odecast
    pip install -e ".[dev]"
 
-This includes testing and code quality tools like pytest, black, and ruff.
-
-Verification
-------------
-
-To verify your installation, run:
+Checking the installation
+-------------------------
 
 .. code-block:: python
 
    import odecast
+   from odecast import var, Eq, solve
+
    print(odecast.__version__)
 
-   # Test basic functionality
-   from odecast import var, Eq, solve
    y = var("y")
-   eq = Eq(y.d() + y, 0)
-   sol = solve(eq, ivp={y: 1}, tspan=(0, 1))
-   print("Installation successful!")
+   sol = solve(Eq(y.d() + y, 0), ivp={y: 1.0}, tspan=(0, 1))
+   print(sol[y][-1])   # approximately exp(-1) = 0.3679

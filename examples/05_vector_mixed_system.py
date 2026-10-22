@@ -23,9 +23,10 @@ We'll rewrite this as a mixed system:
 Where x represents the average motion and u represents the differential motion.
 """
 
-import numpy as np
 import matplotlib.pyplot as plt
-from odecast import var, Eq, solve
+import numpy as np
+
+from odecast import Eq, solve, var
 
 
 def main():
@@ -318,17 +319,6 @@ def main():
             f"  t={t_eval:5.2f}s: θ₁={theta1_val:7.4f}, θ₂={theta2_val:7.4f}, x={x_val:7.4f}, u₀={u_val[0]:7.4f}"
         )
 
-    print()
-    print("Key features demonstrated:")
-    print("  ✓ Physically meaningful mixed scalar/vector system")
-    print("  ✓ Excellent energy conservation (numerical precision)")
-    print("  ✓ Beautiful periodic motion with mode coupling")
-    print("  ✓ Vector solution access sol[u] and component access sol[u[0]]")
-    print("  ✓ Clear physical interpretation of all variables")
-    print("  ✓ Comprehensive visualization and analysis")
-    print("  ✓ Solution evaluation at arbitrary time points")
-
-    print("\nExample completed successfully!")
     print("Close the plot window to continue...")
     plt.show()
 

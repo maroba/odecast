@@ -2,11 +2,11 @@
 SymPy-based backend for symbolic ODE solving
 """
 
-from typing import Dict, List
 import sympy as sp
-from ..symbols import Variable
+
 from ..equation import Eq
 from ..errors import BackendError
+from ..symbols import Variable
 
 
 class SolutionExpr:
@@ -14,7 +14,7 @@ class SolutionExpr:
     Symbolic solution object that wraps SymPy expressions.
     """
 
-    def __init__(self, solutions: Dict[Variable, sp.Expr], t_symbol: sp.Symbol):
+    def __init__(self, solutions: dict[Variable, sp.Expr], t_symbol: sp.Symbol):
         """
         Initialize symbolic solution.
 
@@ -49,7 +49,7 @@ class SymPyBackend:
     """
 
     def solve(
-        self, equations: List[Eq], t_symbol: sp.Symbol, **options
+        self, equations: list[Eq], t_symbol: sp.Symbol, **options
     ) -> SolutionExpr:
         """
         Solve ODEs symbolically using SymPy.
@@ -82,7 +82,7 @@ class SymPyBackend:
                         f"got variables: {[v.name for v in variables]}"
                     )
 
-                var = list(variables)[0]
+                var = next(iter(variables))
                 y_func = sp.Function(var.name)(t_symbol)
                 solution_expr = sp.dsolve(sympy_eq, y_func)
 
@@ -100,7 +100,7 @@ class SymPyBackend:
                 for eq in equations:
                     eq_vars = collect_variables([eq])
                     if len(eq_vars) == 1:
-                        var = list(eq_vars)[0]
+                        var = next(iter(eq_vars))
                         if var not in var_to_eqs:
                             var_to_eqs[var] = []
                         var_to_eqs[var].append(eq)

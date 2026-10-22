@@ -4,8 +4,9 @@ Comprehensive tests for Playbook 7 - SymPy backend implementation
 
 import pytest
 import sympy as sp
-from odecast import var, Eq, solve, t
-from odecast.backends.sympy_backend import SymPyBackend, SolutionExpr
+
+from odecast import Eq, solve, t, var
+from odecast.backends.sympy_backend import SolutionExpr, SymPyBackend
 from odecast.errors import BackendError
 
 
