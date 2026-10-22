@@ -6,10 +6,13 @@
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
+from odecast import __version__
+
 project = "Odecast"
 copyright = "2025, Matthias Baer"
 author = "Matthias Baer"
-release = "0.1.0"
+release = __version__  # defined only in src/odecast/__init__.py
+version = ".".join(release.split(".")[:2])
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
@@ -40,7 +43,6 @@ html_favicon = "odecast-logo.png"
 # GitHub Pages configuration
 html_baseurl = "https://maroba.github.io/odecast/"
 html_theme_options = {
-    "display_version": True,
     "prev_next_buttons_location": "bottom",
     "style_external_links": False,
     "collapse_navigation": True,
