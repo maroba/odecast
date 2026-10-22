@@ -366,6 +366,89 @@ variable is a position rather than a time; odecast still calls it
 
    print(f"max deflection: {sol.eval(w, ell/2):.6f}")   # 5/384 = 0.013021
 
+Analysis
+--------
+
+Phase portrait of the damped pendulum
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The damped pendulum :math:`\ddot\theta + 0.3\,\dot\theta + \sin\theta = 0`
+has equilibria at :math:`\theta = k\pi`. The downward position is a stable
+focus, the upward one a saddle. Trajectories starting at the upward position
+:math:`\theta = -\pi` with increasing velocity show how the saddle at
+:math:`\pi` separates swings that settle at :math:`0` from those that go
+over the top and settle at :math:`2\pi`.
+
+.. plot::
+   :include-source:
+
+   import numpy as np
+   import matplotlib.pyplot as plt
+   import sympy as sp
+   from odecast import var, Eq, solve, equilibria
+
+   theta = var("theta")
+   eq = Eq(theta.d(2) + 0.3*theta.d() + sp.sin(theta), 0)
+
+   fig, ax = plt.subplots(figsize=(8, 4.5))
+   t = np.linspace(0, 30, 3000)
+   for v0 in np.linspace(0.3, 3.3, 11):
+       sol = solve(eq, ivp={theta: -np.pi, theta.d(): v0}, tspan=(0, 30))
+       ax.plot(sol.eval(theta, t), sol.eval(theta.d(), t), lw=1)
+
+   for e in equilibria(eq):
+       th = float(e.point[theta])
+       marker = "ko" if e.stability.startswith("stable") else "kx"
+       for shift in (-2*np.pi, 0, 2*np.pi):
+           ax.plot(th + shift, 0, marker, ms=8)
+       ax.annotate(e.stability, (th, 0), xytext=(6, -14), textcoords="offset points")
+
+   ax.set_xlim(-np.pi - 0.3, 2*np.pi + 1.5)
+   ax.set_xlabel(r"$\theta$")
+   ax.set_ylabel(r"$\dot\theta$")
+   plt.tight_layout()
+
+Estimating parameters from measurements
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Noisy measurements of a damped oscillation are used to estimate the
+damping :math:`c`, the stiffness :math:`k` and the initial displacement
+:math:`y_0` of :math:`y'' + c\,y' + k\,y = 0`. The data are generated here
+from known values, so the result can be checked.
+
+.. plot::
+   :include-source:
+
+   import numpy as np
+   import matplotlib.pyplot as plt
+   import sympy as sp
+   from odecast import var, Eq, solve, fit
+
+   y = var("y")
+   c, k, y0 = sp.symbols("c k y0")
+   eq = Eq(y.d(2) + c*y.d() + k*y, 0)
+
+   # Synthetic measurements
+   true = {c: 0.4, k: 3.0, y0: 1.5}
+   t_data = np.linspace(0, 10, 60)
+   exact = solve(eq, ivp={y: y0, y.d(): 0}, tspan=(0, 10), params=true)
+   y_data = exact.eval(y, t_data) + np.random.default_rng(0).normal(0, 0.05, t_data.size)
+
+   result = fit(eq, {y: (t_data, y_data)}, guess={c: 1.0, k: 2.0, y0: 1.0},
+                ivp={y: y0, y.d(): 0})
+   print(result)
+
+   t = np.linspace(0, 10, 500)
+   plt.figure(figsize=(8, 3.5))
+   plt.plot(t_data, y_data, "k.", label="measurements")
+   plt.plot(t, result.solution.eval(y, t), label="fit")
+   plt.xlabel("$t$")
+   plt.legend()
+   plt.tight_layout()
+
+The fitted values deviate from the true ones by less than two standard
+errors.
+
 Symbolic solutions
 ------------------
 

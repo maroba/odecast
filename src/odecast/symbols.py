@@ -109,6 +109,13 @@ class _ScalarOps:
     def _sympy_(self):
         return self.sympy()
 
+    def _repr_latex_(self):
+        from .printing import latex
+
+        if getattr(self, "shape", None) is not None:
+            return f"$\\mathbf{{{self.name}}}$"
+        return f"$\\displaystyle {latex(self)}$"
+
     def __array_ufunc__(self, ufunc, method, *inputs, **kwargs):
         return _apply_ufunc(ufunc, method, inputs, kwargs)
 
@@ -152,8 +159,16 @@ class _VectorOps:
     def __pos__(self):
         return self
 
+    def __matmul__(self, other):
+        return matmul(self, other)
+
+    def __rmatmul__(self, other):
+        return matmul(other, self)
+
     def _sympy_(self):
-        raise TypeError(
+        # SympifyError lets SymPy return NotImplemented from its operators,
+        # so that e.g. sp.Symbol("k") * u falls back to u.__rmul__.
+        raise sp.SympifyError(
             f"{self!r} is vector-valued and cannot be converted to a SymPy "
             "expression. Apply functions to its components, e.g. sp.sin(u[0])."
         )
@@ -166,6 +181,8 @@ def _apply_ufunc(ufunc, method, inputs, kwargs):
     """Translate a NumPy ufunc call on odecast objects."""
     if method != "__call__" or kwargs:
         return NotImplemented
+    if ufunc is np.matmul:
+        return matmul(*inputs)
     if any(isinstance(x, np.ndarray) and x.ndim > 0 for x in inputs):
         return NotImplemented
     inputs = [
@@ -381,6 +398,16 @@ class Variable(_ScalarOps):
             return _VectorOps.__neg__(self)
         return super().__neg__()
 
+    def __matmul__(self, other):
+        if self.shape is None:
+            raise TypeError(f"Scalar variable '{self.name}' does not support @")
+        return matmul(self, other)
+
+    def __rmatmul__(self, other):
+        if self.shape is None:
+            raise TypeError(f"Scalar variable '{self.name}' does not support @")
+        return matmul(other, self)
+
 
 def _normalize_index(index, shape: tuple[int, ...], name: str):
     """Validate a component index; 1-D indices are plain ints."""
@@ -492,12 +519,89 @@ class VectorExpression(_VectorOps):
         return Expression(self.operator, left, right)
 
 
+class VectorComponents(_VectorOps):
+    """
+    A vector or matrix expression given by its components, e.g. the result
+    of a matrix product ``A @ u``.
+    """
+
+    def __init__(self, components: np.ndarray):
+        self.components = components
+        self.shape = components.shape
+
+    def __repr__(self):
+        return f"VectorComponents({self.components.tolist()})"
+
+    def component(self, index):
+        return self.components[index]
+
+    def sympy(self):
+        return self._sympy_()
+
+
+def shape_of(expr) -> tuple[int, ...] | None:
+    """Shape of a vector-valued expression, or None for scalars."""
+    if isinstance(expr, Variable):
+        return expr.shape
+    if isinstance(expr, VectorDerivative):
+        return expr.variable.shape
+    if isinstance(expr, VectorComponents):
+        return expr.shape
+    if isinstance(expr, (VectorExpression, Expression)):
+        shapes = {shape_of(expr.left), shape_of(expr.right)} - {None}
+        if len(shapes) > 1:
+            raise ValueError(
+                "Vector-valued terms combined element-wise must have the same "
+                f"shape, got {sorted(shapes)} in {expr!r}"
+            )
+        return shapes.pop() if shapes else None
+    return None
+
+
+def _as_object_array(x) -> np.ndarray:
+    """Operand of a matrix product as an object array of scalar entries."""
+    shape = shape_of(x)
+    if shape is not None:
+        out = np.empty(shape, dtype=object)
+        for index in np.ndindex(*shape):
+            out[index] = component_of(x, index[0] if len(index) == 1 else index)
+        return out
+    if isinstance(x, sp.MatrixBase):
+        return np.array(x.tolist(), dtype=object)
+    out = np.empty(np.shape(x), dtype=object)
+    out[...] = np.asarray(x, dtype=object) if not isinstance(x, list) else x
+    return out
+
+
+def matmul(a, b):
+    """
+    Matrix product of constant arrays and vector/matrix variables.
+
+    Either operand may be a NumPy array, nested list or SymPy matrix whose
+    entries are numbers, SymPy expressions or scalar odecast expressions.
+    """
+    left, right = _as_object_array(a), _as_object_array(b)
+    if left.ndim == 0 or right.ndim == 0:
+        raise ValueError("Matrix product requires operands with at least one dimension")
+    try:
+        result = np.matmul(left, right)
+    except ValueError:
+        raise ValueError(
+            f"Matrix product: shapes {left.shape} and {right.shape} are not aligned"
+        ) from None
+    if np.ndim(result) == 0:
+        return result.item() if isinstance(result, np.ndarray) else result
+    return VectorComponents(result)
+
+
 def component_of(expr, index):
     """Component of a vector-valued operand; scalars are broadcast."""
     if isinstance(expr, Variable) and expr.shape is not None:
         return expr[index]
     if isinstance(expr, VectorDerivative):
         return expr[index]
+    if isinstance(expr, VectorComponents):
+        return expr.component(index)
     if isinstance(expr, VectorExpression):
         return expr.component(index)
     if isinstance(expr, Expression):
@@ -579,3 +683,22 @@ def as_sympy(expr) -> sp.Expr:
     if isinstance(expr, (_ScalarOps, _VectorOps)):
         return expr.sympy()
     return sp.sympify(expr)
+
+
+def substitute_params(expr, params: dict | None):
+    """
+    Substitute parameter values into a SymPy expression or matrix.
+
+    Parameters are matched by name, so ``{"k": 1}`` and ``{sp.Symbol("k"): 1}``
+    both apply to a symbol k, whatever its assumptions.
+    """
+    if not params:
+        return expr
+    by_name = {getattr(k, "name", k): v for k, v in params.items()}
+    return expr.subs(
+        {
+            s: by_name[s.name]
+            for s in expr.free_symbols
+            if getattr(s, "name", None) in by_name
+        }
+    )

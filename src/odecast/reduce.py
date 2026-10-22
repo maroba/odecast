@@ -166,6 +166,7 @@ def make_rhs(
     mapping: dict[Variable | tuple, list[int] | int],
     highest_rules: dict[Variable, sp.Expr],
     params: dict[str, float] | None = None,
+    state_prefix: str = "x",
 ) -> tuple[sp.Matrix, sp.Matrix | None]:
     """
     Build the right-hand side vector field f(t, x) for the first-order system.
@@ -175,6 +176,7 @@ def make_rhs(
         mapping: State mapping from build_state_map
         highest_rules: Expressions for highest derivatives from isolate_highest_derivatives
         params: Optional parameter values to substitute
+        state_prefix: Name prefix of the state symbols (x0, x1, ...)
 
     Returns:
         Tuple of (f_sympy_vector, jac_sympy_matrix)
@@ -192,7 +194,7 @@ def make_rhs(
     n_states = max_index + 1
 
     # Create state symbols x0, x1, x2, ...
-    state_symbols = [sp.Symbol(f"x{i}") for i in range(n_states)]
+    state_symbols = [sp.Symbol(f"{state_prefix}{i}") for i in range(n_states)]
 
     # Build the RHS vector
     rhs_exprs = []

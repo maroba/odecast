@@ -37,39 +37,25 @@ class ScipyIVPBackend:
             t0: Initial time
             tspan: Tuple of (t_start, t_end)
             mapping: State mapping from build_state_map
-            options: Additional solver options
+            options: Keyword arguments for scipy.integrate.solve_ivp (method,
+                rtol, atol, max_step, t_eval, first_step, events, ...)
 
         Returns:
             SolutionIVP object with results
         """
-        options = options or {}
+        options = dict(options or {})
+        options.setdefault("rtol", 1e-3)
+        options.setdefault("atol", 1e-6)
+        # Dense output gives eval() an interpolant of the solver's own order
+        options["dense_output"] = True
+        if jac_compiled is not None:
+            options.setdefault("jac", jac_compiled)
 
-        # Extract solver options
-        method = options.get("method", "RK45")
-        rtol = options.get("rtol", 1e-3)
-        atol = options.get("atol", 1e-6)
-        events = options.get("events", None)
-        dense_output = options.get("dense_output", False)
-        max_step = options.get("max_step", np.inf)
-
-        # Solve using scipy.integrate.solve_ivp
-        sol = solve_ivp(
-            fun=f_compiled,
-            t_span=tspan,
-            y0=x0,
-            method=method,
-            rtol=rtol,
-            atol=atol,
-            events=events,
-            dense_output=dense_output,
-            max_step=max_step,
-            **({"jac": jac_compiled} if jac_compiled is not None else {}),
-        )
+        sol = solve_ivp(fun=f_compiled, t_span=tspan, y0=x0, **options)
 
         if not sol.success:
             raise RuntimeError(f"SciPy solve_ivp failed: {sol.message}")
 
-        # Create and return SolutionIVP object
         return SolutionIVP(
             t=sol.t,
             y=sol.y,
@@ -78,6 +64,9 @@ class ScipyIVPBackend:
             f_compiled=f_compiled,
             jac_compiled=jac_compiled,
             x0=x0,
+            interpolant=sol.sol,
+            t_events=sol.t_events,
+            y_events=sol.y_events,
         )
 
 

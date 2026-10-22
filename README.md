@@ -20,8 +20,9 @@ Full documentation: <https://maroba.github.io/odecast>
 pip install odecast
 ```
 
-This installs NumPy, SciPy and SymPy. Python 3.10 or later is required. The
-example scripts additionally need Matplotlib (`pip install "odecast[examples]"`).
+This installs NumPy, SciPy and SymPy. Python 3.10 or later is required.
+Plotting and `to_pandas()` additionally need Matplotlib and pandas
+(`pip install "odecast[examples]"`).
 
 ## Example
 
@@ -66,11 +67,18 @@ for coupled systems of mixed order, which is the case odecast is designed for.
   `y**2` or `sp.sin(y)` (or `np.sin(y)`), can be used directly.
 - **Vector and matrix variables.** `var("u", shape=2)` or
   `var("M", shape=(2, 2))` declares an array-valued unknown. Equations such
-  as `Eq(u.d(2) + u, 0)` are expanded component-wise.
+  as `Eq(u.d(2) + u, 0)` are expanded component-wise; matrix products are
+  written `A @ u`.
+- **Parameters.** SymPy symbols in the equations take values from
+  `params=`. The system is compiled once and reused for further values.
 - **Initial and boundary value problems.** Two-point boundary value problems
-  are solved with `scipy.integrate.solve_bvp`.
+  are solved with `scipy.integrate.solve_bvp`. Events, such as a body
+  reaching the ground, are located during integration.
+- **Stiff problems.** Implicit solvers receive the exact Jacobian.
 - **Symbolic solutions.** The SymPy backend returns closed-form solutions,
   with initial or boundary conditions applied.
+- **Analysis.** Equilibria and their stability; fitting parameters to
+  measured data.
 - **Validation.** Missing, superfluous or inconsistent conditions are
   reported before solving, with a message naming the offending condition.
 
@@ -136,13 +144,65 @@ sol.eval(y, 1.0)     # 0.5403...
 Without conditions the general solution is returned, e.g.
 `C1*sin(t) + C2*cos(t)`.
 
+### Parameters and matrix products
+
+SymPy symbols in the equations are parameters. Solving again with other
+values reuses the compiled system, so parameter studies are fast:
+
+```python
+import numpy as np
+
+u = var("u", shape=2)
+k = sp.Symbol("k")
+A = np.array([[0, 1], [-k, -0.3]], dtype=object)
+
+for kv in [1.0, 2.0, 4.0]:
+    sol = solve(Eq(u.d(), A @ u), ivp={u: [1, 0]}, tspan=(0, 10), params={k: kv})
+```
+
+### Events
+
+```python
+from odecast import Event
+
+y = var("y")
+sol = solve(
+    Eq(y.d(2), -9.81),
+    ivp={y: 10, y.d(): 0},
+    tspan=(0, 10),
+    events=[Event(Eq(y, 0), terminal=True)],   # stop when y reaches 0
+)
+sol.t_events[0]   # [1.428]
+```
+
+### Equilibria and fitting
+
+```python
+from odecast import equilibria, fit
+
+x, y = var("x"), var("y")
+equilibria([Eq(x.d(), x - x * y), Eq(y.d(), x * y - y)])
+# [Equilibrium(x=0, y=0, saddle), Equilibrium(x=1, y=1, center)]
+
+c, k = sp.symbols("c k")
+result = fit(Eq(y.d(2) + c * y.d() + k * y, 0), {y: (t_data, y_data)},
+             guess={c: 1.0, k: 1.0}, ivp={y: 1, y.d(): 0})
+result.params, result.stderr
+```
+
+### Output
+
+`sol.plot()` plots the solution with Matplotlib, `sol.to_pandas()` returns
+a DataFrame, and in Jupyter equations and symbolic solutions are displayed
+as formulas.
+
 ### Solver options
 
 Additional keyword arguments to `solve` are passed to
 `scipy.integrate.solve_ivp` (or `solve_bvp` for boundary value problems):
 
 ```python
-solve(eq, ivp=ic, tspan=(0, 10), method="LSODA", rtol=1e-9, max_step=0.01)
+solve(eq, ivp=ic, tspan=(0, 10), method="LSODA", rtol=1e-9, t_eval=t_points)
 ```
 
 ## Limitations
@@ -153,8 +213,9 @@ odecast is at an early stage (alpha). In particular:
   the end points of `tspan`. Problems with unknown parameters, such as
   eigenvalue problems, are not supported.
 - Functions must be applied to components of vector variables
-  (`sp.sin(u[0])`), not to the vector as a whole. Operations on vector and
-  matrix variables are element-wise; matrix products are not supported.
+  (`sp.sin(u[0])`), not to the vector as a whole.
+- Matrix products require one constant operand: `A @ u` works, a product of
+  two variables such as `M @ u` does not.
 - The SymPy backend can solve what `sympy.dsolve` can solve: single
   equations and linear systems, but generally not nonlinear coupled systems.
 

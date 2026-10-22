@@ -9,7 +9,7 @@ from sympy.core.function import AppliedUndef
 from ..analyze import collect_variables, infer_orders
 from ..equation import Eq
 from ..errors import BackendError
-from ..symbols import Derivative, Variable, VectorDerivative
+from ..symbols import Derivative, Variable, VectorDerivative, substitute_params
 
 
 class SolutionExpr:
@@ -30,6 +30,12 @@ class SolutionExpr:
         """
         self.solutions = solutions
         self.t_symbol = t_symbol
+
+    def _repr_latex_(self):
+        """LaTeX rendering, used by Jupyter."""
+        from ..printing import latex_solution
+
+        return f"$\\displaystyle {latex_solution(self.solutions)}$"
 
     def as_expr(self, target) -> sp.Expr:
         """
@@ -107,6 +113,7 @@ class SymPyBackend:
         equations: list[Eq],
         t_symbol: sp.Symbol,
         conditions: list[tuple[Variable, int, float, object]] | None = None,
+        params: dict | None = None,
         **options,
     ) -> SolutionExpr:
         """
@@ -121,6 +128,8 @@ class SymPyBackend:
             t_symbol: SymPy symbol for independent variable
             conditions: Optional (variable, derivative level, t, value)
                 tuples, used to determine the integration constants
+            params: Optional values for parameters (SymPy symbols) in the
+                equations; parameters without a value stay symbolic
             **options: Additional options (currently unused)
 
         Returns:
@@ -130,6 +139,10 @@ class SymPyBackend:
             BackendError: If SymPy cannot solve the system
         """
         conditions = conditions or []
+
+        def sympy_eq(eq):
+            return substitute_params(eq.sympy(), params)
+
         variables = list(infer_orders(equations))
         funcs = {v: sp.Function(v.name)(t_symbol) for v in variables}
 
@@ -145,13 +158,15 @@ class SymPyBackend:
             for v, level, t_value, value in conditions:
                 if v in vs:
                     key = funcs[v].diff(t_symbol, level) if level else funcs[v]
-                    ics[key.subs(t_symbol, t_value)] = value
+                    ics[key.subs(t_symbol, t_value)] = substitute_params(
+                        sp.sympify(value), params
+                    )
             return ics
 
         def dsolve(eqs, vs):
             try:
                 result = sp.dsolve(
-                    [e.sympy() for e in eqs] if len(eqs) > 1 else eqs[0].sympy(),
+                    [sympy_eq(e) for e in eqs] if len(eqs) > 1 else sympy_eq(eqs[0]),
                     [funcs[v] for v in vs] if len(vs) > 1 else funcs[vs[0]],
                     ics=ics_for(vs) or None,
                 )

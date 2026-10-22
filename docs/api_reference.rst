@@ -15,6 +15,21 @@ Public interface
 
 .. autoclass:: odecast.BC
 
+.. autoclass:: odecast.Event
+
+.. autofunction:: odecast.latex
+
+Analysis
+--------
+
+.. autofunction:: odecast.equilibria
+
+.. autoclass:: odecast.stability.Equilibrium
+
+.. autofunction:: odecast.fit
+
+.. autoclass:: odecast.fitting.FitResult
+
 Solutions
 ---------
 
