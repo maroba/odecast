@@ -2,8 +2,11 @@
 Main APIs for odecast
 """
 
+import numpy as np
+import sympy as sp
+
 from .equation import Eq
-from .symbols import Variable, t
+from .symbols import Variable, substitute_params, t
 
 
 def var(name: str, order: int | None = None, shape: tuple | None = None) -> Variable:
@@ -47,7 +50,17 @@ def var(name: str, order: int | None = None, shape: tuple | None = None) -> Vari
     return Variable(name, order, shape)
 
 
-def solve(equation, *, ivp=None, bvp=None, tspan=None, backend=None, **kwargs):
+def solve(
+    equation,
+    *,
+    ivp=None,
+    bvp=None,
+    tspan=None,
+    backend=None,
+    params=None,
+    events=None,
+    **kwargs,
+):
     """
     Solve an ordinary differential equation or system of ODEs.
 
@@ -132,25 +145,27 @@ def solve(equation, *, ivp=None, bvp=None, tspan=None, backend=None, **kwargs):
         backend = "scipy"
 
     if backend == "scipy":
-        return _solve_numeric(eqs, orders, ivp, bvp, tspan, kwargs)
+        return _solve_numeric(eqs, orders, ivp, bvp, tspan, params, events, kwargs)
 
     if backend == "sympy":
-        return _solve_symbolic(eqs, orders, ivp, bvp, tspan, kwargs)
+        return _solve_symbolic(eqs, orders, ivp, bvp, tspan, params, events, kwargs)
 
     if backend == "auto":
         # Try SciPy first, fall back to SymPy on failure.
         # Invalid conditions are the caller's error, not a reason to
         # switch backends, so validate outside the try block.
         if (ivp is not None or bvp is not None) and tspan is not None:
-            _validate_conditions(orders, ivp, bvp, tspan)
+            _validate_conditions(orders, *_bind_conditions(ivp, bvp, params), tspan)
             try:
-                return _solve_numeric(eqs, orders, ivp, bvp, tspan, kwargs)
+                return _solve_numeric(
+                    eqs, orders, ivp, bvp, tspan, params, events, kwargs
+                )
             # Any numerical failure triggers the fallback below
             except Exception:  # noqa: BLE001, S110
                 pass
 
         try:
-            return _solve_symbolic(eqs, orders, ivp, bvp, tspan, kwargs)
+            return _solve_symbolic(eqs, orders, ivp, bvp, tspan, params, events, kwargs)
         except Exception as sympy_error:
             raise RuntimeError(
                 f"Auto backend failed: Both SciPy and SymPy backends "
@@ -170,14 +185,73 @@ def _validate_conditions(orders, ivp, bvp, tspan):
         validate_ivp(orders, ivp, tspan[0])
 
 
-def _solve_numeric(eqs, orders, ivp, bvp, tspan, options):
-    """Reduce to a first-order system and solve it with SciPy."""
-    import sympy as sp
+def _bind(value, params):
+    """Substitute parameter values into a condition value."""
+    if isinstance(value, (list, tuple)):
+        return type(value)(_bind(v, params) for v in value)
+    if isinstance(value, np.ndarray) and value.dtype == object:
+        return np.vectorize(lambda v: _bind(v, params), otypes=[float])(value)
+    if isinstance(value, sp.Basic):
+        bound = substitute_params(value, params)
+        if bound.free_symbols:
+            names = ", ".join(sorted(str(s) for s in bound.free_symbols))
+            raise ValueError(f"Missing values for parameters: {names}")
+        return float(bound)
+    return value
 
+
+def _bind_conditions(ivp, bvp, params):
+    """Copies of ivp/bvp with parameter values substituted."""
+    if ivp is not None:
+        ivp = {k: _bind(v, params) for k, v in ivp.items()}
+    if bvp is not None:
+        bvp = [BC(bc.variable, t=bc.t, value=_bind(bc.value, params)) for bc in bvp]
+    return ivp, bvp
+
+
+def _dae_params(system, params, options, t0=None, x0=None, z_guess=None):
+    """Add the Baumgarte rate to the parameters if the system needs it."""
+    from .dae import BAUMGARTE, default_baumgarte
+
+    rate = options.pop("baumgarte", None)
+    if BAUMGARTE not in system.param_syms:
+        return params
+    if rate is None:
+        rate = default_baumgarte(system, params, t0, x0, z_guess)
+    return {**(params or {}), BAUMGARTE: rate}
+
+
+def _algebraic_guesses(ivp, orders) -> dict:
+    """Values given for algebraic variables, used as starting guesses."""
+    from .validate import normalize_ivp
+
+    if ivp is None:
+        return {}
+    return {
+        v.name: value
+        for (v, level), value in normalize_ivp(ivp).items()
+        if orders.get(v) == 0 and level == 0
+    }
+
+
+def _attach_algebraic(sol, system, orders, params, z_guess):
+    """Let the solution compute the algebraic variables of a DAE."""
+    if not system.is_dae:
+        return sol
+    by_name = {v.name: v for v in orders}
+    functions = system.algebraic_functions(params, z_guess)
+    sol._algebraic = {by_name[name]: f for name, f in functions.items()}
+    sol._constraints = system.constraint_function(params, z_guess)
+    return sol
+
+
+def _solve_numeric(eqs, orders, ivp, bvp, tspan, params, events, options):
+    """Reduce to a first-order system and solve it with SciPy."""
     from .backends.scipy_bvp import ScipyBVPBackend
     from .backends.scipy_ivp import ScipyIVPBackend, convert_ivp_to_state_vector
-    from .compile import lambdify_jac, lambdify_rhs
-    from .reduce import build_state_map, isolate_highest_derivatives, make_rhs
+    from .compile import compile_system
+    from .events import compile_events
+    from .reduce import build_state_map
     from .validate import normalize_conditions
 
     if ivp is None and bvp is None:
@@ -188,47 +262,76 @@ def _solve_numeric(eqs, orders, ivp, bvp, tspan, options):
     if tspan is None:
         raise ValueError("tspan required for scipy backend")
 
+    ivp, bvp = _bind_conditions(ivp, bvp, params)
     _validate_conditions(orders, ivp, bvp, tspan)
 
-    # Reduce to first-order system
+    system = compile_system(eqs, orders)
     mapping = build_state_map(orders)
-    highest_rules = isolate_highest_derivatives(eqs, orders)
-    f_sym_vec, jac_sym = make_rhs(t.symbol, mapping, highest_rules)
-    state_syms = [sp.Symbol(f"x{i}") for i in range(f_sym_vec.shape[0])]
+    options = dict(options)
+    z_guess = _algebraic_guesses(ivp, orders)
 
     if bvp is not None:
-        return ScipyBVPBackend().solve(
-            f_sym_vec=f_sym_vec,
-            t_symbol=t.symbol,
-            state_syms=state_syms,
+        if events is not None:
+            raise ValueError("Events are only supported for initial value problems")
+        if system.invariants:
+            raise ValueError(
+                "Boundary value problems are only supported for algebraic equations "
+                "that determine the algebraic variables directly (index 1)"
+            )
+        params = _dae_params(system, params, options)
+        sol = ScipyBVPBackend().solve(
+            fun=system.rhs_vectorized(params),
+            n_states=len(system.state_syms),
             conditions=normalize_conditions(bvp=bvp),
             tspan=tspan,
             mapping=mapping,
             **options,
         )
+        return _attach_algebraic(sol, system, orders, params, z_guess)
 
-    # Convert IVP to state vector and compile to numerical functions
     x0 = convert_ivp_to_state_vector(ivp, mapping)
-    f_compiled = lambdify_rhs(f_sym_vec, t.symbol, state_syms)
-    jac_compiled = (
-        lambdify_jac(jac_sym, t.symbol, state_syms) if jac_sym is not None else None
-    )
+    params = _dae_params(system, params, options, tspan[0], x0, z_guess)
+    system.check_consistency(tspan[0], x0, params)
+    if system.is_dae:
+        # Solve the algebraic equations at the initial point first: a failure
+        # is reported clearly, and the result is the best starting guess.
+        z_guess = {
+            name: float(f(tspan[0], x0[:, None])[0])
+            for name, f in system.algebraic_functions(params, z_guess).items()
+        }
 
-    return ScipyIVPBackend().solve(
-        f_compiled=f_compiled,
-        jac_compiled=jac_compiled,
+    method = options.get("method", "RK45")
+    implicit = not isinstance(method, str) or method in ("Radau", "BDF", "LSODA")
+    algebraic = {
+        v.sympy(): system.algebraic_exprs[v.name]
+        for v in orders
+        if v.name in system.algebraic_exprs
+    }
+    events = compile_events(
+        events, mapping, system.state_syms, t.symbol, params, algebraic
+    )
+    if events is not None:
+        options = {**options, "events": events}
+
+    sol = ScipyIVPBackend().solve(
+        f_compiled=system.rhs(params, z_guess),
+        jac_compiled=system.jac(params, z_guess) if implicit else None,
         x0=x0,
         t0=tspan[0],
         tspan=tspan,
         mapping=mapping,
         options=options,
     )
+    return _attach_algebraic(sol, system, orders, params, z_guess)
 
 
-def _solve_symbolic(eqs, orders, ivp, bvp, tspan, options):
+def _solve_symbolic(eqs, orders, ivp, bvp, tspan, params, events, options):
     """Solve with SymPy, applying initial or boundary conditions if given."""
     from .backends.sympy_backend import SymPyBackend
     from .validate import normalize_conditions, validate_condition_levels
+
+    if events is not None:
+        raise ValueError("Events are only supported by the scipy backend")
 
     conditions = None
     if ivp is not None or bvp is not None:
@@ -237,7 +340,11 @@ def _solve_symbolic(eqs, orders, ivp, bvp, tspan, options):
         validate_condition_levels(orders, conditions)
 
     return SymPyBackend().solve(
-        equations=eqs, t_symbol=t.symbol, conditions=conditions, **options
+        equations=eqs,
+        t_symbol=t.symbol,
+        conditions=conditions,
+        params=params,
+        **options,
     )
 
 

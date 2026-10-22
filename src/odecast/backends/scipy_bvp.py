@@ -5,7 +5,6 @@ SciPy-based backend for solving boundary value problems
 from collections.abc import Callable
 
 import numpy as np
-import sympy as sp
 from scipy.integrate import solve_bvp
 
 from ..solution import SolutionBVP
@@ -21,9 +20,8 @@ class ScipyBVPBackend:
 
     def solve(
         self,
-        f_sym_vec: sp.Matrix,
-        t_symbol: sp.Symbol,
-        state_syms: list[sp.Symbol],
+        fun: Callable,
+        n_states: int,
         conditions: list[tuple[Variable, int, float, object]],
         tspan: tuple[float, float],
         mapping: dict,
@@ -35,9 +33,9 @@ class ScipyBVPBackend:
         Solve a boundary value problem.
 
         Args:
-            f_sym_vec: Right-hand side of the first-order system
-            t_symbol: SymPy symbol for the independent variable
-            state_syms: State symbols used in ``f_sym_vec``
+            fun: Right-hand side f(t, X) of the first-order system,
+                vectorized over mesh points
+            n_states: Number of first-order states
             conditions: Validated (variable, level, t, value) boundary conditions
             tspan: Interval (a, b); all conditions lie at a or b
             mapping: State mapping from build_state_map
@@ -57,8 +55,6 @@ class ScipyBVPBackend:
         a, b = tspan
         x = np.linspace(a, b, mesh) if np.isscalar(mesh) else np.asarray(mesh, float)
 
-        fun = _vectorized_rhs(f_sym_vec, t_symbol, state_syms)
-
         residuals = []
         for v, level, t_value, value in conditions:
             at_start = bool(np.isclose(t_value, a))
@@ -72,7 +68,7 @@ class ScipyBVPBackend:
                 ]
             )
 
-        y0 = np.zeros((len(state_syms), x.size))
+        y0 = np.zeros((n_states, x.size))
         for (v, level), value in normalize_ivp(guess or {}).items():
             if (v, level) not in mapping:
                 raise ValueError(
@@ -91,16 +87,3 @@ class ScipyBVPBackend:
             interpolant=sol.sol,
             f_compiled=lambda t, x: fun(np.atleast_1d(t), np.asarray(x)[:, None])[:, 0],
         )
-
-
-def _vectorized_rhs(
-    f_sym_vec: sp.Matrix, t_symbol: sp.Symbol, state_syms: list[sp.Symbol]
-) -> Callable:
-    """Compile f(t, x) for arrays of mesh points, as solve_bvp requires."""
-    f = sp.lambdify([t_symbol, *state_syms], list(f_sym_vec), modules="numpy")
-
-    def fun(t, y):
-        values = f(t, *y)
-        return np.array([np.broadcast_to(v, t.shape) for v in values], dtype=float)
-
-    return fun

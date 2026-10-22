@@ -5,7 +5,7 @@ Equation objects for representing ODEs
 import numpy as np
 import sympy as sp
 
-from .symbols import Variable, VectorDerivative, as_sympy, component_of
+from .symbols import as_sympy, component_of, shape_of
 
 
 def expand_vector_equations(equations: list["Eq"]) -> list["Eq"]:
@@ -34,7 +34,23 @@ def expand_vector_equations(equations: list["Eq"]) -> list["Eq"]:
 
 def _has_vector_operations(eq: "Eq") -> bool:
     """Check if equation contains vector operations."""
-    return bool(_find_vector_variables(eq))
+    return _equation_shape(eq) is not None
+
+
+def _equation_shape(eq: "Eq") -> tuple[int, ...] | None:
+    """Common shape of both sides of an equation; None if scalar."""
+    try:
+        shapes = {shape_of(eq.lhs), shape_of(eq.rhs)} - {None}
+    except ValueError as e:
+        raise ValueError(
+            f"Vector variables in one equation must have the same shape: {e}"
+        ) from None
+    if len(shapes) > 1:
+        raise ValueError(
+            "Vector variables in one equation must have the same shape, got "
+            f"{sorted(shapes)} on the two sides of {eq!r}"
+        )
+    return shapes.pop() if shapes else None
 
 
 def _expand_vector_equation(eq: "Eq") -> list["Eq"]:
@@ -46,15 +62,7 @@ def _expand_vector_equation(eq: "Eq") -> list["Eq"]:
 
     Matrix-valued variables are expanded in row-major order.
     """
-    vector_vars = _find_vector_variables(eq)
-    shapes = {v.shape for v in vector_vars}
-    if len(shapes) > 1:
-        names = ", ".join(f"{v.name}{v.shape}" for v in vector_vars)
-        raise ValueError(
-            f"Vector variables in one equation must have the same shape, got {names}"
-        )
-    (shape,) = shapes
-
+    shape = _equation_shape(eq)
     component_eqs = []
     for index in np.ndindex(*shape):
         index = index[0] if len(index) == 1 else index
@@ -62,25 +70,6 @@ def _expand_vector_equation(eq: "Eq") -> list["Eq"]:
             Eq(component_of(eq.lhs, index), component_of(eq.rhs, index))
         )
     return component_eqs
-
-
-def _find_vector_variables(eq: "Eq") -> list:
-    """Find all vector variables in the equation, in order of appearance."""
-    vector_vars = []
-
-    def collect_vectors(expr):
-        if isinstance(expr, Variable) and expr.shape is not None:
-            if expr not in vector_vars:
-                vector_vars.append(expr)
-        elif isinstance(expr, VectorDerivative):
-            collect_vectors(expr.variable)
-        elif hasattr(expr, "left") and hasattr(expr, "right"):
-            collect_vectors(expr.left)
-            collect_vectors(expr.right)
-
-    collect_vectors(eq.lhs)
-    collect_vectors(eq.rhs)
-    return vector_vars
 
 
 class Eq:
@@ -127,6 +116,19 @@ class Eq:
             SymPy Eq object
         """
         return sp.Eq(as_sympy(self.lhs), as_sympy(self.rhs))
+
+    def _repr_latex_(self):
+        """LaTeX rendering, used by Jupyter."""
+        from .printing import latex
+
+        if not _has_vector_operations(self):
+            return f"$\\displaystyle {latex(self)}$"
+        lines = [
+            latex(eq).replace(" = ", " &= ", 1) for eq in _expand_vector_equation(self)
+        ]
+        return (
+            r"$\displaystyle \begin{aligned}" + r" \\ ".join(lines) + r"\end{aligned}$"
+        )
 
     def __repr__(self):
         if isinstance(self.rhs, (int, float)) and self.rhs == 0:

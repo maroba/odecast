@@ -7,9 +7,10 @@ odecast requires Python 3.10 or later.
 
    pip install odecast
 
-This also installs the required dependencies NumPy, SciPy and SymPy. The
-example scripts and the plotting code in :doc:`examples` additionally use
-Matplotlib, which is available as an extra:
+This also installs the required dependencies NumPy, SciPy and SymPy.
+Plotting (``sol.plot()``, the example scripts and :doc:`examples`) uses
+Matplotlib, and ``sol.to_pandas()`` uses pandas. Both are available as an
+extra:
 
 .. code-block:: bash
 
@@ -24,8 +25,8 @@ From source
    cd odecast
    pip install -e .
 
-For development, use the ``dev`` extra, which adds pytest, pytest-cov, Ruff
-and Black:
+For development, use the ``dev`` extra, which adds pytest, pytest-cov, Ruff,
+Black, Matplotlib and pandas:
 
 .. code-block:: bash
 

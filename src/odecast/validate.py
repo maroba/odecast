@@ -121,6 +121,12 @@ def validate_condition_levels(
             raise ValueError(
                 f"Condition on {v.name}, which does not occur in the equations"
             )
+        if orders[v] == 0:
+            raise OverdeterminedConditionsError(
+                f"Condition on {v.name} at t={t_value} is not allowed: {v.name} is "
+                "an algebraic variable (it has no derivatives) and is determined by "
+                "the algebraic equations."
+            )
         if level >= orders[v]:
             raise OverdeterminedConditionsError(
                 f"Condition on {v.name}^({level}) at t={t_value} is not allowed: "
@@ -191,6 +197,10 @@ def validate_ivp(
 
     # Check each variable
     for var, order in orders.items():
+        # Algebraic variables need no condition; a value is a starting guess
+        if order == 0:
+            continue
+
         # Collect all conditions for this variable
         var_conditions = {}
         for (var_key, level), value in normalized_ivp.items():

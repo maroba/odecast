@@ -5,6 +5,63 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] - 2026-10-22
+
+### Added
+
+- Parameters: SymPy symbols in equations take values from
+  `solve(..., params={k: 2.0})`, also in initial and boundary values. The
+  reduced and compiled system is cached, so solving again with other
+  parameter values does not recompile it.
+- Events: `solve(..., events=[Event(Eq(y, 0), terminal=True)])` locates
+  conditions during integration. Results are in `sol.t_events` and
+  `sol.event_values(i, target)`.
+- Matrix products `A @ u` with constant matrices (NumPy arrays, lists or
+  SymPy matrices, possibly containing parameters) and vector or matrix
+  variables.
+- `equilibria()` finds the equilibria of autonomous systems and classifies
+  their stability from the eigenvalues of the Jacobian.
+- `fit()` estimates parameters of initial value problems from measurements
+  by nonlinear least squares, with standard errors.
+- Differential-algebraic equations. A variable without derivatives is
+  algebraic and determined by the equations without highest derivatives.
+  - Algebraic equations that are linear in the algebraic variables are
+    eliminated symbolically (index 1).
+  - Constraints without algebraic variables (higher index, e.g. a pendulum
+    in Cartesian coordinates) are differentiated until the algebraic
+    variables are determined. Initial values are checked for consistency,
+    and drift is damped by Baumgarte stabilization (`baumgarte=` option).
+    `sol.constraint_residuals()` shows the remaining violation.
+  - Other algebraic equations are solved numerically with Newton's method at
+    each evaluation; values for algebraic variables in `ivp` are starting
+    guesses.
+- `sol.plot()` and `sol.to_pandas()` for numerical solutions.
+- LaTeX rendering of equations and symbolic solutions in Jupyter, and
+  `odecast.latex()`.
+
+### Changed
+
+- `sol.eval` for initial value problems uses the solver's dense output
+  instead of linear interpolation, so values between steps are as accurate
+  as the solution. `max_step` is no longer needed for smooth plots.
+- The implicit methods `"Radau"`, `"BDF"` and `"LSODA"` receive the exact
+  Jacobian, computed symbolically.
+- The `examples` and `dev` extras include pandas; `dev` also includes
+  Matplotlib.
+- A value for a variable that has no derivatives is no longer rejected as an
+  extra initial condition; it is the starting guess for that algebraic
+  variable.
+
+### Fixed
+
+- Solver options other than `method`, `rtol`, `atol`, `max_step`, `events`
+  and `dense_output` were silently ignored; all options are now passed to
+  `scipy.integrate.solve_ivp`, e.g. `t_eval` and `first_step`.
+- Multiplying a SymPy expression by a vector variable (`k * u`) raised an
+  error.
+- A variable without derivatives led to an obscure `NameError` inside the
+  compiled right-hand side.
+
 ## [0.2.0] - 2026-10-22
 
 ### Added
@@ -81,6 +138,7 @@ Initial release.
 - Validation of initial conditions.
 - Backends: SciPy (numerical IVP), SymPy (symbolic), and auto selection.
 
+[0.3.0]: https://github.com/maroba/odecast/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/maroba/odecast/compare/v0.1.1...v0.2.0
 [0.1.1]: https://github.com/maroba/odecast/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/maroba/odecast/releases/tag/v0.1.0

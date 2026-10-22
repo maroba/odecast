@@ -15,6 +15,21 @@ Public interface
 
 .. autoclass:: odecast.BC
 
+.. autoclass:: odecast.Event
+
+.. autofunction:: odecast.latex
+
+Analysis
+--------
+
+.. autofunction:: odecast.equilibria
+
+.. autoclass:: odecast.stability.Equilibrium
+
+.. autofunction:: odecast.fit
+
+.. autoclass:: odecast.fitting.FitResult
+
 Solutions
 ---------
 
@@ -71,6 +86,12 @@ Validation
    :members:
    :undoc-members:
    :show-inheritance:
+
+Differential-algebraic equations
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. automodule:: odecast.dae
+   :members: compile_dae, NumericDAE
 
 Backends
 ~~~~~~~~

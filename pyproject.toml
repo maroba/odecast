@@ -25,8 +25,8 @@ dependencies = ["numpy", "scipy", "sympy"]
 [project.optional-dependencies]
 # Kept for backwards compatibility; numpy, scipy and sympy are now core dependencies.
 math = ["matplotlib"]
-examples = ["matplotlib"]
-dev = ["pytest", "pytest-cov", "ruff==0.17.1", "black==26.10.1"]
+examples = ["matplotlib", "pandas"]
+dev = ["pytest", "pytest-cov", "ruff==0.17.1", "black==26.10.1", "matplotlib", "pandas"]
 
 [project.urls]
 Homepage = "https://github.com/maroba/odecast"
