@@ -321,6 +321,7 @@ def _solve_numeric(eqs, orders, ivp, bvp, tspan, params, events, options):
         tspan=tspan,
         mapping=mapping,
         options=options,
+        after_reset=lambda t, x: system.check_consistency(t, x, params),
     )
     return _attach_algebraic(sol, system, orders, params, z_guess)
 
