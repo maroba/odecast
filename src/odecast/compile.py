@@ -136,6 +136,11 @@ def lambdify_jac(
     return jac_function
 
 
+def _symbol_named(symbols, name: str) -> sp.Symbol:
+    """The symbol with the given name, or a new one (whose derivatives vanish)."""
+    return next((s for s in symbols if s.name == name), sp.Symbol(name))
+
+
 class CompiledSystem:
     """
     First-order system compiled to numerical functions.
@@ -248,6 +253,44 @@ class CompiledSystem:
             return np.array(jac(t, *x, *p), dtype=float)
 
         return jac_function
+
+    def sensitivity_rhs(self, params: dict | None, names: list[str]) -> Callable:
+        """
+        Right-hand side of the system augmented by its sensitivities.
+
+        The state is (x, S) with S = dx/dp for the parameters ``names``,
+        stored column by column after x. S obeys S' = J S + df/dp.
+        """
+        if not hasattr(self, "_sensitivity_cache"):
+            self._sensitivity_cache = {}
+        key = tuple(names)
+        if key not in self._sensitivity_cache:
+            symbols = [_symbol_named(self.param_syms, name) for name in names]
+            fp = (
+                self.f_sym.jacobian(symbols)
+                if symbols
+                else sp.zeros(self.f_sym.shape[0], 0)
+            )
+            self._sensitivity_cache[key] = (
+                sp.lambdify(
+                    self._args, self.jac_sym.tolist(), modules="numpy", cse=True
+                ),
+                sp.lambdify(self._args, fp.tolist(), modules="numpy", cse=True),
+            )
+        jac, fp = self._sensitivity_cache[key]
+        p = self.param_values(params)
+        f = self._f()
+        n, m = len(self.state_syms), len(names)
+
+        def rhs_function(t, y):
+            x = y[:n]
+            S = y[n:].reshape(m, n).T
+            dS = np.asarray(jac(t, *x, *p), dtype=float).reshape(n, n) @ S + np.asarray(
+                fp(t, *x, *p), dtype=float
+            ).reshape(n, m)
+            return np.concatenate([np.asarray(f(t, *x, *p), dtype=float), dS.T.ravel()])
+
+        return rhs_function
 
     def _vectorized(self, exprs) -> Callable:
         """Compile expressions in (t, states, params) for arrays of time points."""

@@ -57,6 +57,8 @@ class SolutionIVP:
         # Algebraic variables of a DAE: functions of (t, states)
         self._algebraic: dict[Variable, Callable] = {}
         self._constraints: Callable | None = None
+        # Parameters whose sensitivities follow the states in y
+        self._sensitivity_names: list[str] = []
 
     def __getitem__(self, target: Variable | Derivative) -> np.ndarray:
         """
@@ -96,7 +98,7 @@ class SolutionIVP:
                     f"{variable.name} is an algebraic variable; its derivatives are "
                     "not part of the solution"
                 )
-            return self._algebraic[variable](times, states)
+            return self._algebraic[variable](times, states[: len(self.mapping)])
         return states[self._state_index(variable, level)]
 
     def _state_index(self, variable: Variable, level: int) -> int:
@@ -152,6 +154,47 @@ class SolutionIVP:
             np.asarray(self.t_events[index]),
         )
 
+    def sensitivity(self, target, param, t: float | np.ndarray | None = None):
+        """
+        Derivative of a variable or derivative with respect to a parameter.
+
+        Available for parameters passed as ``sensitivities`` to solve.
+
+        Args:
+            target: Variable, Derivative, or vector/matrix variable or derivative
+            param: Parameter symbol or name
+            t: Time point(s); the solver's time points if omitted
+
+        Returns:
+            Values of d(target)/d(param), shaped like ``eval`` or ``sol[target]``
+        """
+        name = getattr(param, "name", param)
+        if name not in self._sensitivity_names:
+            raise KeyError(
+                f"No sensitivity for parameter {name}; pass it in "
+                "solve(..., sensitivities=[...])"
+            )
+        if self._algebraic and any(
+            v in self._algebraic for v in self._variables_of(target)
+        ):
+            raise KeyError("Sensitivities of algebraic variables are not available")
+        n = len(self.mapping)
+        j = self._sensitivity_names.index(name)
+        times = self.t if t is None else np.atleast_1d(np.asarray(t, dtype=float))
+        states = self.y if t is None else self._interpolant(times)
+        values = self._select(target, states[n + j * n : n + (j + 1) * n], times)
+        return values[..., 0][()] if t is not None and np.isscalar(t) else values
+
+    def _variables_of(self, target) -> list[Variable]:
+        from .symbols import VectorDerivative
+
+        variable = (
+            target.variable
+            if isinstance(target, (Derivative, VectorDerivative))
+            else target
+        )
+        return [variable] if variable.shape is None else variable.components()
+
     def variables(self) -> list[Variable]:
         """The scalar variables (and vector components) of the system."""
         return [v for (v, level) in self.mapping if level == 0] + list(self._algebraic)
@@ -174,7 +217,7 @@ class SolutionIVP:
             raise ValueError("The system has no algebraic equations")
         times = self.t if t is None else np.atleast_1d(np.asarray(t, dtype=float))
         states = self.y if t is None else self._interpolant(times)
-        return self._constraints(times, states)
+        return self._constraints(times, states[: len(self.mapping)])
 
     def _columns(self, targets, tpoints) -> list[tuple[str, np.ndarray]]:
         """Labels and values for plotting and tabulating."""
