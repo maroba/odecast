@@ -171,7 +171,7 @@ class CompiledSystem:
         free -= {t_symbol, *self.state_syms, *exclude}
         self.param_syms = tuple(sorted(free, key=lambda s: s.name))
         self._args = [t_symbol, *self.state_syms, *self.param_syms]
-        self._f = sp.lambdify(self._args, list(f_sym_vec), modules="numpy", cse=True)
+        self._f_compiled = None
         self._jac_sym = None
         self._jac = None
 
@@ -179,6 +179,14 @@ class CompiledSystem:
         self.algebraic_exprs: dict[str, sp.Expr] = {}
         self.invariants: list[tuple[sp.Expr, str]] = []
         self.constraints: list[sp.Expr] = []
+
+    def _f(self) -> Callable:
+        """f(t, *x, *p), compiled on first use."""
+        if self._f_compiled is None:
+            self._f_compiled = sp.lambdify(
+                self._args, list(self.f_sym), modules="numpy", cse=True
+            )
+        return self._f_compiled
 
     @property
     def is_dae(self) -> bool:
@@ -205,7 +213,7 @@ class CompiledSystem:
     def rhs(self, params: dict | None = None, z_guess: dict | None = None) -> Callable:
         """f(t, x) for scipy.integrate.solve_ivp."""
         p = self.param_values(params)
-        f = self._f
+        f = self._f()
 
         def rhs_function(t, x):
             return np.array(f(t, *x, *p), dtype=float)
@@ -217,7 +225,7 @@ class CompiledSystem:
     ) -> Callable:
         """f(t, X) for arrays of time points, as scipy.integrate.solve_bvp requires."""
         p = self.param_values(params)
-        f = self._f
+        f = self._f()
 
         def rhs_function(t, x):
             t = np.asarray(t)
