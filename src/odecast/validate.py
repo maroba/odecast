@@ -139,9 +139,13 @@ def validate_bvp(
     orders: dict[Variable, int],
     conditions: list[tuple[Variable, int, float, object]],
     tspan: tuple[float, float],
+    n_unknowns: int = 0,
 ) -> None:
     """
     Validate boundary conditions for a two-point boundary value problem.
+
+    Each unknown parameter requires one condition in addition to one per
+    first-order state.
 
     Raises:
         ValueError: If a condition is not at an end point of ``tspan``
@@ -163,16 +167,18 @@ def validate_bvp(
         raise OverdeterminedConditionsError("Duplicate boundary conditions")
 
     n_states = sum(orders.values())
-    if len(conditions) < n_states:
-        raise MissingInitialConditionError(
-            f"The system has {n_states} first-order states and needs {n_states} "
-            f"boundary conditions, got {len(conditions)}."
-        )
-    if len(conditions) > n_states:
-        raise OverdeterminedConditionsError(
-            f"The system has {n_states} first-order states and needs {n_states} "
-            f"boundary conditions, got {len(conditions)}."
-        )
+    n_required = n_states + n_unknowns
+    what = f"{n_states} first-order states" + (
+        f" and {n_unknowns} unknown parameter(s)" if n_unknowns else ""
+    )
+    message = (
+        f"The system has {what} and needs {n_required} boundary conditions, "
+        f"got {len(conditions)}."
+    )
+    if len(conditions) < n_required:
+        raise MissingInitialConditionError(message)
+    if len(conditions) > n_required:
+        raise OverdeterminedConditionsError(message)
 
 
 def validate_ivp(

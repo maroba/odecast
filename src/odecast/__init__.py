@@ -6,9 +6,21 @@ from .api import BC, solve, var
 from .equation import Eq
 from .events import Event
 from .fitting import fit
+from .periodic import periodic_orbit
 from .printing import latex
 from .stability import equilibria
 from .symbols import t
 
 __version__ = "0.3.0"
-__all__ = ["BC", "Eq", "Event", "equilibria", "fit", "latex", "solve", "t", "var"]
+__all__ = [
+    "BC",
+    "Eq",
+    "Event",
+    "equilibria",
+    "fit",
+    "latex",
+    "periodic_orbit",
+    "solve",
+    "t",
+    "var",
+]

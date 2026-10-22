@@ -182,12 +182,12 @@ def solve(
     raise ValueError(f"Unknown backend: {backend}")
 
 
-def _validate_conditions(orders, ivp, bvp, tspan):
+def _validate_conditions(orders, ivp, bvp, tspan, n_unknowns=0):
     """Validate initial or boundary conditions for a numeric solution."""
     from .validate import normalize_conditions, validate_bvp, validate_ivp
 
     if bvp is not None:
-        validate_bvp(orders, normalize_conditions(bvp=bvp), tspan)
+        validate_bvp(orders, normalize_conditions(bvp=bvp), tspan, n_unknowns)
     else:
         validate_ivp(orders, ivp, tspan[0])
 
@@ -316,9 +316,14 @@ def _solve_numeric(
     if tspan is None:
         raise ValueError("tspan required for scipy backend")
 
+    options = dict(options)
+    unknowns = options.pop("unknowns", None) or {}
+    if unknowns and bvp is None:
+        raise ValueError("unknowns are only supported for boundary value problems")
+
     ivp_unbound = ivp
     ivp, bvp = _bind_conditions(ivp, bvp, params)
-    _validate_conditions(orders, ivp, bvp, tspan)
+    _validate_conditions(orders, ivp, bvp, tspan, len(unknowns))
 
     system = compile_system(eqs, orders)
     mapping = build_state_map(orders)
@@ -341,14 +346,23 @@ def _solve_numeric(
 
         reject_delays(system.f_sym, "A boundary value problem")
         params = _dae_params(system, params, options)
+        names = [getattr(s, "name", s) for s in unknowns]
         sol = ScipyBVPBackend().solve(
-            fun=system.rhs_vectorized(params),
+            fun=(
+                system.rhs_vectorized_free(params, names)
+                if names
+                else system.rhs_vectorized(params)
+            ),
             n_states=len(system.state_syms),
             conditions=normalize_conditions(bvp=bvp),
             tspan=tspan,
             mapping=mapping,
+            p0=[float(v) for v in unknowns.values()] if names else None,
             **options,
         )
+        if names:
+            sol.unknowns = dict(zip(unknowns, (float(v) for v in sol.p), strict=True))
+            params = {**(params or {}), **sol.unknowns}
         return _attach_algebraic(sol, system, orders, params, z_guess)
 
     x0 = convert_ivp_to_state_vector(ivp, mapping)

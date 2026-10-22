@@ -240,6 +240,31 @@ class CompiledSystem:
 
         return rhs_function
 
+    def rhs_vectorized_free(self, params: dict | None, names: list[str]) -> Callable:
+        """
+        f(t, X, p) for solve_bvp, where p holds the values of the parameters
+        ``names``, which are determined together with the solution.
+        """
+        missing = [n for n in names if n not in {s.name for s in self.param_syms}]
+        if missing:
+            raise ValueError(
+                f"Unknown parameters {', '.join(missing)} do not occur in the equations"
+            )
+        base = self.param_values({**(params or {}), **dict.fromkeys(names, 0.0)})
+        positions = [[s.name for s in self.param_syms].index(n) for n in names]
+        f = self._f()
+
+        def rhs_function(t, x, p):
+            values = list(base)
+            for i, v in zip(positions, p, strict=True):
+                values[i] = v
+            t = np.asarray(t)
+            return np.array(
+                [np.broadcast_to(v, t.shape) for v in f(t, *x, *values)], dtype=float
+            )
+
+        return rhs_function
+
     def jac(self, params: dict | None = None, z_guess: dict | None = None) -> Callable:
         """Jacobian J(t, x) for implicit solvers."""
         p = self.param_values(params)
