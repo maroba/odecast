@@ -133,14 +133,3 @@ def lambdify_jac(
         return np.array(result)
 
     return jac_function
-
-
-def compile_to_function(expression):
-    """
-    Compile a symbolic expression to a numerical function.
-
-    This is a placeholder that will be removed once the above functions are integrated.
-    """
-    raise NotImplementedError(
-        "compile_to_function will be implemented in later playbooks"
-    )

@@ -282,14 +282,3 @@ def validate_variable_orders(
                     f"but equations require order {inferred_order}. "
                     f"Either update the declaration or check your equations."
                 )
-
-
-def validate_initial_conditions(equation, conditions):
-    """
-    Validate that initial conditions match the equation requirements.
-
-    This is a placeholder that will be removed once the above functions are integrated.
-    """
-    raise NotImplementedError(
-        "validate_initial_conditions will be implemented in later playbooks"
-    )

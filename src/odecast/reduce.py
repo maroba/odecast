@@ -13,8 +13,8 @@ class StateMapping(dict):
     """
     Enhanced state mapping that supports both Variable and (Variable, level) access patterns.
 
-    This class ensures that mapping[var][level] == mapping[(var, level)] for consistency
-    across the API as required by Playbook 8.
+    This class ensures that mapping[var][level] == mapping[(var, level)] for
+    consistency across the API.
     """
 
     def __getitem__(self, key):
@@ -344,15 +344,3 @@ def _substitute_derivatives_with_states(
     result = expr.subs(substitutions)
 
     return result
-
-
-def reduce_to_first_order(equation, initial_conditions):
-    """
-    Reduce a higher-order ODE to a system of first-order ODEs.
-
-    This is a placeholder for future implementation that will integrate
-    the above functions.
-    """
-    raise NotImplementedError(
-        "reduce_to_first_order will be implemented in later playbooks"
-    )

@@ -122,14 +122,3 @@ def convert_ivp_to_state_vector(
         # components don't need that level of derivative
 
     return x0
-
-
-def solve_ivp_scipy(equation, initial_conditions, tspan, **kwargs):
-    """
-    Solve an IVP using SciPy's solve_ivp.
-
-    This is a placeholder that will be removed once the ScipyIVPBackend is integrated.
-    """
-    raise NotImplementedError(
-        "SciPy IVP backend will be implemented in later playbooks"
-    )

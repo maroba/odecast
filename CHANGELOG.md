@@ -5,7 +5,7 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.2.0] - 2026-10-22
 
 ### Added
 
@@ -37,7 +37,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   types raise `TypeError` (previously `ValueError`).
 - Component indices are validated: out-of-range indices and the wrong number
   of indices raise `IndexError`.
-- Removed the unused placeholder class `odecast.solution.Solution`.
+- Removed the unused placeholder class `odecast.solution.Solution` and
+  placeholder functions that only raised `NotImplementedError`.
+- Python 3.13 is tested and listed as supported.
 - The `dev` extra now includes Ruff (pinned to 0.17.1) and Black (pinned to
   26.10.1). The unused `.flake8` configuration was removed. The code
   base passes Ruff's default rule set; the only exceptions are configured in
@@ -78,3 +80,7 @@ Initial release.
   equations.
 - Validation of initial conditions.
 - Backends: SciPy (numerical IVP), SymPy (symbolic), and auto selection.
+
+[0.2.0]: https://github.com/maroba/odecast/compare/v0.1.1...v0.2.0
+[0.1.1]: https://github.com/maroba/odecast/compare/v0.1.0...v0.1.1
+[0.1.0]: https://github.com/maroba/odecast/releases/tag/v0.1.0

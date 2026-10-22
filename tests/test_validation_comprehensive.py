@@ -1,5 +1,5 @@
 """
-Test validation functions thoroughly for Playbook 6
+Tests for the functions in odecast.validate
 """
 
 import pytest

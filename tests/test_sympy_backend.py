@@ -1,5 +1,5 @@
 """
-Comprehensive tests for Playbook 7 - SymPy backend implementation
+Tests for the SymPy backend
 """
 
 import numpy as np

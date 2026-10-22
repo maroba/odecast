@@ -74,3 +74,30 @@ Pull requests
 Keep pull requests focused on a single change and describe the motivation
 in the description. For larger changes, consider opening an issue first to
 discuss the design.
+
+Releasing
+---------
+
+Releases are published to PyPI by the ``Release`` workflow, which runs when
+a tag of the form ``vX.Y.Z`` is pushed.
+
+1. Set ``__version__`` in ``src/odecast/__init__.py``. This is the only
+   place the version is defined.
+2. Rename the ``Unreleased`` section of ``CHANGELOG.md`` to the version and
+   date, and add the comparison link at the end of the file.
+3. Commit, merge into ``main`` and wait for CI to pass.
+4. Tag and push:
+
+   .. code-block:: bash
+
+      git tag v0.2.0
+      git push origin v0.2.0
+
+The workflow runs the tests, checks that the tag matches the package
+version, builds the distributions, uploads them to PyPI, and creates a
+GitHub release whose notes are the changelog section for that version.
+
+Publishing uses PyPI's trusted publishing, so no API token is stored in the
+repository. This requires a one-time setup on PyPI: under the project's
+*Publishing* settings, add a GitHub publisher with owner ``maroba``,
+repository ``odecast``, workflow ``release.yml`` and environment ``pypi``.

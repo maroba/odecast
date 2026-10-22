@@ -1,5 +1,5 @@
 """
-Unit tests for Playbook 5 functionality - compilation and SciPy backend
+Tests for compilation to numerical functions and the SciPy IVP backend
 """
 
 import numpy as np

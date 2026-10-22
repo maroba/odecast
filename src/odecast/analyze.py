@@ -111,12 +111,3 @@ def resolve_orders(
             resolved[var] = inferred_order
 
     return resolved
-
-
-def analyze_equation(equation):
-    """
-    Analyze an equation to determine properties like order, variables involved, etc.
-
-    This is a placeholder for future implementation.
-    """
-    raise NotImplementedError("analyze_equation will be implemented in later playbooks")

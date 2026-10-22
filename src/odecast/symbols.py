@@ -241,7 +241,7 @@ class Variable(_ScalarOps):
         shape: int | tuple[int, ...] | None = None,
     ):
         self.name = name
-        self.intent_order = order  # Use intent_order as specified in Playbook 2
+        self.intent_order = order  # Declared order, None if inferred
         self._derivatives = {}
         self._component_cache = {}  # Cache component variables for consistency
 
@@ -322,7 +322,7 @@ class Variable(_ScalarOps):
         return id(self)
 
     def __eq__(self, other):
-        """Equality by identity as specified in Playbook 2."""
+        """Equality by identity, so that distinct variables never compare equal."""
         return self is other
 
     # Vector variables combine element-wise

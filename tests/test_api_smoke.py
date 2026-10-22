@@ -40,14 +40,14 @@ def test_basic_equation_creation():
     assert eq.rhs == 0
 
 
-def test_solve_placeholder():
-    """Test that solve raises appropriate errors for unimplemented backends."""
+def test_solve_backend_requirements():
+    """Test backend selection and the arguments each backend requires."""
     from odecast import Eq, solve, var
 
     y = var("y")
     eq = Eq(y.d(2) + y, 0)
 
-    # SymPy backend should now work (Playbook 7 implemented)
+    # SymPy backend needs no conditions
     sol = solve(eq, backend="sympy")
     assert hasattr(sol, "as_expr")
     expr = sol.as_expr(y)

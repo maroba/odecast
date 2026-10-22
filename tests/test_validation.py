@@ -1,5 +1,5 @@
 """
-Comprehensive tests for Playbook 6 - Validation and precise errors
+Tests for validation of initial conditions and error messages
 """
 
 import pytest

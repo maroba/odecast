@@ -190,12 +190,3 @@ class SymPyBackend:
             solutions.update(dsolve(equations, variables))
 
         return SolutionExpr(solutions, t_symbol)
-
-
-def solve_symbolic_sympy(equation, **kwargs):
-    """
-    Solve an ODE symbolically using SymPy.
-
-    This is a placeholder for future implementation.
-    """
-    raise NotImplementedError("SymPy backend will be implemented in later playbooks")

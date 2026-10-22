@@ -1,5 +1,5 @@
 """
-Unit tests for the reduce module - Playbook 4 functionality
+Tests for the reduction to first-order systems
 """
 
 import pytest
