@@ -16,6 +16,13 @@ extra:
 
    pip install "odecast[examples]"
 
+Partial differential equations (:doc:`pde`) need
+`findiff <https://github.com/maroba/findiff>`_:
+
+.. code-block:: bash
+
+   pip install "odecast[pde]"
+
 From source
 -----------
 
@@ -26,7 +33,7 @@ From source
    pip install -e .
 
 For development, use the ``dev`` extra, which adds pytest, pytest-cov, Ruff,
-Black, Matplotlib and pandas:
+Black, Matplotlib, pandas and findiff:
 
 .. code-block:: bash
 

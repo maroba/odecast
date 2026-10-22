@@ -105,6 +105,38 @@ period grows. The comparison below starts both at
    plt.legend(loc="upper center", ncol=2)
    plt.tight_layout()
 
+Bouncing ball
+~~~~~~~~~~~~~
+
+A ball dropped from a height of 1 m loses 20% of its speed at every bounce.
+The bounce is an event that resets the velocity,
+:math:`\dot y \to -0.8\,\dot y`. The bounces follow at intervals that
+shrink by the factor 0.8.
+
+.. plot::
+   :include-source:
+
+   import numpy as np
+   import matplotlib.pyplot as plt
+   from odecast import var, Eq, Event, solve
+
+   y = var("y")
+   bounce = Event(Eq(y, 0), direction=-1, reset={y.d(): -0.8*y.d()})
+   sol = solve(Eq(y.d(2), -9.81), ivp={y: 1.0, y.d(): 0.0}, tspan=(0, 4),
+               events=bounce, rtol=1e-8, atol=1e-10)
+
+   t = np.linspace(0, 4, 2000)
+   fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(11, 3.5))
+   ax1.plot(t, sol.eval(y, t))
+   ax1.plot(sol.t_events[0], 0*sol.t_events[0], "k.", label="bounces")
+   ax1.set_xlabel("$t$ [s]")
+   ax1.set_ylabel("$y$ [m]")
+   ax1.legend()
+   ax2.plot(t, sol.eval(y.d(), t))
+   ax2.set_xlabel("$t$ [s]")
+   ax2.set_ylabel(r"$\dot y$ [m/s]")
+   plt.tight_layout()
+
 Isotropic oscillator in two dimensions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -366,6 +398,56 @@ variable is a position rather than a time; odecast still calls it
 
    print(f"max deflection: {sol.eval(w, ell/2):.6f}")   # 5/384 = 0.013021
 
+Quantum harmonic oscillator
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The stationary Schrödinger equation of the harmonic oscillator, in units
+where :math:`\hbar = m = \omega = 1`,
+
+.. math::
+
+   \psi'' = (x^2 - 2E)\,\psi,
+
+has normalizable solutions only for the energies
+:math:`E_n = n + \tfrac12`. The energy is an unknown parameter of the
+boundary value problem: besides :math:`\psi(\pm L) = 0`, the condition
+:math:`\psi'(-L) = 10^{-6}` fixes the otherwise arbitrary amplitude. The
+starting values select the eigenvalue. Here the independent variable is the
+position; odecast still calls it :math:`t`.
+
+.. plot::
+   :include-source:
+
+   import numpy as np
+   import matplotlib.pyplot as plt
+   import sympy as sp
+   from odecast import var, Eq, solve, BC, t
+
+   psi = var("psi")
+   E = sp.Symbol("E")
+   L = 6
+   eq = Eq(psi.d(2), (t**2 - 2*E)*psi)
+   bcs = [BC(psi, t=-L, value=0), BC(psi, t=L, value=0),
+          BC(psi.d(), t=-L, value=1e-6)]
+
+   x = np.linspace(-L, L, 400)
+   plt.figure(figsize=(8, 4))
+   for n in range(4):
+       hermite = np.polynomial.hermite.hermval(x, [0]*n + [1]) * np.exp(-x**2/2)
+       sol = solve(eq, bvp=bcs, tspan=(-L, L), unknowns={E: n + 0.4}, mesh=200,
+                   tol=1e-6, guess={psi: lambda s: np.interp(s, x, hermite)})
+       energy = sol.unknowns[E]
+       values = sol.eval(psi, x)
+       values /= np.sqrt(np.sum(values**2) * (x[1] - x[0]))
+       plt.plot(x, energy + 0.5*values, label=f"$E_{n} = {energy:.4f}$")
+       plt.axhline(energy, color="0.8", linewidth=0.8)
+   plt.plot(x, x**2/2, "k:", label="$V = x^2/2$")
+   plt.ylim(0, 4.5)
+   plt.xlim(-4, 4)
+   plt.xlabel("$x$")
+   plt.legend(loc="upper center", ncol=3, fontsize="small")
+   plt.tight_layout()
+
 Differential-algebraic equations
 --------------------------------
 
@@ -501,10 +583,9 @@ Phase portrait of the damped pendulum
 
 The damped pendulum :math:`\ddot\theta + 0.3\,\dot\theta + \sin\theta = 0`
 has equilibria at :math:`\theta = k\pi`. The downward position is a stable
-focus, the upward one a saddle. Trajectories starting at the upward position
-:math:`\theta = -\pi` with increasing velocity show how the saddle at
-:math:`\pi` separates swings that settle at :math:`0` from those that go
-over the top and settle at :math:`2\pi`.
+focus, the upward one a saddle. The trajectory starting just beside the
+upright position :math:`\theta = -\pi` swings through, settles at
+:math:`0`, and shows how the saddles separate the basins of attraction.
 
 .. plot::
    :include-source:
@@ -512,28 +593,77 @@ over the top and settle at :math:`2\pi`.
    import numpy as np
    import matplotlib.pyplot as plt
    import sympy as sp
-   from odecast import var, Eq, solve, equilibria
+   from odecast import var, Eq, phase_portrait
 
    theta = var("theta")
-   eq = Eq(theta.d(2) + 0.3*theta.d() + sp.sin(theta), 0)
-
-   fig, ax = plt.subplots(figsize=(8, 4.5))
-   t = np.linspace(0, 30, 3000)
-   for v0 in np.linspace(0.3, 3.3, 11):
-       sol = solve(eq, ivp={theta: -np.pi, theta.d(): v0}, tspan=(0, 30))
-       ax.plot(sol.eval(theta, t), sol.eval(theta.d(), t), lw=1)
-
-   for e in equilibria(eq):
-       th = float(e.point[theta])
-       marker = "ko" if e.stability.startswith("stable") else "kx"
-       for shift in (-2*np.pi, 0, 2*np.pi):
-           ax.plot(th + shift, 0, marker, ms=8)
-       ax.annotate(e.stability, (th, 0), xytext=(6, -14), textcoords="offset points")
-
-   ax.set_xlim(-np.pi - 0.3, 2*np.pi + 1.5)
-   ax.set_xlabel(r"$\theta$")
-   ax.set_ylabel(r"$\dot\theta$")
+   plt.figure(figsize=(8, 4.5))
+   phase_portrait(
+       Eq(theta.d(2) + 0.3*theta.d() + sp.sin(theta), 0),
+       xlim=(-4, 7), ylim=(-3, 3),
+       trajectories=[{theta: -np.pi + 0.01, theta.d(): 0},
+                     {theta: -np.pi, theta.d(): 3.2}],
+   )
    plt.tight_layout()
+
+The second trajectory starts with enough energy to pass over the top at
+:math:`\pi` once and settles at :math:`2\pi`. Only the equilibria :math:`0` and :math:`\pi` are
+marked: :func:`sympy.solve` returns representatives of periodic solutions.
+
+Hopf bifurcation in the Brusselator
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The Brusselator is a model of an oscillating chemical reaction,
+
+.. math::
+
+   \dot x = a - (b + 1)\,x + x^2 y, \qquad \dot y = b\,x - x^2 y.
+
+Its equilibrium :math:`(a, b/a)` loses stability in a Hopf bifurcation at
+:math:`b = 1 + a^2`, where a stable limit cycle appears. The continuation
+finds the bifurcation; the limit cycles beyond it are computed with
+:func:`~odecast.periodic_orbit`, and their range of :math:`x` is drawn into
+the bifurcation diagram.
+
+.. plot::
+   :include-source:
+
+   import numpy as np
+   import matplotlib.pyplot as plt
+   import sympy as sp
+   from odecast import var, Eq, continuation, periodic_orbit
+
+   a = 1.0
+   b = sp.Symbol("b")
+   x, y = var("x"), var("y")
+   eqs = [Eq(x.d(), a - (b + 1)*x + x**2*y), Eq(y.d(), b*x - x**2*y)]
+
+   branch = continuation(eqs, b, start={x: a, y: 1/a, b: 1.0}, p_range=(1, 3.5))
+   (hopf,) = branch.bifurcations
+
+   bs, lows, highs, periods = [], [], [], []
+   for bv in np.linspace(hopf.param + 0.02, 3.5, 12):
+       orbit = periodic_orbit(eqs, ivp={x: 1.2, y: 2.0}, period=6.5,
+                              params={b: bv}, transient=60)
+       xs = orbit.solution.eval(x, np.linspace(0, orbit.period, 400))
+       bs.append(bv)
+       lows.append(xs.min())
+       highs.append(xs.max())
+       periods.append(orbit.period)
+
+   fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(11, 4))
+   branch.plot(x, ax=ax1)
+   ax1.plot(bs, highs, "o-", color="tab:blue", markersize=3, label="limit cycle")
+   ax1.plot(bs, lows, "o-", color="tab:blue", markersize=3)
+   ax1.legend(fontsize="small")
+   ax2.plot(bs, periods, "o-", markersize=3)
+   ax2.axhline(2*np.pi/a, color="0.6", linestyle=":", label=r"$2\pi/a$")
+   ax2.set_xlabel("b")
+   ax2.set_ylabel("period")
+   ax2.legend(fontsize="small")
+   plt.tight_layout()
+
+Near the bifurcation the period approaches :math:`2\pi/a`, given by the
+imaginary part of the critical eigenvalues.
 
 Estimating parameters from measurements
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -575,6 +705,142 @@ from known values, so the result can be checked.
 
 The fitted values deviate from the true ones by less than two standard
 errors.
+
+Delay equations
+---------------
+
+Mackey-Glass equation
+~~~~~~~~~~~~~~~~~~~~~
+
+The Mackey-Glass equation, a model of blood cell production,
+
+.. math::
+
+   \dot y = \frac{\beta\, y(t - \tau)}{1 + y(t - \tau)^{10}} - \gamma y,
+
+becomes chaotic for long delays. With :math:`\tau = 17` the solution is
+irregular, and the delay embedding :math:`(y(t), y(t - \tau))` shows a
+strange attractor.
+
+.. plot::
+   :include-source:
+
+   import numpy as np
+   import matplotlib.pyplot as plt
+   from odecast import var, Eq, solve
+
+   y = var("y")
+   tau = 17
+   eq = Eq(y.d(), 0.2*y.delay(tau)/(1 + y.delay(tau)**10) - 0.1*y)
+   sol = solve(eq, ivp={y: 1.2}, tspan=(0, 1000), rtol=1e-8, atol=1e-10)
+
+   t = np.linspace(300, 1000, 7000)
+   fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(11, 3.8),
+                                  gridspec_kw={"width_ratios": [2, 1]})
+   ax1.plot(t, sol.eval(y, t), linewidth=0.8)
+   ax1.set_xlabel("$t$")
+   ax1.set_ylabel("$y$")
+   ax2.plot(sol.eval(y, t), sol.eval(y, t - tau), linewidth=0.4)
+   ax2.set_xlabel("$y(t)$")
+   ax2.set_ylabel(r"$y(t - \tau)$")
+   plt.tight_layout()
+
+Stochastic equations
+--------------------
+
+Langevin equation
+~~~~~~~~~~~~~~~~~
+
+A damped oscillator driven by white noise,
+
+.. math::
+
+   \ddot x + \gamma \dot x + \omega^2 x = \sigma \xi(t),
+
+reaches a stationary state in which :math:`x` has the variance
+:math:`\sigma^2 / (2\gamma\omega^2)`. The plot shows sample paths, the
+ensemble mean and standard deviation, and the variance over time.
+
+.. plot::
+   :include-source:
+
+   import numpy as np
+   import matplotlib.pyplot as plt
+   from odecast import var, Eq, solve_sde
+
+   gamma, omega, sigma = 0.5, 2.0, 0.4
+   x = var("x")
+   sol = solve_sde(Eq(x.d(2) + gamma*x.d() + omega**2*x, 0), noise={x.d(): sigma},
+                   ivp={x: 0.3, x.d(): 0}, tspan=(0, 20), dt=5e-3, paths=2000,
+                   seed=1)
+
+   fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(11, 3.8))
+   sol.plot(x, paths=5, ax=ax1)
+   ax2.plot(sol.t, sol.std(x)**2, label="ensemble")
+   ax2.axhline(sigma**2/(2*gamma*omega**2), color="k", linestyle=":",
+               label="stationary")
+   ax2.set_xlabel("$t$")
+   ax2.set_ylabel("Var $x$")
+   ax2.legend()
+   plt.tight_layout()
+
+Partial differential equations
+------------------------------
+
+Travelling front of the Fisher-KPP equation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The Fisher-KPP equation :math:`u_t = D u_{xx} + r u (1 - u)` describes a
+population that spreads by diffusion and grows logistically. From a
+localized initial population a front develops that travels at the speed
+:math:`2\sqrt{rD}`.
+
+.. plot::
+   :include-source:
+
+   import numpy as np
+   import matplotlib.pyplot as plt
+   from odecast import Eq
+   from odecast.pde import Grid, field, solve_pde, Neumann
+
+   x = np.linspace(0, 100, 501)
+   u = field("u", Grid(x=x))
+   sol = solve_pde(Eq(u.d(), u.dx(2) + u*(1 - u)),
+                   ic={u: lambda x: np.where(x < 5, 1.0, 0.0)},
+                   bc={u: {"x": (Neumann(0), Neumann(0))}},
+                   tspan=(0, 40))
+
+   plt.figure(figsize=(8, 3.5))
+   sol.plot(u, times=[0, 10, 20, 30, 40])
+   plt.tight_layout()
+
+Plucked string
+~~~~~~~~~~~~~~
+
+The wave equation :math:`u_{tt} = c^2 u_{xx}` for a string fixed at both
+ends, plucked in the middle. The initial triangle splits into two waves
+that travel to the ends and are reflected with opposite sign. The small
+ripples behind the corners are numerical dispersion of the finite
+differences; they shrink on a finer grid.
+
+.. plot::
+   :include-source:
+
+   import numpy as np
+   import matplotlib.pyplot as plt
+   from odecast import Eq
+   from odecast.pde import Grid, field, solve_pde, Dirichlet
+
+   x = np.linspace(0, 1, 201)
+   u = field("u", Grid(x=x))
+   sol = solve_pde(Eq(u.d(2), u.dx(2)),
+                   ic={u: lambda x: 0.1*(1 - np.abs(2*x - 1)), u.d(): 0},
+                   bc={u: {"x": (Dirichlet(0), Dirichlet(0))}},
+                   tspan=(0, 1), rtol=1e-6, atol=1e-9)
+
+   plt.figure(figsize=(8, 3.5))
+   sol.plot(u, times=[0, 0.125, 0.25, 0.5, 0.75])
+   plt.tight_layout()
 
 Symbolic solutions
 ------------------
